@@ -97,22 +97,23 @@ class ImageViewer(QWidget):
         self.current_index = (self.current_index - 1) % len(self.file_list)
         self.show_image()
     def process_image(self):
-        if self.file_list:
-            image_path = self.file_list[self.current_index]
+            if hasattr(self, 'edited_image'):
+                img=self.edited_image
+            else :
+                image_path = self.file_list[self.current_index]
+                img = cv2.imread(image_path)
 
-            # Load the image using OpenCV
-            img = cv2.imread(image_path)
-
-            # Invert the colors using NumPy operations
             inverted_img = 255 - img
             self.edited_image=inverted_img
-            # Display the processed image
             pixmap = self.convert_cv_image_to_qpixmap(inverted_img)
             self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
     def  BGR2GRAY(self):
-        if self.file_list:
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
             image_path = self.file_list[self.current_index]
-        img = cv2.imread(image_path)
+            img = cv2.imread(image_path)
+        
         gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
         gray_3C=cv2.merge([gray,gray,gray])
         
