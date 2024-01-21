@@ -1,12 +1,12 @@
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog,QHBoxLayout,QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog,QHBoxLayout,QMessageBox,QSlider
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
 from PyQt5.QtGui import QColor  # Add this import statement
 from PyQt5.QtGui import QImage
 import cv2
-import os
+import numpy as np
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 
 class ImageViewer(QWidget):
@@ -56,12 +56,30 @@ class ImageViewer(QWidget):
         
         
         
+        
+        
+        # Add a slider and set its range and initial value
+        self.exposure_slider = QSlider(Qt.Horizontal)
+        self.exposure_slider.setMinimum(0)
+        self.exposure_slider.setMaximum(200)
+        self.exposure_slider.setValue(100)  # Set an initial value
+        self.exposure_slider.valueChanged.connect(self.update_exposure)
+        self.exposure_slider.hide()
+        layout.addWidget(self.exposure_slider)
+        
+        
+        self.set_exposure_button = QPushButton('Set Exposure', self)
+        self.set_exposure_button.setFocusPolicy(Qt.NoFocus)
+
+        self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
+        button_layout.addWidget(self.set_exposure_button)
+        
+        
         self.save_button = QPushButton('💾', self)
         self.save_button.setFocusPolicy(Qt.NoFocus)
         self.save_button.clicked.connect(self.save_image)
         button_layout.addWidget(self.save_button)
 
-        
         
         self.image_label.setFocusPolicy(Qt.StrongFocus)
         self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -143,8 +161,24 @@ class ImageViewer(QWidget):
         pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
         self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
     
-     
 
+    def toggle_exposure_slider(self):
+    # Toggle the visibility of the slider when the button is pressed
+        self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
+
+    def update_exposure(self, gamma1e2):
+
+        image_path = self.file_list[self.current_index]
+        img = cv2.imread(image_path)
+        gamma=gamma1e2/100
+        invGamma = 1.0 / gamma
+        table = np.array([((i / 255.0) ** invGamma) * 255
+            for i in np.arange(0, 256)]).astype("uint8")
+        exposureImg= cv2.LUT(img, table)
+        self.edited_image=exposureImg
+        pixmap = self.convert_cv_image_to_qpixmap(exposureImg)
+        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+    
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
             height, width, channel = cv_image.shape
