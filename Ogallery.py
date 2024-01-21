@@ -49,7 +49,14 @@ class ImageViewer(QWidget):
         
         
         
-        self.save_button = QPushButton('Save Image', self)
+        self.rotate_button = QPushButton('↶', self)
+        self.rotate_button.setFocusPolicy(Qt.NoFocus)
+        self.rotate_button.clicked.connect(self.rotateCCW)
+        button_layout.addWidget(self.rotate_button)
+        
+        
+        
+        self.save_button = QPushButton('💾', self)
         self.save_button.setFocusPolicy(Qt.NoFocus)
         self.save_button.clicked.connect(self.save_image)
         button_layout.addWidget(self.save_button)
@@ -114,15 +121,29 @@ class ImageViewer(QWidget):
         self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
     
     def gaussianBlur(self):
-        if self.file_list:
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
             image_path = self.file_list[self.current_index]
-        img = cv2.imread(image_path)
+            img = cv2.imread(image_path)
         Blurred_img=cv2.GaussianBlur(img,ksize=(9,9),sigmaX=9)
         self.edited_image=Blurred_img
         pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
         self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
     
+    def rotateCCW(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        self.edited_image=rotatedImg
+        pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
+        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
     
+     
+
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
             height, width, channel = cv_image.shape
@@ -134,10 +155,10 @@ class ImageViewer(QWidget):
             return QPixmap.fromImage(image)
         
     def save_image(self):
-        if self.edited_image is not None:
+        if hasattr(self, 'edited_image'):
             cv2.imwrite(f"{self.file_list[self.current_index]} Copy",self.edited_image)  
             self.show_success_message()
-            
+        delattr(self,'edited_image')   
     def show_success_message(self):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Information)
