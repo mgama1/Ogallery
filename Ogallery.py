@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog,QHBoxLayout,QMessageBox,QSlider
+from PyQt5.QtWidgets import QApplication,QDesktopWidget, QWidget, QLabel, QVBoxLayout, QFileDialog,QHBoxLayout,QMessageBox,QSlider
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
@@ -18,7 +18,7 @@ class ImageViewer(QWidget):
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(100, 100, 800, 600)
-
+        self.setStyleSheet("background-color: #222324;")
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
 
@@ -26,29 +26,32 @@ class ImageViewer(QWidget):
         self.current_index = 0
 
         self.load_images()
-
+        #---------------------layouts-----------------------------------
         layout = QVBoxLayout(self)
         layout.addWidget(self.image_label)
-        
-        button_layout = QHBoxLayout()  # Add a QHBoxLayout for the buttons
+        button_layout = QHBoxLayout()  
         layout.addLayout(button_layout)
-        self.process_button = QPushButton('Process Image', self)
+        
+        #-----------process/invert button(to be deleted)-----------
+        self.process_button = QPushButton('Invert', self)
         self.process_button.setFocusPolicy(Qt.NoFocus)
         self.process_button.clicked.connect(self.process_image)
         button_layout.addWidget(self.process_button)    
 
-        self.gray_button = QPushButton('gray Image', self)
+        #---------------Gray button---------------------------
+        self.gray_button = QPushButton('Gray scale', self)
         self.gray_button.setFocusPolicy(Qt.NoFocus)
         self.gray_button.clicked.connect(self.BGR2GRAY)
         button_layout.addWidget(self.gray_button)
         
-        self.gaussianBlur_button = QPushButton('Blur', self)
+        #-------------- gaussian blur button-----------------
+        self.gaussianBlur_button = QPushButton('smooth', self)
         self.gaussianBlur_button.setFocusPolicy(Qt.NoFocus)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         button_layout.addWidget(self.gaussianBlur_button)
         
         
-        
+        #----------------Rotate button------------------------------------
         self.rotate_button = QPushButton('↶', self)
         self.rotate_button.setFocusPolicy(Qt.NoFocus)
         self.rotate_button.clicked.connect(self.rotateCCW)
@@ -56,9 +59,9 @@ class ImageViewer(QWidget):
         
         
         
+        #--------------Exposure slider/button--------------------------------
+
         
-        
-        # Add a slider and set its range and initial value
         self.exposure_slider = QSlider(Qt.Horizontal)
         self.exposure_slider.setMinimum(0)
         self.exposure_slider.setMaximum(200)
@@ -67,8 +70,7 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         layout.addWidget(self.exposure_slider)
         
-        
-        self.set_exposure_button = QPushButton('Set Exposure', self)
+        self.set_exposure_button = QPushButton('Exposure', self)
         self.set_exposure_button.setFocusPolicy(Qt.NoFocus)
 
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
@@ -79,8 +81,18 @@ class ImageViewer(QWidget):
         self.save_button.setFocusPolicy(Qt.NoFocus)
         self.save_button.clicked.connect(self.save_image)
         button_layout.addWidget(self.save_button)
-
         
+      # Set background color for all buttons
+        button_style = "QPushButton { background-color: #212121; color: white; }"
+        
+        self.process_button.setStyleSheet(button_style)
+        self.gray_button.setStyleSheet(button_style)
+        self.gaussianBlur_button.setStyleSheet(button_style)
+        self.rotate_button.setStyleSheet(button_style)
+        self.save_button.setStyleSheet(button_style)
+        self.set_exposure_button.setStyleSheet(button_style)
+        
+        #-----------------------------------------------------
         self.image_label.setFocusPolicy(Qt.StrongFocus)
         self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -95,10 +107,15 @@ class ImageViewer(QWidget):
                               if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
 
     def show_image(self):
+        primary_screen = QDesktopWidget().screenGeometry()
+        screen_width = primary_screen.width()
+        screen_height = primary_screen.height()
+
         if self.file_list:
             image_path = self.file_list[self.current_index]
             pixmap = QPixmap(image_path)
-            self.image_label.setPixmap(pixmap.scaledToWidth(self.width()/2, Qt.SmoothTransformation))
+            img = cv2.imread(image_path)
+            self.image_label.setPixmap(pixmap.scaled(screen_width*.8,screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
     def keyPressEvent(self, event):
@@ -137,7 +154,7 @@ class ImageViewer(QWidget):
         
         self.edited_image=gray_3C
         pixmap = self.convert_cv_image_to_qpixmap(gray_3C)
-        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaledToWidth(img.shape[0], Qt.SmoothTransformation))
     
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
