@@ -22,11 +22,10 @@ class PathInputWidget(QWidget):
         super().__init__()
 
         self.init_ui()
-
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(100, 100, 800, 600)
-
+        
         layout = QVBoxLayout(self)
         self.setStyleSheet("background-color: #222324;")
 
@@ -45,39 +44,33 @@ class PathInputWidget(QWidget):
 
     def open_image_viewer(self):
         self.getQuery()
-        directory_path ='/home/mgama1/tempsearch'
-        if os.path.isdir(directory_path):
-            self.viewer = ImageViewer(directory_path)
-            self.viewer.show() 
-            self.close()
-        else:
-            # 
-            pass
+        
+        self.viewer = ImageViewer(self.result)
+        self.viewer.show() 
+        self.close()
+        
     def getQuery(self):
         self.queryText=self.query.text()
         db=pd.read_csv("log.csv")
-        result=db[db["class"]==self.queryText]["directory"]
-        
-        #make a temporary directory to copy and the show the search results in it
-        os.system('mkdir ~/tempsearch')
-        for filename in result:
-            os.system(f'cp {filename} ~/tempsearch')
+        self.result=db[db["class"]==self.queryText]["directory"].to_list()
+                
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Enter or Qt.Key_Return:
             self.open_image_viewer()
             
+
+    
 class ImageViewer(QWidget):
-    def __init__(self, directory_path):
+    def __init__(self,result):
         super().__init__()
 
-        self.directory_path = directory_path
         self.file_list = []
         self.current_index = 0
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
-
+        self.result = result
         self.init_ui()
 
     def init_ui(self):
@@ -170,10 +163,8 @@ class ImageViewer(QWidget):
         self.show()
 
     def load_images(self):
-        if self.directory_path:
-            self.file_list = [os.path.join(self.directory_path, file) for file in os.listdir(self.directory_path)
-                              if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
-
+        self.file_list = self.result
+        
     def show_image(self):
        
         if self.file_list:
@@ -338,7 +329,6 @@ class ImageViewer(QWidget):
     @pyqtSlot()
     def closeApp(self):
         #print("Exiting application")
-        os.system('rm -r ~/tempsearch')
         print(self.file_list)
         app.quit()
 if __name__ == '__main__':
