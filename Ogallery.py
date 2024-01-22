@@ -48,6 +48,9 @@ class ImageViewer(QWidget):
         self.directory_path = directory_path
         self.file_list = []
         self.current_index = 0
+        self.primary_screen = QDesktopWidget().screenGeometry()
+        self.screen_width = self.primary_screen.width()
+        self.screen_height = self.primary_screen.height()
 
         self.init_ui()
 
@@ -146,15 +149,12 @@ class ImageViewer(QWidget):
                               if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
 
     def show_image(self):
-        primary_screen = QDesktopWidget().screenGeometry()
-        screen_width = primary_screen.width()
-        screen_height = primary_screen.height()
-
+       
         if self.file_list:
             image_path = self.file_list[self.current_index]
             pixmap = QPixmap(image_path)
             img = cv2.imread(image_path)
-            self.image_label.setPixmap(pixmap.scaled(screen_width*.8,screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
     def keyPressEvent(self, event):
@@ -180,7 +180,7 @@ class ImageViewer(QWidget):
             inverted_img = 255 - img
             self.edited_image=inverted_img
             pixmap = self.convert_cv_image_to_qpixmap(inverted_img)
-            self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+            self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -193,7 +193,7 @@ class ImageViewer(QWidget):
         
         self.edited_image=gray_3C
         pixmap = self.convert_cv_image_to_qpixmap(gray_3C)
-        self.image_label.setPixmap(pixmap.scaledToWidth(img.shape[0], Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
@@ -204,7 +204,7 @@ class ImageViewer(QWidget):
         Blurred_img=cv2.GaussianBlur(img,ksize=(9,9),sigmaX=9)
         self.edited_image=Blurred_img
         pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
-        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def rotateCCW(self):
         if hasattr(self, 'edited_image'):
@@ -215,7 +215,7 @@ class ImageViewer(QWidget):
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
         pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
-        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
 
     def toggle_exposure_slider(self):
@@ -233,7 +233,7 @@ class ImageViewer(QWidget):
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
         pixmap = self.convert_cv_image_to_qpixmap(exposureImg)
-        self.image_label.setPixmap(pixmap.scaledToWidth(self.width() / 2, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
@@ -260,6 +260,9 @@ class ImageViewer(QWidget):
 if __name__ == '__main__':
     app = QApplication([])
 
+    
+    
+    
     path_input_widget = PathInputWidget()
 
     app.exec_()
