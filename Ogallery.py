@@ -8,6 +8,13 @@ from PyQt5.QtGui import QImage
 import cv2
 import numpy as np
 import time
+from __future__ import print_function
+import pandas as pd
+from numpy.linalg import norm
+import argparse
+import rembg
+import imagehash
+from PIL import Image
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 
 class PathInputWidget(QWidget):
@@ -17,33 +24,44 @@ class PathInputWidget(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('Directory Input')
+        self.setWindowTitle('OGallery')
         self.setGeometry(100, 100, 800, 600)
 
         layout = QVBoxLayout(self)
         self.setStyleSheet("background-color: #222324;")
 
-        self.path_edit = QLineEdit(self)
-        layout.addWidget(self.path_edit)
+        self.query = QLineEdit(self)
+        layout.addWidget(self.query)
 
-        open_button = QPushButton('Open Image Viewer', self)
-        open_button.clicked.connect(self.open_image_viewer)
-        layout.addWidget(open_button)
+        search_button = QPushButton('Search', self)
+        search_button.clicked.connect(self.open_image_viewer)
+        layout.addWidget(search_button)
         
         button_style = "QPushButton { background-color: #212121; color: white; }"
-        open_button.setStyleSheet(button_style) 
-        
+        search_button.setStyleSheet(button_style) 
+        line_style="QLineEdit { background-color: #212121; color: white; }"
+        self.query.setStyleSheet(line_style)
         self.show()
 
     def open_image_viewer(self):
-        directory_path = self.path_edit.text()
+        self.getQuery()
+        directory_path ='/home/mgama1/tempsearch'
         if os.path.isdir(directory_path):
             self.viewer = ImageViewer(directory_path)
-            self.viewer.show()  # Show the ImageViewer
+            self.viewer.show() 
             self.close()
         else:
-            # Handle invalid directory path
+            # 
             pass
+    def getQuery(self):
+        self.queryText=self.query.text()
+        db=pd.read_csv("log.csv")
+        result=db[db["class"]==self.queryText]["directory"]
+        
+        #make a temporary directory to copy and the show the search results in it
+        os.system('mkdir ~/tempsearch')
+        for filename in result:
+            os.system(f'cp {filename} ~/tempsearch')
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Enter or Qt.Key_Return:
