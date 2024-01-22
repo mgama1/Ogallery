@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QApplication,QDesktopWidget, QWidget, QLabel, QVBoxLayout, QFileDialog,QHBoxLayout,QMessageBox,QSlider
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
@@ -9,15 +9,52 @@ import cv2
 import numpy as np
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 
-class ImageViewer(QWidget):
+class PathInputWidget(QWidget):
     def __init__(self):
         super().__init__()
 
         self.init_ui()
 
     def init_ui(self):
+        self.setWindowTitle('Directory Input')
+        self.setGeometry(100, 100, 400, 100)
+
+        layout = QVBoxLayout(self)
+
+        self.path_edit = QLineEdit(self)
+        layout.addWidget(self.path_edit)
+
+        open_button = QPushButton('Open Image Viewer', self)
+        open_button.clicked.connect(self.open_image_viewer)
+        layout.addWidget(open_button)
+
+        self.show()
+
+    def open_image_viewer(self):
+        directory_path = self.path_edit.text()
+        if os.path.isdir(directory_path):
+            self.viewer = ImageViewer(directory_path)
+            self.viewer.show()  # Show the ImageViewer
+            self.close()
+        else:
+            # Handle invalid directory path
+            pass
+
+
+class ImageViewer(QWidget):
+    def __init__(self, directory_path):
+        super().__init__()
+
+        self.directory_path = directory_path
+        self.file_list = []
+        self.current_index = 0
+
+        self.init_ui()
+
+    def init_ui(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(100, 100, 800, 600)
+
         self.setStyleSheet("background-color: #222324;")
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
@@ -96,14 +133,16 @@ class ImageViewer(QWidget):
         self.image_label.setFocusPolicy(Qt.StrongFocus)
         self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+
+        self.load_images()
+
         self.show_image()
 
         self.show()
 
     def load_images(self):
-        directory = QFileDialog.getExistingDirectory(self, 'Select Directory')
-        if directory:
-            self.file_list = [os.path.join(directory, file) for file in os.listdir(directory)
+        if self.directory_path:
+            self.file_list = [os.path.join(self.directory_path, file) for file in os.listdir(self.directory_path)
                               if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
 
     def show_image(self):
@@ -217,7 +256,10 @@ class ImageViewer(QWidget):
         msg_box.setText("Saved successfully!")
         msg_box.setWindowTitle("Success")
         msg_box.exec_()
+        
 if __name__ == '__main__':
     app = QApplication([])
-    viewer = ImageViewer()
+
+    path_input_widget = PathInputWidget()
+
     app.exec_()
