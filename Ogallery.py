@@ -201,7 +201,7 @@ class ImageViewer(QWidget):
         else :
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
-        Blurred_img=cv2.GaussianBlur(img,ksize=(9,9),sigmaX=9)
+        Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
         pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
         self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
