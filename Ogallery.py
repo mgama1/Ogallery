@@ -16,7 +16,7 @@ import rembg
 import imagehash
 from PIL import Image
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
-
+from PyQt5.QtCore import pyqtSlot
 class PathInputWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -330,7 +330,17 @@ class ImageViewer(QWidget):
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
+    
+    def closeEvent(self, event):
+        # Override the closeEvent method to handle the window close event
+        self.closeApp()
         
+    @pyqtSlot()
+    def closeApp(self):
+        #print("Exiting application")
+        os.system('rm -r ~/tempsearch')
+        print(self.file_list)
+        app.quit()
 if __name__ == '__main__':
     app = QApplication([])
 
