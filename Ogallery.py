@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
-from PyQt5.QtGui import QColor  # Add this import statement
+from PyQt5.QtGui import QColor  
 from PyQt5.QtGui import QImage
 import cv2
 import numpy as np
@@ -40,7 +40,10 @@ class PathInputWidget(QWidget):
             # Handle invalid directory path
             pass
 
-
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Enter or Qt.Key_Return:
+            self.open_image_viewer()
+            
 class ImageViewer(QWidget):
     def __init__(self, directory_path):
         super().__init__()
@@ -154,7 +157,10 @@ class ImageViewer(QWidget):
             image_path = self.file_list[self.current_index]
             pixmap = QPixmap(image_path)
             img = cv2.imread(image_path)
-            self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                     round(self.screen_height*.8),
+                                                     Qt.KeepAspectRatio,
+                                                     Qt.SmoothTransformation))
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
     def keyPressEvent(self, event):
@@ -180,7 +186,7 @@ class ImageViewer(QWidget):
             inverted_img = 255 - img
             self.edited_image=inverted_img
             pixmap = self.convert_cv_image_to_qpixmap(inverted_img)
-            self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -193,7 +199,7 @@ class ImageViewer(QWidget):
         
         self.edited_image=gray_3C
         pixmap = self.convert_cv_image_to_qpixmap(gray_3C)
-        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
@@ -204,7 +210,7 @@ class ImageViewer(QWidget):
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
         pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
-        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def rotateCCW(self):
         if hasattr(self, 'edited_image'):
@@ -215,7 +221,7 @@ class ImageViewer(QWidget):
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
         pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
-        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
 
     def toggle_exposure_slider(self):
@@ -233,7 +239,7 @@ class ImageViewer(QWidget):
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
         pixmap = self.convert_cv_image_to_qpixmap(exposureImg)
-        self.image_label.setPixmap(pixmap.scaled(self.screen_width*.8,self.screen_height*.8,Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
     
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
