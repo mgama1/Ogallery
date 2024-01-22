@@ -7,6 +7,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QImage
 import cv2
 import numpy as np
+import time
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 
 class PathInputWidget(QWidget):
@@ -17,9 +18,10 @@ class PathInputWidget(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Directory Input')
-        self.setGeometry(100, 100, 400, 100)
+        self.setGeometry(100, 100, 800, 600)
 
         layout = QVBoxLayout(self)
+        self.setStyleSheet("background-color: #222324;")
 
         self.path_edit = QLineEdit(self)
         layout.addWidget(self.path_edit)
@@ -27,7 +29,10 @@ class PathInputWidget(QWidget):
         open_button = QPushButton('Open Image Viewer', self)
         open_button.clicked.connect(self.open_image_viewer)
         layout.addWidget(open_button)
-
+        
+        button_style = "QPushButton { background-color: #212121; color: white; }"
+        open_button.setStyleSheet(button_style) 
+        
         self.show()
 
     def open_image_viewer(self):
@@ -64,7 +69,7 @@ class ImageViewer(QWidget):
         self.setStyleSheet("background-color: #222324;")
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
-
+        self.keylist=[]
         self.file_list = []
         self.current_index = 0
 
@@ -164,11 +169,31 @@ class ImageViewer(QWidget):
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
     def keyPressEvent(self, event):
+        
+        #Navigating images in the directory
         if event.key() == Qt.Key_Right:
             self.next_image()
         elif event.key() == Qt.Key_Left:
             self.previous_image()
-
+    
+        #saving edited images using key event ctrl&s
+        if event.key()== Qt.Key_Control:
+            self.keylist.append(Qt.Key_Control)
+            print(self.keylist)#to be deleted later
+            
+        if event.key()==Qt.Key_S :
+            self.keylist.append(Qt.Key_S)
+            print(self.keylist)#to be deleted later
+        
+        if len(self.keylist)==2:
+            if (self.keylist[0]*self.keylist[1])==Qt.Key_Control*Qt.Key_S:
+                self.save_image()
+            
+    
+    def keyReleaseEvent(self, event):
+        time.sleep(.2)
+        self.keylist=[] #clear keylist
+        
     def next_image(self):
         self.current_index = (self.current_index + 1) % len(self.file_list)
         self.show_image()
@@ -186,7 +211,10 @@ class ImageViewer(QWidget):
             inverted_img = 255 - img
             self.edited_image=inverted_img
             pixmap = self.convert_cv_image_to_qpixmap(inverted_img)
-            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                     round(self.screen_height*.8),
+                                                     Qt.KeepAspectRatio,
+                                                     Qt.SmoothTransformation))
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -199,7 +227,10 @@ class ImageViewer(QWidget):
         
         self.edited_image=gray_3C
         pixmap = self.convert_cv_image_to_qpixmap(gray_3C)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio,
+                                                 Qt.SmoothTransformation))
     
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
@@ -210,7 +241,10 @@ class ImageViewer(QWidget):
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
         pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio, 
+                                                 Qt.SmoothTransformation))
     
     def rotateCCW(self):
         if hasattr(self, 'edited_image'):
@@ -221,7 +255,10 @@ class ImageViewer(QWidget):
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
         pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio, 
+                                                 Qt.SmoothTransformation))
     
 
     def toggle_exposure_slider(self):
@@ -239,7 +276,10 @@ class ImageViewer(QWidget):
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
         pixmap = self.convert_cv_image_to_qpixmap(exposureImg)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),round(self.screen_height*.8),Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio,
+                                                 Qt.SmoothTransformation))
     
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
@@ -255,7 +295,9 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             cv2.imwrite(f"{self.file_list[self.current_index]} Copy",self.edited_image)  
             self.show_success_message()
-        delattr(self,'edited_image')   
+            delattr(self,'edited_image')
+        else:
+            self.show_error_message("no changes made to save")
     def show_success_message(self):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Information)
@@ -263,9 +305,19 @@ class ImageViewer(QWidget):
         msg_box.setWindowTitle("Success")
         msg_box.exec_()
         
+    
+    def show_error_message(self,msg):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setText(msg)
+        msg_box.setWindowTitle('Warning')
+        msg_box.exec_()
+        
 if __name__ == '__main__':
     app = QApplication([])
 
+    
+    
     
     
     
