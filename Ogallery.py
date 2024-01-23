@@ -27,14 +27,16 @@ class PathInputWidget(QWidget):
         self.setGeometry(100, 100, 800, 600)
         
         layout = QVBoxLayout(self)
+        horizontal_layout = QHBoxLayout()
         self.setStyleSheet("background-color: #222324;")
 
         self.query = QLineEdit(self)
-        layout.addWidget(self.query)
-
+        horizontal_layout.addWidget(self.query)
         search_button = QPushButton('Search', self)
         search_button.clicked.connect(self.open_image_viewer)
-        layout.addWidget(search_button)
+        search_button.setFixedSize(100, 30)  # Adjust the width and height as needed
+        horizontal_layout.addWidget(search_button)
+        layout.addLayout(horizontal_layout)
         
         button_style = "QPushButton { background-color: #212121; color: white; }"
         search_button.setStyleSheet(button_style) 
