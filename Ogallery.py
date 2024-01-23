@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
-from PyQt5.QtGui import QColor  
+from PyQt5.QtGui import QColor,QFont
 from PyQt5.QtGui import QImage
 import cv2
 import numpy as np
@@ -30,14 +30,27 @@ class PathInputWidget(QWidget):
         horizontal_layout = QHBoxLayout()
         self.setStyleSheet("background-color: #222324;")
 
+        
+        self.logo_label = QLabel(self)
+        
+        pixmap = QPixmap('logo.jpg')#.scaled(300, 300)
+        self.logo_label.setPixmap(pixmap)
+        #self.logo_label.setScaledContents(True)
+        self.logo_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.logo_label)
+        
+        
         self.query = QLineEdit(self)
         horizontal_layout.addWidget(self.query)
-        search_button = QPushButton('Search', self)
+        search_button = QPushButton('➤', self)
+        font = QFont()
+        font.setPointSize(16)  # Change 16 to the desired font size
+        search_button.setFont(font)
         search_button.clicked.connect(self.open_image_viewer)
-        search_button.setFixedSize(100, 30)  # Adjust the width and height as needed
+        search_button.setFixedSize(30, 30)  # Adjust the width and height as needed
         horizontal_layout.addWidget(search_button)
         layout.addLayout(horizontal_layout)
-        
+        layout.addStretch(1)
         button_style = "QPushButton { background-color: #212121; color: white; }"
         search_button.setStyleSheet(button_style) 
         line_style="QLineEdit { background-color: #212121; color: white; }"
@@ -58,7 +71,7 @@ class PathInputWidget(QWidget):
                 
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Enter or Qt.Key_Return:
+        if event.key() == Qt.Key_Return:
             self.open_image_viewer()
             
 
