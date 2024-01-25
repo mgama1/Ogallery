@@ -71,13 +71,13 @@ class PathInputWidget(QWidget):
         self.show()
     def selectImages(self):
         self.queryText=self.query.text()
-        self.queryText=self.suggestClasses(self.queryText)[0]
+        self.queryText=self.suggestClasses(self.queryText,.8)
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
                 
     
     
-    def suggestClasses(self,query):
+    def suggestClasses(self,query,threshold=.7):
         '''
         finds the cosine similarity between existing classes and 
         the search query and returns the classes above certain threshold
@@ -86,7 +86,7 @@ class PathInputWidget(QWidget):
         '''
         classes=['plane','car','cat','dog','food','sea','documents']
         query=query.lower()
-        suggested=[]
+        cosine_prev=0
         for classi in classes:
             v1=dict.fromkeys(set(query+classi),0)
             v2=dict.fromkeys(set(query+classi),0)
@@ -102,15 +102,17 @@ class PathInputWidget(QWidget):
 
             # compute cosine similarity
             cosine = np.sum(A*B, axis=0)/(norm(A, axis=0)*norm(B, axis=0))
-            if cosine >.70:
-                suggested.append(classi)
+            if (cosine >cosine_prev) and (cosine >threshold):
+                    suggested= classi
+                    cosine_prev=cosine
         return suggested
-
+    
+    
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
             self.open_image_viewer()
             
-
+      
     
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
@@ -257,6 +259,9 @@ class ImageViewer(QWidget):
         elif event.key() == Qt.Key_Left:
             self.previous_image()
     
+        if event.key() == Qt.Key_Backspace:
+            self.goHome()
+
         #saving edited images using key event ctrl&s
         if event.key()== Qt.Key_Control:
             self.keylist.append(Qt.Key_Control)
@@ -269,7 +274,8 @@ class ImageViewer(QWidget):
         if len(self.keylist)==2:
             if (self.keylist[0]*self.keylist[1])==Qt.Key_Control*Qt.Key_S:
                 self.save_image()
-            
+         
+        
     
     def keyReleaseEvent(self, event):
         time.sleep(.2)
