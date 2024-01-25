@@ -1,7 +1,7 @@
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,pyqtSignal
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
 from PyQt5.QtGui import QColor,QFont
 from PyQt5.QtGui import QImage
@@ -58,17 +58,53 @@ class PathInputWidget(QWidget):
         self.show()
 
     def open_image_viewer(self):
-        self.getQuery()
+        self.selectImages()
+
+        self.viewer = ImageViewer(self.result, self)
+        self.viewer.finishedSignal.connect(self.showMainWidget)
+        self.viewer.show()
+        self.hide()
         
-        self.viewer = ImageViewer(self.result)
-        self.viewer.show() 
-        self.close()
-        
-    def getQuery(self):
+
+    def showMainWidget(self):
+    # Show the main widget when the ImageViewer is closed
+        self.show()
+    def selectImages(self):
         self.queryText=self.query.text()
+        self.queryText=self.suggestClasses(self.queryText)[0]
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
                 
+    
+    
+    def suggestClasses(self,query):
+        '''
+        finds the cosine similarity between existing classes and 
+        the search query and returns the classes above certain threshold
+        inputs: str query
+        outputs: list of suggested classes 
+        '''
+        classes=['plane','car','cat','dog','food','sea','documents']
+        query=query.lower()
+        suggested=[]
+        for classi in classes:
+            v1=dict.fromkeys(set(query+classi),0)
+            v2=dict.fromkeys(set(query+classi),0)
+            for e in query:
+                    v1[e]+=1
+            for e in classi:
+                    v2[e]+=1
+
+
+            A = np.array(list(v1.values()))
+            B = np.array(list(v2.values()))
+
+
+            # compute cosine similarity
+            cosine = np.sum(A*B, axis=0)/(norm(A, axis=0)*norm(B, axis=0))
+            if cosine >.70:
+                suggested.append(classi)
+        return suggested
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
@@ -77,7 +113,8 @@ class PathInputWidget(QWidget):
 
     
 class ImageViewer(QWidget):
-    def __init__(self,result):
+    finishedSignal = pyqtSignal()
+    def __init__(self, result, path_input_widget):
         super().__init__()
 
         self.file_list = []
@@ -86,6 +123,7 @@ class ImageViewer(QWidget):
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
         self.result = result
+        self.path_input_widget = path_input_widget  # Store reference to the main widget
         self.init_ui()
 
     def init_ui(self):
@@ -156,6 +194,15 @@ class ImageViewer(QWidget):
         self.save_button.clicked.connect(self.save_image)
         button_layout.addWidget(self.save_button)
         
+        
+        #---------------------------
+        self.back_button = QPushButton('↩', self)
+        self.back_button.setFocusPolicy(Qt.NoFocus)
+        self.back_button.setGeometry(0, 0, 40, 40) 
+        self.back_button.clicked.connect(self.goHome)
+
+        
+        
       # Set background color for all buttons
         button_style = "QPushButton { background-color: #212121; color: white; }"
         
@@ -165,6 +212,16 @@ class ImageViewer(QWidget):
         self.rotate_button.setStyleSheet(button_style)
         self.save_button.setStyleSheet(button_style)
         self.set_exposure_button.setStyleSheet(button_style)
+        self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none; color: white;")
+        font = QFont()
+        font.setPointSize(16)  # Change 16 to the desired font size
+        self.back_button.setFont(font)
+        
+        
+        
+        
+        
+        
         
         #-----------------------------------------------------
         self.image_label.setFocusPolicy(Qt.StrongFocus)
@@ -337,18 +394,30 @@ class ImageViewer(QWidget):
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
     
+    def goHome(self):  
+         # Hide the current widget (ImageViewer)
+        self.hide()
+
+        # Close the current widget (ImageViewer)
+        self.close()
+        
     def closeEvent(self, event):
         # Override the closeEvent method to handle the window close event
-        self.closeApp()
+        self.finishedSignal.emit()
+        event.accept()
+        #self.closeApp()
         
-    @pyqtSlot()
-    def closeApp(self):
+   # @pyqtSlot()
+    #def closeApp(self):
         #print("Exiting application")
-        print(self.file_list)
-        app.quit()
+      #  print(self.file_list)
+      #  app.quit()
 if __name__ == '__main__':
     app = QApplication([])
 
+    
+    
+    
     
     
     
