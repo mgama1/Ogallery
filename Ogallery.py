@@ -72,6 +72,11 @@ class PathInputWidget(QWidget):
     def selectImages(self):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText,.8)
+        if self.queryText=='':
+            self.show_error_message(
+                "there are no images found ( ̿–ᆺ ̿–)")
+            
+            
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
                 
@@ -87,6 +92,7 @@ class PathInputWidget(QWidget):
         classes=['plane','car','cat','dog','food','sea','documents']
         query=query.lower()
         cosine_prev=0
+        suggested=''
         for classi in classes:
             v1=dict.fromkeys(set(query+classi),0)
             v2=dict.fromkeys(set(query+classi),0)
@@ -109,11 +115,16 @@ class PathInputWidget(QWidget):
     
     
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Return:
+        if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
             self.open_image_viewer()
             
-      
-    
+    def show_error_message(self,msg):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setText(msg)
+        msg_box.setWindowTitle('Warning')
+        msg_box.exec_()
+
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
     def __init__(self, result, path_input_widget):
@@ -131,81 +142,69 @@ class ImageViewer(QWidget):
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(100, 100, 800, 600)
-
         self.setStyleSheet("background-color: #222324;")
+        
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
-        self.keylist=[]
+
+        self.keylist = []
         self.file_list = []
         self.current_index = 0
 
         self.load_images()
-        #---------------------layouts-----------------------------------
+
+        # Main layout using QVBoxLayout
         layout = QVBoxLayout(self)
-        layout.addWidget(self.image_label)
-        button_layout = QHBoxLayout()  
-        layout.addLayout(button_layout)
+        button_layout = QHBoxLayout(self)
+        Hlayout=QHBoxLayout(self)
+
+        self.leftBrowse = QPushButton('〈', self)
+        self.rightBrowse = QPushButton('〉', self)
         
-        #-----------process/invert button(to be deleted)-----------
+        Hlayout.addWidget(self.leftBrowse)
+        Hlayout.addWidget(self.image_label)
+        Hlayout.addWidget(self.rightBrowse)
+
+        
+
+        # Create buttons and add to the grid layout
         self.process_button = QPushButton('Invert', self)
-        self.process_button.setFocusPolicy(Qt.NoFocus)
-        self.process_button.clicked.connect(self.process_image)
-        button_layout.addWidget(self.process_button)    
-
-        #---------------Gray button---------------------------
         self.gray_button = QPushButton('Gray scale', self)
-        self.gray_button.setFocusPolicy(Qt.NoFocus)
-        self.gray_button.clicked.connect(self.BGR2GRAY)
-        button_layout.addWidget(self.gray_button)
-        
-        #-------------- gaussian blur button-----------------
-        self.gaussianBlur_button = QPushButton('smooth', self)
-        self.gaussianBlur_button.setFocusPolicy(Qt.NoFocus)
-        self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
-        button_layout.addWidget(self.gaussianBlur_button)
-        
-        
-        #----------------Rotate button------------------------------------
+        self.gaussianBlur_button = QPushButton('Smooth', self)
         self.rotate_button = QPushButton('↶', self)
-        self.rotate_button.setFocusPolicy(Qt.NoFocus)
-        self.rotate_button.clicked.connect(self.rotateCCW)
-        button_layout.addWidget(self.rotate_button)
-        
-        
-        
-        #--------------Exposure slider/button--------------------------------
-
-        
-        self.exposure_slider = QSlider(Qt.Horizontal)
-        self.exposure_slider.setMinimum(0)
-        self.exposure_slider.setMaximum(200)
-        self.exposure_slider.setValue(100)  # Set an initial value
-        self.exposure_slider.valueChanged.connect(self.update_exposure)
-        self.exposure_slider.hide()
-        layout.addWidget(self.exposure_slider)
-        
         self.set_exposure_button = QPushButton('Exposure', self)
-        self.set_exposure_button.setFocusPolicy(Qt.NoFocus)
-
-        self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
-        button_layout.addWidget(self.set_exposure_button)
-        
-        
         self.save_button = QPushButton('💾', self)
-        self.save_button.setFocusPolicy(Qt.NoFocus)
-        self.save_button.clicked.connect(self.save_image)
+        self.back_button = QPushButton('↩', self)
+        self.back_button.setGeometry(0, 0, 40, 40) 
+
+
+        button_layout.addWidget(self.process_button)
+        button_layout.addWidget(self.gray_button)
+        button_layout.addWidget(self.gaussianBlur_button)
+        button_layout.addWidget(self.rotate_button)
+        button_layout.addWidget(self.set_exposure_button)
         button_layout.addWidget(self.save_button)
         
         
-        #---------------------------
-        self.back_button = QPushButton('↩', self)
-        self.back_button.setFocusPolicy(Qt.NoFocus)
-        self.back_button.setGeometry(0, 0, 40, 40) 
-        self.back_button.clicked.connect(self.goHome)
+        layout.addLayout(Hlayout)
+        layout.addLayout(button_layout)
 
         
+
+        self.setLayout(layout)
+
+        # Connect button signals to their respective functions
+        self.process_button.clicked.connect(self.process_image)
+        self.gray_button.clicked.connect(self.BGR2GRAY)
+        self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
+        self.rotate_button.clicked.connect(self.rotateCCW)
+        self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
+        self.save_button.clicked.connect(self.save_image)
+        self.back_button.clicked.connect(self.goHome)
         
       # Set background color for all buttons
+        font = QFont()
+        font.setPointSize(16)  
         button_style = "QPushButton { background-color: #212121; color: white; }"
         
         self.process_button.setStyleSheet(button_style)
@@ -215,11 +214,16 @@ class ImageViewer(QWidget):
         self.save_button.setStyleSheet(button_style)
         self.set_exposure_button.setStyleSheet(button_style)
         self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none; color: white;")
-        font = QFont()
-        font.setPointSize(16)  # Change 16 to the desired font size
+        
         self.back_button.setFont(font)
         
+        self.leftBrowse.setFixedSize(40, 100)
+        self.leftBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none ;color: white;")
+        self.leftBrowse.setFont(font)
         
+        self.rightBrowse.setFixedSize(40, 100)
+        self.rightBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); color: white; border: none ;")
+        self.rightBrowse.setFont(font)
         
         
         
@@ -421,6 +425,7 @@ class ImageViewer(QWidget):
 if __name__ == '__main__':
     app = QApplication([])
 
+    
     
     
     
