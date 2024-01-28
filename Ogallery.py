@@ -150,7 +150,7 @@ class ImageViewer(QWidget):
         self.keylist = []
         self.file_list = []
         self.current_index = 0
-
+        self.setMouseTracking(True)
         self.load_images()
 
         # Main layout using QVBoxLayout
@@ -201,7 +201,13 @@ class ImageViewer(QWidget):
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
+        self.leftBrowse.clicked.connect(self.next_image)
+        self.rightBrowse.clicked.connect(self.previous_image)
         
+        self.rightBrowse.enterEvent = self.on_enter_event
+        self.rightBrowse.leaveEvent = self.on_leave_event
+        self.leftBrowse.enterEvent = self.on_enter_event
+        self.leftBrowse.leaveEvent = self.on_leave_event
       # Set background color for all buttons
         font = QFont()
         font.setPointSize(16)  
@@ -217,14 +223,14 @@ class ImageViewer(QWidget):
         
         self.back_button.setFont(font)
         
-        self.leftBrowse.setFixedSize(40, 100)
+        self.leftBrowse.setFixedSize(60, self.height())
         self.leftBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none ;color: white;")
         self.leftBrowse.setFont(font)
         
-        self.rightBrowse.setFixedSize(40, 100)
+        self.rightBrowse.setFixedSize(60, self.height())
         self.rightBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); color: white; border: none ;")
         self.rightBrowse.setFont(font)
-        
+        self.set_transparency(0)
         
         
         
@@ -292,6 +298,20 @@ class ImageViewer(QWidget):
     def previous_image(self):
         self.current_index = (self.current_index - 1) % len(self.file_list)
         self.show_image()
+        
+    
+    def set_transparency(self, alpha):
+        self.rightBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
+        self.leftBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
+
+    def on_enter_event(self, event):
+        # Set transparency when mouse enters
+        self.set_transparency(.5)
+
+    def on_leave_event(self, event):
+        # Set transparency back to normal when mouse leaves
+        self.set_transparency(0)
+        
     def process_image(self):
             if hasattr(self, 'edited_image'):
                 img=self.edited_image
@@ -425,6 +445,7 @@ class ImageViewer(QWidget):
 if __name__ == '__main__':
     app = QApplication([])
 
+    
     
     
     
