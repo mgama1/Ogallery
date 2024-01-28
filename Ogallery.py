@@ -175,7 +175,7 @@ class ImageViewer(QWidget):
         self.set_exposure_button = QPushButton('Exposure', self)
         self.save_button = QPushButton('💾', self)
         self.back_button = QPushButton('↩', self)
-        self.back_button.setGeometry(0, 0, 40, 40) 
+        self.back_button.setGeometry(10, 0, 60, 40) 
 
 
         button_layout.addWidget(self.process_button)
@@ -209,8 +209,10 @@ class ImageViewer(QWidget):
         self.leftBrowse.enterEvent = self.on_enter_event
         self.leftBrowse.leaveEvent = self.on_leave_event
       # Set background color for all buttons
-        font = QFont()
-        font.setPointSize(16)  
+        mediumFont = QFont()
+        mediumFont.setPointSize(16)
+        bigFont = QFont()
+        bigFont.setPointSize(20)
         button_style = "QPushButton { background-color: #212121; color: white; }"
         
         self.process_button.setStyleSheet(button_style)
@@ -219,17 +221,17 @@ class ImageViewer(QWidget):
         self.rotate_button.setStyleSheet(button_style)
         self.save_button.setStyleSheet(button_style)
         self.set_exposure_button.setStyleSheet(button_style)
-        self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none; color: white;")
         
-        self.back_button.setFont(font)
-        
+        self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border:none; color: white;")
+        self.back_button.setFont(mediumFont)
+
         self.leftBrowse.setFixedSize(60, self.height())
         self.leftBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none ;color: white;")
-        self.leftBrowse.setFont(font)
+        self.leftBrowse.setFont(bigFont)
         
         self.rightBrowse.setFixedSize(60, self.height())
         self.rightBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); color: white; border: none ;")
-        self.rightBrowse.setFont(font)
+        self.rightBrowse.setFont(bigFont)
         self.set_transparency(0)
         
         
