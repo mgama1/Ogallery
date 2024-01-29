@@ -187,6 +187,13 @@ class ImageViewer(QWidget):
         self.set_exposure_button = QPushButton('Exposure', self)
         self.save_button = QPushButton('💾', self)
 
+        self.exposure_slider = QSlider(Qt.Horizontal)
+        self.exposure_slider.setMinimum(0)
+        self.exposure_slider.setMaximum(200)
+        self.exposure_slider.setValue(100)  # Set an initial value
+        self.exposure_slider.valueChanged.connect(self.update_exposure)
+        self.exposure_slider.hide()
+        
 
         editing_buttons=[self.process_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
@@ -202,7 +209,8 @@ class ImageViewer(QWidget):
         for  button in editing_buttons:
             editing_buttons_layout.addWidget(button)
    
-        
+        layout.addWidget(self.exposure_slider)
+    
         layout.addLayout(Hlayout)
         layout.addLayout(editing_buttons_layout)
 
