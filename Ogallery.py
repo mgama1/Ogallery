@@ -17,7 +17,7 @@ import imagehash
 from PIL import Image
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
-class PathInputWidget(QWidget):
+class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -499,6 +499,6 @@ if __name__ == '__main__':
     
     
     
-    main_widget = PathInputWidget()
+    main_widget = MainWidget()
 
     app.exec_()
