@@ -41,20 +41,31 @@ class PathInputWidget(QWidget):
         
         
         self.query = QLineEdit(self)
+        self.query.setFixedHeight(33)
         horizontal_layout.addWidget(self.query)
         search_button = QPushButton('➤', self)
         font = QFont()
         font.setPointSize(16)  # Change 16 to the desired font size
         search_button.setFont(font)
         search_button.clicked.connect(self.open_image_viewer)
-        search_button.setFixedSize(30, 30)  # Adjust the width and height as needed
+        search_button.setFixedSize(36, 36)  # Adjust the width and height as needed
         horizontal_layout.addWidget(search_button)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
-        button_style = "QPushButton { background-color: #212121; color: white; }"
+        button_style = "QPushButton { background-color: #212121; color: white; border: 2px solid #2e2e2e;border-radius: 18px;padding: 5px;}"
         search_button.setStyleSheet(button_style) 
-        line_style="QLineEdit { background-color: #212121; color: white; }"
+        line_style = (
+            "QLineEdit {"
+            "background-color: #212121; "
+            "color: white; "
+            "border-radius: 15px; "
+            "padding: 5px; "
+            "border: 2px solid #2e2e2e;"
+            "}"
+        )
+        
         self.query.setStyleSheet(line_style)
+        
         self.show()
 
     def open_image_viewer(self):
@@ -74,7 +85,7 @@ class PathInputWidget(QWidget):
         self.queryText=self.suggestClasses(self.queryText,.8)
         if self.queryText=='':
             self.show_error_message(
-                "there are no images found ( ̿–ᆺ ̿–)")
+                "there are no images found (⌣̩̩́_⌣̩̩̀)")
             
             
         db=pd.read_csv("log.csv")
@@ -453,6 +464,7 @@ if __name__ == '__main__':
     
     
     
+
     
     
     
