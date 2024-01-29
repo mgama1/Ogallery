@@ -138,7 +138,7 @@ class PathInputWidget(QWidget):
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    def __init__(self, result, path_input_widget):
+    def __init__(self, result, main_widget):
         super().__init__()
 
         self.file_list = []
@@ -147,7 +147,7 @@ class ImageViewer(QWidget):
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
         self.result = result
-        self.path_input_widget = path_input_widget  # Store reference to the main widget
+        self.main_widget = main_widget  # Store reference to the main widget
         self.init_ui()
 
     def init_ui(self):
@@ -211,6 +211,7 @@ class ImageViewer(QWidget):
         self.setLayout(layout)
 
         # Connect button signals to their respective functions
+        
         self.process_button.clicked.connect(self.process_image)
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
@@ -220,36 +221,50 @@ class ImageViewer(QWidget):
         self.back_button.clicked.connect(self.goHome)
         self.leftBrowse.clicked.connect(self.next_image)
         self.rightBrowse.clicked.connect(self.previous_image)
+        ###############################
         
         self.rightBrowse.enterEvent = self.on_enter_event
         self.rightBrowse.leaveEvent = self.on_leave_event
         self.leftBrowse.enterEvent = self.on_enter_event
         self.leftBrowse.leaveEvent = self.on_leave_event
-      # Set background color for all buttons
+      
+        # ---------------Setting styles----------------------------
         mediumFont = QFont()
         mediumFont.setPointSize(16)
         bigFont = QFont()
         bigFont.setPointSize(20)
-        button_style = "QPushButton { background-color: #212121; color: white; }"
         
-        self.process_button.setStyleSheet(button_style)
-        self.gray_button.setStyleSheet(button_style)
-        self.gaussianBlur_button.setStyleSheet(button_style)
-        self.rotate_button.setStyleSheet(button_style)
-        self.save_button.setStyleSheet(button_style)
-        self.set_exposure_button.setStyleSheet(button_style)
-        
-        self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border:none; color: white;")
         self.back_button.setFont(mediumFont)
+        self.leftBrowse.setFont(bigFont)
+        self.rightBrowse.setFont(bigFont)
+        
+        button_style = "QPushButton { background-color: #212121; color: white; }"
+        for button in editing_buttons:
+            button.setStyleSheet(button_style)
+        
+        
+
+        self.back_button.setStyleSheet(
+            "background-color: rgba(22, 22, 22, .5); "
+            "border: none; "
+            "color: white;"
+        )
+        
         self.back_button.setGeometry(10, 0, 60, 40) 
 
         self.leftBrowse.setFixedSize(60, self.height())
-        self.leftBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none ;color: white;")
-        self.leftBrowse.setFont(bigFont)
-        
         self.rightBrowse.setFixedSize(60, self.height())
-        self.rightBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); color: white; border: none ;")
-        self.rightBrowse.setFont(bigFont)
+
+        browsing_buttons_style= "background-color: rgba(22, 22, 22, .5); \
+                                                    color: white; \
+                                                    border: none;"
+        self.leftBrowse.setStyleSheet(browsing_buttons_style)
+        self.rightBrowse.setStyleSheet(browsing_buttons_style)
+
+        
+        
+        
+        
         self.set_transparency(0)
         
         
@@ -476,6 +491,6 @@ if __name__ == '__main__':
     
     
     
-    path_input_widget = PathInputWidget()
+    main_widget = PathInputWidget()
 
     app.exec_()
