@@ -166,39 +166,45 @@ class ImageViewer(QWidget):
 
         # Main layout using QVBoxLayout
         layout = QVBoxLayout(self)
-        button_layout = QHBoxLayout(self)
         Hlayout=QHBoxLayout(self)
+        editing_buttons_layout = QHBoxLayout(self)
 
+       
         self.leftBrowse = QPushButton('〈', self)
         self.rightBrowse = QPushButton('〉', self)
-        
+        self.back_button = QPushButton('↩', self)
+
         Hlayout.addWidget(self.leftBrowse)
         Hlayout.addWidget(self.image_label)
         Hlayout.addWidget(self.rightBrowse)
 
         
-
-        # Create buttons and add to the grid layout
+        
         self.process_button = QPushButton('Invert', self)
         self.gray_button = QPushButton('Gray scale', self)
         self.gaussianBlur_button = QPushButton('Smooth', self)
         self.rotate_button = QPushButton('↶', self)
         self.set_exposure_button = QPushButton('Exposure', self)
         self.save_button = QPushButton('💾', self)
-        self.back_button = QPushButton('↩', self)
-        self.back_button.setGeometry(10, 0, 60, 40) 
 
 
-        button_layout.addWidget(self.process_button)
-        button_layout.addWidget(self.gray_button)
-        button_layout.addWidget(self.gaussianBlur_button)
-        button_layout.addWidget(self.rotate_button)
-        button_layout.addWidget(self.set_exposure_button)
-        button_layout.addWidget(self.save_button)
+        editing_buttons=[self.process_button,self.gray_button,
+                self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
+                 self.save_button
+                ]
+        navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button]
         
+        #setting focus policy for all buttons
+        for button in editing_buttons+navigation_buttons:
+            button.setFocusPolicy(Qt.NoFocus)
+
+        #adding editing buttons to th editing buttons layout
+        for  button in editing_buttons:
+            editing_buttons_layout.addWidget(button)
+   
         
         layout.addLayout(Hlayout)
-        layout.addLayout(button_layout)
+        layout.addLayout(editing_buttons_layout)
 
         
 
@@ -235,6 +241,7 @@ class ImageViewer(QWidget):
         
         self.back_button.setStyleSheet("background-color: rgba(22, 22, 22, .5); border:none; color: white;")
         self.back_button.setFont(mediumFont)
+        self.back_button.setGeometry(10, 0, 60, 40) 
 
         self.leftBrowse.setFixedSize(60, self.height())
         self.leftBrowse.setStyleSheet("background-color: rgba(22, 22, 22, .5); border: none ;color: white;")
