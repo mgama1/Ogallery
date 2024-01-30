@@ -15,6 +15,7 @@ import argparse
 import rembg
 import imagehash
 from PIL import Image
+from Levenshtein import distance as lev_distance
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 class MainWidget(QWidget):
@@ -97,8 +98,8 @@ class MainWidget(QWidget):
         self.show()
     def selectImages(self):
         self.queryText=self.query.text()
-        self.queryText=self.suggestClasses(self.queryText,.8)
-        if self.queryText=='':
+        self.queryText=self.suggestClasses(self.queryText)
+        if self.queryText==None:
             self.show_error_message("there are no images found (⌣̩̩́_⌣̩̩̀)")
             
         db=pd.read_csv("log.csv")
@@ -106,36 +107,22 @@ class MainWidget(QWidget):
                 
     
     
-    def suggestClasses(self,query,threshold=.7):
+    def suggestClasses(self,query):
         '''
-        finds the cosine similarity between existing classes and 
-        the search query and returns the classes above certain threshold
+        finds the levenshtein distance between existing classes and 
+        the search query and returns the classes with distance < 2
         inputs: str query
-        outputs: list of suggested classes 
+        outputs: suggested classes 
         '''
         classes=['plane','car','cat','dog','food','sea','documents']
         query=query.lower()
-        cosine_prev=0
-        suggested=''
+        if query in classes:
+            return query
+        
         for classi in classes:
-            v1=dict.fromkeys(set(query+classi),0)
-            v2=dict.fromkeys(set(query+classi),0)
-            for e in query:
-                    v1[e]+=1
-            for e in classi:
-                    v2[e]+=1
-
-
-            A = np.array(list(v1.values()))
-            B = np.array(list(v2.values()))
-
-
-            # compute cosine similarity
-            cosine = np.sum(A*B, axis=0)/(norm(A, axis=0)*norm(B, axis=0))
-            if (cosine >cosine_prev) and (cosine >threshold):
-                    suggested= classi
-                    cosine_prev=cosine
-        return suggested
+            if lev_distance(query,classi)==1:
+                return classi
+        return None
     
     
     def keyPressEvent(self, event):
