@@ -24,44 +24,58 @@ class MainWidget(QWidget):
         self.init_ui()
     def init_ui(self):
         self.setWindowTitle('OGallery')
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(300, 100, 800, 600)
         
         layout = QVBoxLayout(self)
         horizontal_layout = QHBoxLayout()
-        self.setStyleSheet("background-color: #222324;")
 
         
         self.logo_label = QLabel(self)
-        
         pixmap = QPixmap('logo.jpg')#.scaled(300, 300)
         self.logo_label.setPixmap(pixmap)
-        #self.logo_label.setScaledContents(True)
         self.logo_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.logo_label)
         
-        
+
         self.query = QLineEdit(self)
-        self.query.setFixedHeight(33)
-        horizontal_layout.addWidget(self.query)
         search_button = QPushButton('➤', self)
-        font = QFont()
-        font.setPointSize(16)  # Change 16 to the desired font size
-        search_button.setFont(font)
+
+        horizontal_layout.addWidget(self.query)
+        
+        #----------connect button signals to their respective functions
         search_button.clicked.connect(self.open_image_viewer)
-        search_button.setFixedSize(36, 36)  # Adjust the width and height as needed
+        
+        # -----------Elements font-----------------------
+        font = QFont()
+        font.setPointSize(16)  
+        search_button.setFont(font)
+        
+        #-----------layout----------------
         horizontal_layout.addWidget(search_button)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
-        button_style = "QPushButton { background-color: #212121; color: white; border: 2px solid #2e2e2e;border-radius: 18px;padding: 5px;}"
+        
+        #----------setting style---------------------------
+        
+        self.setStyleSheet("background-color: #222324;")
+        self.query.setFixedHeight(33)
+        search_button.setFixedSize(36, 36)  
+        
+        button_style = "QPushButton { background-color: #212121; \
+                                        color: white; border: 2px solid #2e2e2e; \
+                                        border-radius: 18px;padding: 5px;} \
+                                        QPushButton:hover {  \
+                                        background-color: #2e2e2e; }"
+        
         search_button.setStyleSheet(button_style) 
         line_style = (
-            "QLineEdit {"
-            "background-color: #212121; "
-            "color: white; "
-            "border-radius: 15px; "
-            "padding: 5px; "
-            "border: 2px solid #2e2e2e;"
-            "}"
+            "QLineEdit { \
+             background-color: #212121; \
+             color: white; \
+             border-radius: 15px; \
+             padding: 5px; \
+             border: 2px solid #2e2e2e; \
+             }"
         )
         
         self.query.setStyleSheet(line_style)
@@ -70,11 +84,12 @@ class MainWidget(QWidget):
 
     def open_image_viewer(self):
         self.selectImages()
-
-        self.viewer = ImageViewer(self.result, self)
-        self.viewer.finishedSignal.connect(self.showMainWidget)
-        self.viewer.show()
-        self.hide()
+            
+        if self.result:
+            self.viewer = ImageViewer(self.result, self)
+            self.viewer.finishedSignal.connect(self.showMainWidget)
+            self.viewer.show()
+            self.hide()
         
 
     def showMainWidget(self):
@@ -84,9 +99,7 @@ class MainWidget(QWidget):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText,.8)
         if self.queryText=='':
-            self.show_error_message(
-                "there are no images found (⌣̩̩́_⌣̩̩̀)")
-            
+            self.show_error_message("there are no images found (⌣̩̩́_⌣̩̩̀)")
             
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
@@ -152,7 +165,7 @@ class ImageViewer(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet("background-color: #222324;")
         
         self.image_label = QLabel(self)
@@ -180,7 +193,7 @@ class ImageViewer(QWidget):
 
         
         
-        self.process_button = QPushButton('Invert', self)
+        self.sharpen_button = QPushButton('Sharpen', self)
         self.gray_button = QPushButton('Gray scale', self)
         self.gaussianBlur_button = QPushButton('Smooth', self)
         self.rotate_button = QPushButton('↶', self)
@@ -195,7 +208,7 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         
 
-        editing_buttons=[self.process_button,self.gray_button,
+        editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
                  self.save_button
                 ]
@@ -209,9 +222,10 @@ class ImageViewer(QWidget):
         for  button in editing_buttons:
             editing_buttons_layout.addWidget(button)
    
-        layout.addWidget(self.exposure_slider)
     
         layout.addLayout(Hlayout)
+        layout.addWidget(self.exposure_slider)
+
         layout.addLayout(editing_buttons_layout)
 
         
@@ -220,7 +234,7 @@ class ImageViewer(QWidget):
 
         # Connect button signals to their respective functions
         
-        self.process_button.clicked.connect(self.process_image)
+        self.sharpen_button.clicked.connect(self.sharpen_image)
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
@@ -246,16 +260,18 @@ class ImageViewer(QWidget):
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
         
-        button_style = "QPushButton { background-color: #212121; color: white; }"
+        button_style = "QPushButton { background-color: #212121; color: white; } \
+                        QPushButton:hover {background-color: #00347d; }"
         for button in editing_buttons:
             button.setStyleSheet(button_style)
         
         
 
         self.back_button.setStyleSheet(
-            "background-color: rgba(22, 22, 22, .5); "
-            "border: none; "
-            "color: white;"
+            "QPushButton {background-color: rgba(22, 22, 22, .5); \
+            border: none; \
+            color: white;} \
+            QPushButton:hover {background-color: #c90202;} "
         )
         
         self.back_button.setGeometry(10, 0, 60, 40) 
@@ -355,16 +371,16 @@ class ImageViewer(QWidget):
         # Set transparency back to normal when mouse leaves
         self.set_transparency(0)
         
-    def process_image(self):
+    def sharpen_image(self):
             if hasattr(self, 'edited_image'):
                 img=self.edited_image
             else :
                 image_path = self.file_list[self.current_index]
                 img = cv2.imread(image_path)
-
-            inverted_img = 255 - img
-            self.edited_image=inverted_img
-            pixmap = self.convert_cv_image_to_qpixmap(inverted_img)
+            gaussian_blurred=cv2.GaussianBlur(img,(5,5),1)
+            sharpened=cv2.addWeighted(img,1.5,gaussian_blurred,-.5,0)
+            self.edited_image=sharpened
+            pixmap = self.convert_cv_image_to_qpixmap(sharpened)
             self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
                                                      round(self.screen_height*.8),
                                                      Qt.KeepAspectRatio,
