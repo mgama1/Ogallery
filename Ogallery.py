@@ -1,3 +1,7 @@
+classesNames=['bicycle','boat','building','bus','car','forest',
+             'glacier','helicopter','motorcycle', 'mountain',
+             'plane','sea','street','train','truck']
+
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
@@ -16,6 +20,8 @@ import rembg
 import imagehash
 from PIL import Image
 from Levenshtein import distance as lev_distance
+import rembg
+
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 class MainWidget(QWidget):
@@ -30,38 +36,42 @@ class MainWidget(QWidget):
         layout = QVBoxLayout(self)
         horizontal_layout = QHBoxLayout()
 
+        self.query = QLineEdit(self)
+        search_button = QPushButton('➤', self)
+        self.info_button=QPushButton('ⓘ',self)
         
         self.logo_label = QLabel(self)
-        pixmap = QPixmap('logo.jpg')#.scaled(300, 300)
+        pixmap = QPixmap('logo.jpg')
         self.logo_label.setPixmap(pixmap)
         self.logo_label.setAlignment(Qt.AlignCenter)
+        
+        layout.addWidget(self.info_button,alignment=Qt.AlignTop|Qt.AlignRight)
         layout.addWidget(self.logo_label)
         
 
-        self.query = QLineEdit(self)
-        search_button = QPushButton('➤', self)
-
-        horizontal_layout.addWidget(self.query)
         
+        horizontal_layout.addWidget(self.query)
+        horizontal_layout.addWidget(search_button)
+
         #----------connect button signals to their respective functions
         search_button.clicked.connect(self.open_image_viewer)
-        
+        self.info_button.clicked.connect(self.show_info)
         # -----------Elements font-----------------------
         font = QFont()
         font.setPointSize(16)  
         search_button.setFont(font)
-        
+        self.info_button.setFont(font)
         #-----------layout----------------
-        horizontal_layout.addWidget(search_button)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
         #----------setting style---------------------------
         
-        self.setStyleSheet("background-color: #222324;")
+        self.setStyleSheet("background-color: #212121;color:white;")
         self.query.setFixedHeight(33)
-        search_button.setFixedSize(36, 36)  
-        
+        search_button.setFixedSize(36, 36) 
+        self.info_button.setFixedWidth(45)
+
         button_style = "QPushButton { background-color: #212121; \
                                         color: white; border: 2px solid #2e2e2e; \
                                         border-radius: 18px;padding: 5px;} \
@@ -69,6 +79,7 @@ class MainWidget(QWidget):
                                         background-color: #2e2e2e; }"
         
         search_button.setStyleSheet(button_style) 
+        self.info_button.setStyleSheet(button_style)
         line_style = (
             "QLineEdit { \
              background-color: #212121; \
@@ -100,7 +111,7 @@ class MainWidget(QWidget):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText==None:
-            self.show_error_message("there are no images found (⌣̩̩́_⌣̩̩̀)")
+            self.show_error_message("No images found (⌣̩̩́_⌣̩̩̀)")
             
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
@@ -134,6 +145,18 @@ class MainWidget(QWidget):
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
+        msg_box.exec_()
+        
+    def show_info(self):
+        msg_box = QMessageBox()
+        msg_box.setStyleSheet("QMessageBox { background-color: #212121; color: white; }")
+
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setText(f"This application is created and maintained by \
+Mahmoud gamal \
+        current supported search classes are {', '.join(classesNames)}")
+        
+        msg_box.setWindowTitle('info')
         msg_box.exec_()
 
 class ImageViewer(QWidget):
@@ -185,6 +208,7 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button = QPushButton('Smooth', self)
         self.rotate_button = QPushButton('↶', self)
         self.set_exposure_button = QPushButton('Exposure', self)
+        self.remove_bg_button = QPushButton('Remove Background', self)
         self.save_button = QPushButton('💾', self)
 
         self.exposure_slider = QSlider(Qt.Horizontal)
@@ -197,7 +221,7 @@ class ImageViewer(QWidget):
 
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
-                 self.save_button
+                 self.save_button,self.remove_bg_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button]
         
@@ -228,6 +252,7 @@ class ImageViewer(QWidget):
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
+        self.remove_bg_button.clicked.connect(self.removeBackground)
         self.leftBrowse.clicked.connect(self.next_image)
         self.rightBrowse.clicked.connect(self.previous_image)
         ###############################
@@ -438,6 +463,23 @@ class ImageViewer(QWidget):
                                                  Qt.KeepAspectRatio,
                                                  Qt.SmoothTransformation))
     
+    
+    
+    def removeBackground(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        removed_bg_image=rembg.remove(img,bgcolor=(0,0,0,1))
+        self.edited_image=removed_bg_image
+        pixmap = self.convert_cv_image_to_qpixmap(removed_bg_image)
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio, 
+                                                 Qt.SmoothTransformation))
+    
+        
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
             height, width, channel = cv_image.shape
@@ -498,6 +540,7 @@ if __name__ == '__main__':
     
     
 
+    
     
     
     
