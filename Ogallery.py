@@ -418,9 +418,11 @@ class ImageViewer(QWidget):
             else :
                 image_path = self.file_list[self.current_index]
                 img = cv2.imread(image_path)
+            
             gaussian_blurred=cv2.GaussianBlur(img,(5,5),1)
             sharpened=cv2.addWeighted(img,1.5,gaussian_blurred,-.5,0)
             self.edited_image=sharpened
+            self.edit_history.append(self.edited_image)
             self.show_edited_image(self.edited_image)
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
@@ -431,17 +433,18 @@ class ImageViewer(QWidget):
         
         gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
         gray_3C=cv2.merge([gray,gray,gray])
-        
         self.edited_image=gray_3C
+        self.edit_history.append(self.edited_image)
         self.show_edited_image(self.edited_image)
         
-        self.edit_history.append(self.edited_image)
+        
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
+        
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
         self.edit_history.append(self.edited_image)
@@ -454,11 +457,12 @@ class ImageViewer(QWidget):
         else :
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
+        
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
-        
-        self.show_edited_image(self.edited_image)
         self.edit_history.append(self.edited_image)
+        self.show_edited_image(self.edited_image)
+        
 
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
@@ -474,6 +478,7 @@ class ImageViewer(QWidget):
             for i in np.arange(0, 256)]).astype("uint8")
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
+        self.edit_history.append(self.edited_image)
         self.show_edited_image(self.edited_image)
     
     def removeBackground(self):
@@ -494,7 +499,7 @@ class ImageViewer(QWidget):
             return QPixmap.fromImage(q_image)
 
 
-            return QPixmap.fromImage(image)
+            #return QPixmap.fromImage(image)
         
         
     def undo(self):
