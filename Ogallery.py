@@ -5,7 +5,7 @@ classesNames=['bicycle','boat','building','bus','car','forest',
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt,pyqtSignal
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
 from PyQt5.QtGui import QColor,QFont
 from PyQt5.QtGui import QImage
@@ -170,7 +170,8 @@ class ImageViewer(QWidget):
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
         self.result = result
-        self.main_widget = main_widget  # Store reference to the main widget
+        self.edit_history=[]
+        self.main_widget = main_widget  
         self.init_ui()
 
     def init_ui(self):
@@ -180,7 +181,17 @@ class ImageViewer(QWidget):
         
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
+        ###########################################
+        #self.palette_label = QLabel(self.image_label)
+        #palettePixmap = QPixmap('Untitled.png')
+        #self.palette_label.setAlignment(Qt.AlignBottom | Qt.AlignHCenter)
+        
+        
+        #self.palette_label.setPixmap(palettePixmap.scaledToHeight(80, Qt.SmoothTransformation))
+      
 
+
+        ##############################################
         self.keylist = []
         self.file_list = []
         self.current_index = 0
@@ -209,6 +220,10 @@ class ImageViewer(QWidget):
         self.rotate_button = QPushButton('↶', self)
         self.set_exposure_button = QPushButton('Exposure', self)
         self.remove_bg_button = QPushButton('Remove Background', self)
+        
+        self.palette_button=QPushButton('Palette',self)
+        self.undo_button=QPushButton('undo',self)
+        self.revert_button = QPushButton('Revert', self)
         self.save_button = QPushButton('💾', self)
 
         self.exposure_slider = QSlider(Qt.Horizontal)
@@ -218,10 +233,10 @@ class ImageViewer(QWidget):
         self.exposure_slider.valueChanged.connect(self.update_exposure)
         self.exposure_slider.hide()
         
-
+        
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
-                 self.save_button,self.remove_bg_button
+                 self.palette_button,self.undo_button,self.revert_button,self.save_button,self.remove_bg_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button]
         
@@ -235,6 +250,9 @@ class ImageViewer(QWidget):
    
     
         layout.addLayout(Hlayout)
+        #################
+        #layout.addWidget(self.palette_label)
+        ##########################333
         layout.addWidget(self.exposure_slider)
 
         layout.addLayout(editing_buttons_layout)
@@ -253,6 +271,8 @@ class ImageViewer(QWidget):
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
         self.remove_bg_button.clicked.connect(self.removeBackground)
+        self.undo_button.clicked.connect(self.undo)
+        self.revert_button.clicked.connect(self.revert)
         self.leftBrowse.clicked.connect(self.next_image)
         self.rightBrowse.clicked.connect(self.previous_image)
         ###############################
@@ -309,13 +329,16 @@ class ImageViewer(QWidget):
         #-----------------------------------------------------
         self.image_label.setFocusPolicy(Qt.StrongFocus)
         self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
+        #self.palette_label.setFocusPolicy(Qt.StrongFocus)
+        #self.palette_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.palette_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         self.load_images()
 
         self.show_image()
 
         self.show()
+      
 
     def load_images(self):
         self.file_list = self.result
@@ -325,13 +348,19 @@ class ImageViewer(QWidget):
         if self.file_list:
             image_path = self.file_list[self.current_index]
             pixmap = QPixmap(image_path)
-            img = cv2.imread(image_path)
             self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
                                                      round(self.screen_height*.8),
                                                      Qt.KeepAspectRatio,
                                                      Qt.SmoothTransformation))
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
+    def show_edited_image(self,img):
+        pixmap = self.convert_cv_image_to_qpixmap(img)
+        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
+                                                 round(self.screen_height*.8),
+                                                 Qt.KeepAspectRatio,
+                                                 Qt.SmoothTransformation))
+        
     def keyPressEvent(self, event):
         
         #Navigating images in the directory
@@ -392,11 +421,7 @@ class ImageViewer(QWidget):
             gaussian_blurred=cv2.GaussianBlur(img,(5,5),1)
             sharpened=cv2.addWeighted(img,1.5,gaussian_blurred,-.5,0)
             self.edited_image=sharpened
-            pixmap = self.convert_cv_image_to_qpixmap(sharpened)
-            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                     round(self.screen_height*.8),
-                                                     Qt.KeepAspectRatio,
-                                                     Qt.SmoothTransformation))
+            self.show_edited_image(self.edited_image)
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -408,12 +433,9 @@ class ImageViewer(QWidget):
         gray_3C=cv2.merge([gray,gray,gray])
         
         self.edited_image=gray_3C
-        pixmap = self.convert_cv_image_to_qpixmap(gray_3C)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio,
-                                                 Qt.SmoothTransformation))
-    
+        self.show_edited_image(self.edited_image)
+        
+        self.edit_history.append(self.edited_image)
     def gaussianBlur(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -422,12 +444,10 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
-        pixmap = self.convert_cv_image_to_qpixmap(Blurred_img)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio, 
-                                                 Qt.SmoothTransformation))
-    
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image(self.edited_image)
+        
+        
     def rotateCCW(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -436,12 +456,9 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
-        pixmap = self.convert_cv_image_to_qpixmap(rotatedImg)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio, 
-                                                 Qt.SmoothTransformation))
-    
+        
+        self.show_edited_image(self.edited_image)
+        self.edit_history.append(self.edited_image)
 
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
@@ -457,13 +474,7 @@ class ImageViewer(QWidget):
             for i in np.arange(0, 256)]).astype("uint8")
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
-        pixmap = self.convert_cv_image_to_qpixmap(exposureImg)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio,
-                                                 Qt.SmoothTransformation))
-    
-    
+        self.show_edited_image(self.edited_image)
     
     def removeBackground(self):
         if hasattr(self, 'edited_image'):
@@ -471,14 +482,9 @@ class ImageViewer(QWidget):
         else :
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
-        removed_bg_image=rembg.remove(img,bgcolor=(0,0,0,1))
+        removed_bg_image=rembg.remove(img,bgcolor=(2555,255,0,1))
         self.edited_image=removed_bg_image
-        pixmap = self.convert_cv_image_to_qpixmap(removed_bg_image)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio, 
-                                                 Qt.SmoothTransformation))
-    
+        self.show_edited_image(self.edited_image)
         
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
@@ -490,6 +496,23 @@ class ImageViewer(QWidget):
 
             return QPixmap.fromImage(image)
         
+        
+    def undo(self):
+        if len(self.edit_history)>0:
+            self.edit_history.pop()            
+            self.show_edited_image(self.edit_history[-1])
+            
+
+        else:
+            if hasattr(self, 'edited_image'):
+                delattr(self,'edited_image')
+                self.show_image()
+            
+            
+    def revert(self):
+        if hasattr(self, 'edited_image'):
+            delattr(self,'edited_image')
+        self.show_image()
     def save_image(self):
         if hasattr(self, 'edited_image'):
             cv2.imwrite(f"{self.file_list[self.current_index]} Copy",self.edited_image)  
