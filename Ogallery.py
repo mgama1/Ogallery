@@ -31,7 +31,7 @@ class MainWidget(QWidget):
         self.init_ui()
     def init_ui(self):
         self.setWindowTitle('OGallery')
-        self.setGeometry(300, 100, 800, 600)
+        self.setGeometry(300, 100, 800, 650)
         
         layout = QVBoxLayout(self)
         horizontal_layout = QHBoxLayout()
@@ -39,6 +39,10 @@ class MainWidget(QWidget):
         self.query = QLineEdit(self)
         search_button = QPushButton('➤', self)
         self.info_button=QPushButton('ⓘ',self)
+        
+        completer = QCompleter(classesNames, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.query.setCompleter(completer)
         
         self.logo_label = QLabel(self)
         pixmap = QPixmap('logo.jpg')
@@ -91,6 +95,9 @@ class MainWidget(QWidget):
         )
         
         self.query.setStyleSheet(line_style)
+        
+
+        
         
         self.show()
 
