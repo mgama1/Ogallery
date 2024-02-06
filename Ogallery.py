@@ -91,11 +91,14 @@ class MainWidget(QWidget):
              border-radius: 15px; \
              padding: 5px; \
              border: 2px solid #2e2e2e; \
+             font-size: 12pt; \
              }"
         )
         
         self.query.setStyleSheet(line_style)
-        
+        completer.popup().setStyleSheet("background-color: #2e2e2e; color: white; \
+                                        font-size: 12pt;")
+
 
         
         
@@ -194,6 +197,8 @@ class ImageViewer(QWidget):
         
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
+        
+        # this is to fix weird behaviour similar to stackoverflow Q #68182395
         QTimer.singleShot(0, self.handle_timeout)
         self.image_view.wheelEvent = self.zoom_image
         ###########################################
@@ -203,10 +208,8 @@ class ImageViewer(QWidget):
         
         
         #self.palette_label.setPixmap(palettePixmap.scaledToHeight(80, Qt.SmoothTransformation))
-      
-
-
         ##############################################
+        
         self.keylist = []
         self.file_list = []
         self.current_index = 0
@@ -269,7 +272,7 @@ class ImageViewer(QWidget):
         layout.addLayout(Hlayout)
         #################
         #layout.addWidget(self.palette_label)
-        ##########################333
+        ##########################3
         layout.addWidget(self.exposure_slider)
 
         layout.addLayout(editing_buttons_layout)
@@ -320,7 +323,7 @@ class ImageViewer(QWidget):
             "QPushButton {background-color: rgba(22, 22, 22, .5); \
             border: none; \
             color: white;} \
-            QPushButton:hover {background-color: #c90202;} "
+            QPushButton:hover {background-color: #2e2e2e;} "
         )
         
         self.back_button.setGeometry(10, 0, 60, 40) 
@@ -334,7 +337,7 @@ class ImageViewer(QWidget):
         self.leftBrowse.setStyleSheet(browsing_buttons_style)
         self.rightBrowse.setStyleSheet(browsing_buttons_style)
 
-        
+        self.image_view.setStyleSheet("border: none;")
         
         
         
@@ -371,11 +374,15 @@ class ImageViewer(QWidget):
             pixmap_item = QGraphicsPixmapItem(pixmap)
             self.scene.addItem(pixmap_item)
 
+             # Add a QGraphicsPixmapItem to the scene
+        
+            
             # Set the scene rect to match the pixmap size
             self.scene.setSceneRect(pixmap_item.boundingRect())
 
             # Fit the image to the view
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
 
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
