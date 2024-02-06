@@ -189,7 +189,6 @@ class ImageViewer(QWidget):
         self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet("background-color: #222324;")
         
-       # Replace QLabel with QGraphicsView
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
         self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -201,14 +200,7 @@ class ImageViewer(QWidget):
         # this is to fix weird behaviour similar to stackoverflow Q #68182395
         QTimer.singleShot(0, self.handle_timeout)
         self.image_view.wheelEvent = self.zoom_image
-        ###########################################
-        #self.palette_label = QLabel(self.image_label)
-        #palettePixmap = QPixmap('Untitled.png')
-        #self.palette_label.setAlignment(Qt.AlignBottom | Qt.AlignHCenter)
-        
-        
-        #self.palette_label.setPixmap(palettePixmap.scaledToHeight(80, Qt.SmoothTransformation))
-        ##############################################
+
         
         self.keylist = []
         self.file_list = []
@@ -270,15 +262,8 @@ class ImageViewer(QWidget):
    
     
         layout.addLayout(Hlayout)
-        #################
-        #layout.addWidget(self.palette_label)
-        ##########################3
         layout.addWidget(self.exposure_slider)
-
         layout.addLayout(editing_buttons_layout)
-
-        
-
         self.setLayout(layout)
 
         # Connect button signals to their respective functions
@@ -342,20 +327,8 @@ class ImageViewer(QWidget):
         
         
         self.set_transparency(0)
-        
-        
-        
-        #-----------------------------------------------------
-        #self.image_label.setFocusPolicy(Qt.StrongFocus)
-        #self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #self.palette_label.setFocusPolicy(Qt.StrongFocus)
-        #self.palette_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #self.palette_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
         self.load_images()
-
         self.show_image()
-
         self.show()
       
 
@@ -374,7 +347,6 @@ class ImageViewer(QWidget):
             pixmap_item = QGraphicsPixmapItem(pixmap)
             self.scene.addItem(pixmap_item)
 
-             # Add a QGraphicsPixmapItem to the scene
         
             
             # Set the scene rect to match the pixmap size
@@ -570,7 +542,6 @@ class ImageViewer(QWidget):
             return QPixmap.fromImage(q_image)
 
 
-            #return QPixmap.fromImage(image)
         
         
     def undo(self):
