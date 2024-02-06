@@ -5,7 +5,7 @@ classesNames=['bicycle','boat','building','bus','car','forest',
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
 from PyQt5.QtWidgets import QPushButton,QSizePolicy
 from PyQt5.QtGui import QColor,QFont
 from PyQt5.QtGui import QImage
@@ -186,8 +186,16 @@ class ImageViewer(QWidget):
         self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet("background-color: #222324;")
         
-        self.image_label = QLabel(self)
-        self.image_label.setAlignment(Qt.AlignCenter)
+       # Replace QLabel with QGraphicsView
+        self.image_view = QGraphicsView(self)
+        self.image_view.setAlignment(Qt.AlignCenter)
+        self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.image_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        self.scene = QGraphicsScene()
+        self.image_view.setScene(self.scene)
+        QTimer.singleShot(0, self.handle_timeout)
+        self.image_view.wheelEvent = self.zoom_image
         ###########################################
         #self.palette_label = QLabel(self.image_label)
         #palettePixmap = QPixmap('Untitled.png')
@@ -216,7 +224,7 @@ class ImageViewer(QWidget):
         self.back_button = QPushButton('↩', self)
 
         Hlayout.addWidget(self.leftBrowse)
-        Hlayout.addWidget(self.image_label)
+        Hlayout.addWidget(self.image_view)
         Hlayout.addWidget(self.rightBrowse)
 
         
@@ -251,6 +259,8 @@ class ImageViewer(QWidget):
         for button in editing_buttons+navigation_buttons:
             button.setFocusPolicy(Qt.NoFocus)
 
+        
+        self.image_view.setFocusPolicy(Qt.NoFocus)
         #adding editing buttons to th editing buttons layout
         for  button in editing_buttons:
             editing_buttons_layout.addWidget(button)
@@ -332,10 +342,9 @@ class ImageViewer(QWidget):
         
         
         
-        
         #-----------------------------------------------------
-        self.image_label.setFocusPolicy(Qt.StrongFocus)
-        self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.image_label.setFocusPolicy(Qt.StrongFocus)
+        #self.image_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.palette_label.setFocusPolicy(Qt.StrongFocus)
         #self.palette_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.palette_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -351,23 +360,71 @@ class ImageViewer(QWidget):
         self.file_list = self.result
         
     def show_image(self):
-       
         if self.file_list:
             image_path = self.file_list[self.current_index]
             pixmap = QPixmap(image_path)
-            self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                     round(self.screen_height*.8),
-                                                     Qt.KeepAspectRatio,
-                                                     Qt.SmoothTransformation))
+
+            # Clear the scene before adding a new item
+            self.scene.clear()
+
+            # Add a QGraphicsPixmapItem to the scene
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(pixmap_item)
+
+            # Set the scene rect to match the pixmap size
+            self.scene.setSceneRect(pixmap_item.boundingRect())
+
+            # Fit the image to the view
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
 
-    def show_edited_image(self,img):
-        pixmap = self.convert_cv_image_to_qpixmap(img)
-        self.image_label.setPixmap(pixmap.scaled(round(self.screen_width*.8),
-                                                 round(self.screen_height*.8),
-                                                 Qt.KeepAspectRatio,
-                                                 Qt.SmoothTransformation))
+
+
+    def show_edited_image(self):
+        self.scene.clear()
+        pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
+
+        # Clear the scene before adding a new item
+        #
+
+        # Add a QGraphicsPixmapItem to the scene
+        pixmap_item = QGraphicsPixmapItem(pixmap)
+        self.scene.addItem(pixmap_item)
+
+        # Set the scene rect to match the pixmap size
+        self.scene.setSceneRect(pixmap_item.boundingRect())
+
+        # Fit the image to the view
+        self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
         
+    def handle_timeout(self):
+        if self.file_list:
+            image_path = self.file_list[self.current_index]
+            pixmap = QPixmap(image_path)
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+        
+    def zoom_image(self, event):
+        # Get the current transformation matrix of the view
+        transform = self.image_view.transform()
+
+        # Set the transformation anchor to the center of the view
+        self.image_view.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+
+        # Get the zoom factor
+        delta = event.angleDelta().y() / 120  # Get the scroll steps (typically 120 per step)
+        zoom_factor = 1.1 if delta > 0 else 0.9  # Define the zoom factor
+
+        # Scale the view using zoom_factor
+        transform.scale(zoom_factor, zoom_factor)
+
+        # Apply the new transformation to the view
+        self.image_view.setTransform(transform)
+
+
     def keyPressEvent(self, event):
         
         #Navigating images in the directory
@@ -430,7 +487,7 @@ class ImageViewer(QWidget):
             sharpened=cv2.addWeighted(img,1.5,gaussian_blurred,-.5,0)
             self.edited_image=sharpened
             self.edit_history.append(self.edited_image)
-            self.show_edited_image(self.edited_image)
+            self.show_edited_image()
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -442,7 +499,7 @@ class ImageViewer(QWidget):
         gray_3C=cv2.merge([gray,gray,gray])
         self.edited_image=gray_3C
         self.edit_history.append(self.edited_image)
-        self.show_edited_image(self.edited_image)
+        self.show_edited_image()
         
         
     def gaussianBlur(self):
@@ -455,7 +512,7 @@ class ImageViewer(QWidget):
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
         self.edited_image=Blurred_img
         self.edit_history.append(self.edited_image)
-        self.show_edited_image(self.edited_image)
+        self.show_edited_image()
         
         
     def rotateCCW(self):
@@ -468,7 +525,7 @@ class ImageViewer(QWidget):
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image=rotatedImg
         self.edit_history.append(self.edited_image)
-        self.show_edited_image(self.edited_image)
+        self.show_edited_image()
         
 
     def toggle_exposure_slider(self):
@@ -486,7 +543,7 @@ class ImageViewer(QWidget):
         exposureImg= cv2.LUT(img, table)
         self.edited_image=exposureImg
         self.edit_history.append(self.edited_image)
-        self.show_edited_image(self.edited_image)
+        self.show_edited_image()
     
     def removeBackground(self):
         if hasattr(self, 'edited_image'):
@@ -496,7 +553,7 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         removed_bg_image=rembg.remove(img,bgcolor=(2555,255,0,1))
         self.edited_image=removed_bg_image
-        self.show_edited_image(self.edited_image)
+        self.show_edited_image()
         
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
@@ -511,8 +568,9 @@ class ImageViewer(QWidget):
         
     def undo(self):
         if len(self.edit_history)>0:
-            self.edit_history.pop()            
-            self.show_edited_image(self.edit_history[-1])
+            self.edit_history.pop()  
+            self.edited_image=self.edit_history[-1]
+            self.show_edited_image()
             
 
         else:
@@ -524,6 +582,7 @@ class ImageViewer(QWidget):
     def revert(self):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
+            self.edit_history=[]
         self.show_image()
     def save_image(self):
         if hasattr(self, 'edited_image'):
