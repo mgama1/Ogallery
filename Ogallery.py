@@ -9,7 +9,7 @@ import datetime
 
 
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap,QColor,QFont,QImage
+from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
 from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
 import numpy as np
 import pandas as pd
@@ -564,10 +564,29 @@ class ImageViewer(QWidget):
     
     def save_image(self):
         if hasattr(self, 'edited_image'):
-            time_now = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
-            cv2.imwrite(f"{self.file_list[self.current_index]} {time_now}",self.edited_image)  
-            self.show_success_message()
-            delattr(self,'edited_image')
+            msg_box = QMessageBox()
+            msg_box.setText("Overwrite image or save as a copy?")
+            msg_box.setWindowTitle("Saving options")
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            msg_box.button(QMessageBox.Ok).setText('Overwrite')
+            msg_box.button(QMessageBox.Cancel).setText('Copy')
+            msg_box.button(QMessageBox.Ok).setIcon(QIcon()) 
+            msg_box.button(QMessageBox.Cancel).setIcon(QIcon())
+            result = msg_box.exec_()
+            if result == QMessageBox.Ok:
+                cv2.imwrite(f"{self.file_list[self.current_index]}",self.edited_image)  
+                #self.show_success_message()
+                delattr(self,'edited_image')
+            elif result == QMessageBox.Cancel:
+                time_now = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+                cv2.imwrite(f"{self.file_list[self.current_index]} {time_now}",self.edited_image)  
+                #self.show_success_message()
+                delattr(self,'edited_image')
+
+            
+            
+        
         else:
             self.show_error_message("no changes made to save")
     
