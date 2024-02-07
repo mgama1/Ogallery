@@ -564,26 +564,9 @@ class ImageViewer(QWidget):
     
     def save_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = QMessageBox()
-            msg_box.setText("Overwrite image or save as a copy?")
-            msg_box.setWindowTitle("Saving options")
-            msg_box.setIcon(QMessageBox.Information)
-            msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-            msg_box.button(QMessageBox.Ok).setText('Overwrite')
-            msg_box.button(QMessageBox.Cancel).setText('Copy')
-            msg_box.button(QMessageBox.Ok).setIcon(QIcon()) 
-            msg_box.button(QMessageBox.Cancel).setIcon(QIcon())
-            result = msg_box.exec_()
-            if result == QMessageBox.Ok:
-                cv2.imwrite(f"{self.file_list[self.current_index]}",self.edited_image)  
-                #self.show_success_message()
-                delattr(self,'edited_image')
-            elif result == QMessageBox.Cancel:
-                time_now = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
-                cv2.imwrite(f"{self.file_list[self.current_index]} {time_now}",self.edited_image)  
-                #self.show_success_message()
-                delattr(self,'edited_image')
-
+            msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box.exec_()
+        
             
             
         
@@ -641,6 +624,41 @@ class ImageViewer(QWidget):
         #print("Exiting application")
       #  print(self.file_list)
       #  app.quit()
+        
+        
+        
+class SavingMessageBox(QMessageBox):
+    def __init__(self, image_path, edited_image, *args, **kwargs):
+        super(SavingMessageBox, self).__init__(*args, **kwargs)
+
+        self.image_path=image_path
+        self.edited_image=edited_image
+        self.overwrite_button = QPushButton("Overwrite")
+        self.copy_button = QPushButton("Copy")
+ 
+
+
+        self.addButton(self.overwrite_button, QMessageBox.ActionRole)
+        self.addButton(self.copy_button, QMessageBox.ActionRole)
+                       
+        
+        self.overwrite_button.clicked.connect(self.handle_overwrite)
+        self.copy_button.clicked.connect(self.handle_copy)
+        
+        #################
+
+       
+        self.setWindowTitle("Save Image")
+        self.setText("Do you want to overwrite the existing image or save a copy?")
+        self.setStyleSheet("background-color: #212121;color:white;")
+        
+    def handle_overwrite(self):
+        cv2.imwrite(self.image_path, self.edited_image)
+
+    def handle_copy(self):
+        print("Copy")
+
+        
 if __name__ == '__main__':
     app = QApplication([])
 
@@ -659,3 +677,4 @@ if __name__ == '__main__':
     main_widget = MainWidget()
 
     app.exec_()
+
