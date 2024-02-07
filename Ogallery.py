@@ -3,24 +3,24 @@ classesNames=['bicycle','boat','building','bus','car','forest',
              'plane','sea','street','train','truck']
 
 import os
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
-from PyQt5.QtWidgets import QPushButton,QSizePolicy
-from PyQt5.QtGui import QColor,QFont
-from PyQt5.QtGui import QImage
-import cv2
-import numpy as np
 import time
-from __future__ import print_function
+import datetime
+
+
+
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QPixmap,QColor,QFont,QImage
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
+import numpy as np
 import pandas as pd
-from numpy.linalg import norm
+import cv2
+from PIL import Image
+#import imagehash
+from Levenshtein import distance as lev_distance
+from __future__ import print_function
 import argparse
 import rembg
-import imagehash
-from PIL import Image
-from Levenshtein import distance as lev_distance
-import rembg
+
 
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
@@ -561,14 +561,26 @@ class ImageViewer(QWidget):
             delattr(self,'edited_image')
             self.edit_history=[]
         self.show_image()
+    
     def save_image(self):
         if hasattr(self, 'edited_image'):
-            cv2.imwrite(f"{self.file_list[self.current_index]} Copy",self.edited_image)  
+            time_now = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+            cv2.imwrite(f"{self.file_list[self.current_index]} {time_now}",self.edited_image)  
             self.show_success_message()
             delattr(self,'edited_image')
         else:
             self.show_error_message("no changes made to save")
+    
     def show_success_message(self):
+        '''
+        Display a QMessageBox ("Saved successfully!") with information icon
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Information)
         msg_box.setText("Saved successfully!")
@@ -577,17 +589,26 @@ class ImageViewer(QWidget):
         
     
     def show_error_message(self,msg):
+        '''
+        Display a QMessageBox with a warning icon.
+
+        Args:
+            msg (str): The message to be displayed in the QMessageBox.
+
+        Returns:
+            None
+        '''
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
     
-    def goHome(self):  
-         # Hide the current widget (ImageViewer)
-        self.hide()
-
-        # Close the current widget (ImageViewer)
+    def goHome(self):
+        '''
+        Close the current widget (ImageViewer)
+        '''
+        
         self.close()
         
     def closeEvent(self, event):
