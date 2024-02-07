@@ -648,7 +648,9 @@ class SavingMessageBox(QMessageBox):
         self.setWindowTitle("Save Image")
         self.setText("Do you want to overwrite the existing image or save a copy?")
         self.setStyleSheet("background-color: #212121;color:white;")
-        
+        self.overwrite_button.setStyleSheet("QPushButton:hover {background-color: #cc0e14; }")
+        self.copy_button.setStyleSheet("QPushButton:hover {background-color: #0e90cc; }")
+
     def handle_overwrite(self):
         cv2.imwrite(self.image_path, self.edited_image)
 
