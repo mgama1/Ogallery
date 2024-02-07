@@ -566,12 +566,11 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
             msg_box.exec_()
-        
+            delattr(self,'edited_image')
+            self.edit_history=[]
             
-            
-        
         else:
-            self.show_error_message("no changes made to save")
+            self.show_error_message("no changes were made!")
     
     def show_success_message(self):
         '''
@@ -635,9 +634,7 @@ class SavingMessageBox(QMessageBox):
         self.edited_image=edited_image
         self.overwrite_button = QPushButton("Overwrite")
         self.copy_button = QPushButton("Copy")
- 
-
-
+       
         self.addButton(self.overwrite_button, QMessageBox.ActionRole)
         self.addButton(self.copy_button, QMessageBox.ActionRole)
                        
@@ -656,8 +653,9 @@ class SavingMessageBox(QMessageBox):
         cv2.imwrite(self.image_path, self.edited_image)
 
     def handle_copy(self):
-        print("Copy")
-
+        mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
+                    self.edited_image)
         
 if __name__ == '__main__':
     app = QApplication([])
