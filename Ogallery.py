@@ -231,7 +231,6 @@ class ImageViewer(QWidget):
         self.set_exposure_button = QPushButton('Exposure', self)
         self.remove_bg_button = QPushButton('Remove Background', self)
         
-        self.palette_button=QPushButton('Palette',self)
         self.undo_button=QPushButton('undo',self)
         self.revert_button = QPushButton('Revert', self)
         self.save_button = QPushButton('💾', self)
@@ -246,7 +245,7 @@ class ImageViewer(QWidget):
         
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
-                 self.palette_button,self.undo_button,self.revert_button,self.save_button,self.remove_bg_button
+                 self.undo_button,self.remove_bg_button,self.revert_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button]
         
@@ -412,7 +411,7 @@ class ImageViewer(QWidget):
         elif event.key() == Qt.Key_Left:
             self.previous_image()
     
-        if event.key() == Qt.Key_Backspace:
+        if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
             self.goHome()
 
         #saving edited images using key event ctrl&s
