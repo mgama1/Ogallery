@@ -39,7 +39,8 @@ class MainWidget(QWidget):
         self.query = QLineEdit(self)
         search_button = QPushButton('➤', self)
         self.info_button=QPushButton('ⓘ',self)
-        
+        self.settings_button=QPushButton('⚙',self)
+
         completer = QCompleter(classesNames, self)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.query.setCompleter(completer)
@@ -48,8 +49,14 @@ class MainWidget(QWidget):
         pixmap = QPixmap('logo.jpg')
         self.logo_label.setPixmap(pixmap)
         self.logo_label.setAlignment(Qt.AlignCenter)
+        header_layout=QHBoxLayout()
+        header_layout.addWidget(self.settings_button)
+        header_layout.addStretch(1)
+        header_layout.addWidget(self.info_button)
         
-        layout.addWidget(self.info_button,alignment=Qt.AlignTop|Qt.AlignRight)
+
+        
+        layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
         
 
@@ -62,9 +69,12 @@ class MainWidget(QWidget):
         self.info_button.clicked.connect(self.show_info)
         # -----------Elements font-----------------------
         font = QFont()
-        font.setPointSize(16)  
+        font.setPointSize(16)
+        HugeFont = QFont()
+        HugeFont.setPointSize(22)  
         search_button.setFont(font)
         self.info_button.setFont(font)
+        self.settings_button.setFont(HugeFont)
         #-----------layout----------------
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
@@ -75,6 +85,7 @@ class MainWidget(QWidget):
         self.query.setFixedHeight(33)
         search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
+        self.settings_button.setFixedSize(45,45)
 
         button_style = "QPushButton { background-color: #212121; \
                                         color: white; border: 2px solid #2e2e2e; \
@@ -82,8 +93,16 @@ class MainWidget(QWidget):
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
+        info_button_style = "QPushButton { background-color: #212121; \
+                                        color: #999999; border: 2px solid #2e2e2e; \
+                                        border: none;} \
+                                        QPushButton:hover {  \
+                                        background-color: #2e2e2e; }"
+        
         search_button.setStyleSheet(button_style) 
-        self.info_button.setStyleSheet(button_style)
+        self.info_button.setStyleSheet(info_button_style)
+        self.settings_button.setStyleSheet(info_button_style)
+
         line_style = (
             "QLineEdit { \
              background-color: #212121; \
@@ -130,19 +149,30 @@ class MainWidget(QWidget):
     
     def suggestClasses(self,query):
         '''
-        finds the levenshtein distance between existing classes and 
-        the search query and returns the classes with distance < 2
-        inputs: str query
-        outputs: suggested classes 
+        find the levenshtein distance between existing classes and 
+        the search query and returns the classes with distance <= 2
+        Args:
+            query (str)
+        Returns: 
+            suggested class (str) or None
         '''
         classes=['plane','car','cat','dog','food','sea','documents']
         query=query.lower()
+        
+        #check for exact match
         if query in classes:
             return query
-        
+        #check for lev distance of 1 with avg words length
         for classi in classes:
             if lev_distance(query,classi)==1:
                 return classi
+        
+        #check for lev distance of 2 with long words i.e >=8
+        for classi in list(filter(lambda x: len(x) >= 8, classes)):
+            if lev_distance(query,classi)==2:
+                return classi
+        
+        #No matches returned.
         return None
     
     
@@ -608,6 +638,12 @@ class ImageViewer(QWidget):
     def goHome(self):
         '''
         Close the current widget (ImageViewer)
+        
+        Args:
+            None
+            
+        Returns:
+            None
         '''
         
         self.close()
