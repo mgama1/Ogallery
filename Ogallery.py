@@ -33,46 +33,48 @@ class MainWidget(QWidget):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 650)
         
-        layout = QVBoxLayout(self)
-        horizontal_layout = QHBoxLayout()
-
+       
+        #buttons instantiation
         self.query = QLineEdit(self)
-        search_button = QPushButton('➤', self)
+        self.search_button = QPushButton('➤', self)
         self.info_button=QPushButton('ⓘ',self)
         self.settings_button=QPushButton('⚙',self)
-
+        
+        #Autocomplete using QCompleter
         completer = QCompleter(classesNames, self)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.query.setCompleter(completer)
         
+        #logo QLabel instantiation and settings
         self.logo_label = QLabel(self)
         pixmap = QPixmap('logo.jpg')
         self.logo_label.setPixmap(pixmap)
         self.logo_label.setAlignment(Qt.AlignCenter)
+        
+        #layout structure 
+        layout = QVBoxLayout(self)
+        horizontal_layout = QHBoxLayout()
         header_layout=QHBoxLayout()
+        
         header_layout.addWidget(self.settings_button)
         header_layout.addStretch(1)
         header_layout.addWidget(self.info_button)
-        
-
-        
+                
         layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
-        
-
-        
+                
         horizontal_layout.addWidget(self.query)
-        horizontal_layout.addWidget(search_button)
+        horizontal_layout.addWidget(self.search_button)
 
-        #----------connect button signals to their respective functions
-        search_button.clicked.connect(self.open_image_viewer)
+        #connect button signals to their respective functions
+        self.search_button.clicked.connect(self.open_image_viewer)
         self.info_button.clicked.connect(self.show_info)
         # -----------Elements font-----------------------
         font = QFont()
         font.setPointSize(16)
         HugeFont = QFont()
         HugeFont.setPointSize(22)  
-        search_button.setFont(font)
+        self.search_button.setFont(font)
         self.info_button.setFont(font)
         self.settings_button.setFont(HugeFont)
         #-----------layout----------------
@@ -83,7 +85,7 @@ class MainWidget(QWidget):
         
         self.setStyleSheet("background-color: #212121;color:white;")
         self.query.setFixedHeight(33)
-        search_button.setFixedSize(36, 36) 
+        self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
         self.settings_button.setFixedSize(45,45)
 
@@ -99,7 +101,7 @@ class MainWidget(QWidget):
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
-        search_button.setStyleSheet(button_style) 
+        self.search_button.setStyleSheet(button_style) 
         self.info_button.setStyleSheet(info_button_style)
         self.settings_button.setStyleSheet(info_button_style)
 
