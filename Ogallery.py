@@ -97,18 +97,14 @@ class MainWidget(QWidget):
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
-        info_button_style = "QPushButton { background-color: #212121; \
+        header_buttons_style = "QPushButton { background-color: #212121; \
                                         color: #999999; \
                                         border: 2px solid #212121; \
                                         border-radius: 18px;padding: 5px;} \
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
-        self.search_button.setStyleSheet(button_style) 
-        self.info_button.setStyleSheet(info_button_style)
-        self.settings_button.setStyleSheet(info_button_style)
-
-        line_style = (
+        qline_style = (
             "QLineEdit { \
              background-color: #212121; \
              color: white; \
@@ -119,10 +115,13 @@ class MainWidget(QWidget):
              }"
         )
         
-        self.query.setStyleSheet(line_style)
-        completer.popup().setStyleSheet("background-color: #2e2e2e; color: white; \
+        self.search_button.setStyleSheet(button_style) 
+        self.info_button.setStyleSheet(header_buttons_style)
+        self.settings_button.setStyleSheet(header_buttons_style)   
+        self.query.setStyleSheet(qline_style)
+        completer.popup().setStyleSheet("background-color: #2e2e2e; \
+                                        color: white; \
                                         font-size: 12pt;")
-
 
         
         
@@ -145,7 +144,7 @@ class MainWidget(QWidget):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText==None:
-            self.show_error_message("No images found (⌣̩̩́_⌣̩̩̀)")
+            self.showErrorMessage("No images found (⌣̩̩́_⌣̩̩̀)")
             
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
@@ -185,7 +184,7 @@ class MainWidget(QWidget):
         if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
             self.open_image_viewer()
             
-    def show_error_message(self,msg):
+    def showErrorMessage(self,msg):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
@@ -605,7 +604,7 @@ class ImageViewer(QWidget):
             self.edit_history=[]
             
         else:
-            self.show_error_message("no changes were made!")
+            self.showErrorMessage("no changes were made!")
     
     def show_success_message(self):
         '''
@@ -624,7 +623,7 @@ class ImageViewer(QWidget):
         msg_box.exec_()
         
     
-    def show_error_message(self,msg):
+    def showErrorMessage(self,msg):
         '''
         Display a QMessageBox with a warning icon.
 
