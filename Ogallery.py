@@ -138,8 +138,16 @@ class MainWidget(QWidget):
         
 
     def showMainWidget(self):
-    # Show the main widget when the ImageViewer is closed
+        """
+        Show the main widget when the ImageViewer is closed
+        Args:
+            None
+        Returns:
+            None
+        """
         self.show()
+        
+        
     def selectImages(self):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText)
@@ -181,10 +189,27 @@ class MainWidget(QWidget):
     
     
     def keyPressEvent(self, event):
+        """
+        Event handler for key press events, overriding the base class method.
+
+        Args:
+            event (QKeyEvent): The key event object containing information about the key press.
+
+        Returns:
+            None
+        """
+        
         if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
             self.openImageViewer()
             
     def showErrorMessage(self,msg):
+        """
+        Displays a QMessageBox warning
+        Args:
+            msg (str)
+        Returns:
+            None
+        """
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
@@ -192,14 +217,20 @@ class MainWidget(QWidget):
         msg_box.exec_()
         
     def showAppInfo(self):
+        """
+        Displays a QMessageBox containing application information such as maintainers 
+        and supported classes
+        
+        Args:
+            None
+        Returns:
+            None
+        """
         msg_box = QMessageBox()
-        msg_box.setStyleSheet("QMessageBox { background-color: #212121; color: white; }")
-
         msg_box.setIcon(QMessageBox.Information)
         msg_box.setText(f"This application is created and maintained by \
 Mahmoud gamal \
         current supported search classes are {', '.join(classesNames)}")
-        
         msg_box.setWindowTitle('info')
         msg_box.exec_()
 
