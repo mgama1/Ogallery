@@ -65,24 +65,25 @@ class MainWidget(QWidget):
                 
         horizontal_layout.addWidget(self.query)
         horizontal_layout.addWidget(self.search_button)
-
-        #connect button signals to their respective functions
-        self.search_button.clicked.connect(self.open_image_viewer)
-        self.info_button.clicked.connect(self.show_info)
-        # -----------Elements font-----------------------
-        font = QFont()
-        font.setPointSize(16)
-        HugeFont = QFont()
-        HugeFont.setPointSize(22)  
-        self.search_button.setFont(font)
-        self.info_button.setFont(font)
-        self.settings_button.setFont(HugeFont)
-        #-----------layout----------------
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
-        #----------setting style---------------------------
+        #connect button signals to their respective functions
+        self.search_button.clicked.connect(self.open_image_viewer)
+        self.info_button.clicked.connect(self.show_info)
         
+        # Elements font
+        font = QFont()
+        font.setPointSize(16)
+        medium_font = QFont()
+        medium_font.setPointSize(22)
+        
+        self.search_button.setFont(font)
+        self.info_button.setFont(font)
+        self.settings_button.setFont(medium_font)
+        
+        
+        #Elements style
         self.setStyleSheet("background-color: #212121;color:white;")
         self.query.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
@@ -90,14 +91,16 @@ class MainWidget(QWidget):
         self.settings_button.setFixedSize(45,45)
 
         button_style = "QPushButton { background-color: #212121; \
-                                        color: white; border: 2px solid #2e2e2e; \
+                                        color: white; \
+                                        border: 2px solid #2e2e2e; \
                                         border-radius: 18px;padding: 5px;} \
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
         info_button_style = "QPushButton { background-color: #212121; \
-                                        color: #999999; border: 2px solid #2e2e2e; \
-                                        border: none;} \
+                                        color: #999999; \
+                                        border: 2px solid #212121; \
+                                        border-radius: 18px;padding: 5px;} \
                                         QPushButton:hover {  \
                                         background-color: #2e2e2e; }"
         
