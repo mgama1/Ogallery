@@ -70,7 +70,7 @@ class MainWidget(QWidget):
         
         #connect button signals to their respective functions
         self.search_button.clicked.connect(self.open_image_viewer)
-        self.info_button.clicked.connect(self.show_info)
+        self.info_button.clicked.connect(self.showAppInfo)
         
         # Elements font
         font = QFont()
@@ -191,7 +191,7 @@ class MainWidget(QWidget):
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
         
-    def show_info(self):
+    def showAppInfo(self):
         msg_box = QMessageBox()
         msg_box.setStyleSheet("QMessageBox { background-color: #212121; color: white; }")
 
