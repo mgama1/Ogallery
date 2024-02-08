@@ -69,7 +69,7 @@ class MainWidget(QWidget):
         layout.addStretch(1)
         
         #connect button signals to their respective functions
-        self.search_button.clicked.connect(self.open_image_viewer)
+        self.search_button.clicked.connect(self.openImageViewer)
         self.info_button.clicked.connect(self.showAppInfo)
         
         # Elements font
@@ -127,7 +127,7 @@ class MainWidget(QWidget):
         
         self.show()
 
-    def open_image_viewer(self):
+    def openImageViewer(self):
         self.selectImages()
             
         if self.result:
@@ -182,7 +182,7 @@ class MainWidget(QWidget):
     
     def keyPressEvent(self, event):
         if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
-            self.open_image_viewer()
+            self.openImageViewer()
             
     def showErrorMessage(self,msg):
         msg_box = QMessageBox()
