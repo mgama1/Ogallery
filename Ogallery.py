@@ -5,7 +5,7 @@ classesNames=['bicycle','boat','building','bus','car','forest',
 import os
 import time
 import datetime
-
+import subprocess
 
 
 from PyQt5.QtWidgets import *
@@ -276,18 +276,22 @@ class ImageViewer(QWidget):
         # Main layout using QVBoxLayout
         layout = QVBoxLayout(self)
         Hlayout=QHBoxLayout(self)
+        header_layout=QHBoxLayout()
         editing_buttons_layout = QHBoxLayout(self)
 
        
         self.leftBrowse = QPushButton('〈', self)
         self.rightBrowse = QPushButton('〉', self)
         self.back_button = QPushButton('↩', self)
-
+        self.show_containing_folder_button=QPushButton('find',self)
+        
         Hlayout.addWidget(self.leftBrowse)
         Hlayout.addWidget(self.image_view)
         Hlayout.addWidget(self.rightBrowse)
 
-        
+        header_layout.addWidget(self.back_button)
+        header_layout.addStretch(1)
+        header_layout.addWidget(self.show_containing_folder_button)
         
         self.sharpen_button = QPushButton('Sharpen', self)
         self.gray_button = QPushButton('Gray scale', self)
@@ -324,7 +328,7 @@ class ImageViewer(QWidget):
         for  button in editing_buttons:
             editing_buttons_layout.addWidget(button)
    
-    
+        layout.addLayout(header_layout)
         layout.addLayout(Hlayout)
         layout.addWidget(self.exposure_slider)
         layout.addLayout(editing_buttons_layout)
@@ -344,6 +348,7 @@ class ImageViewer(QWidget):
         self.revert_button.clicked.connect(self.revert)
         self.leftBrowse.clicked.connect(self.next_image)
         self.rightBrowse.clicked.connect(self.previous_image)
+        self.show_containing_folder_button.clicked.connect(self.show_containing_folder)
         ###############################
         
         self.rightBrowse.enterEvent = self.on_enter_event
@@ -357,7 +362,7 @@ class ImageViewer(QWidget):
         bigFont = QFont()
         bigFont.setPointSize(20)
         
-        self.back_button.setFont(mediumFont)
+        #self.back_button.setFont(mediumFont)
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
         
@@ -367,16 +372,19 @@ class ImageViewer(QWidget):
             button.setStyleSheet(button_style)
         
         
-
-        self.back_button.setStyleSheet(
+        
+        header_buttons_style=(
             "QPushButton {background-color: rgba(22, 22, 22, .5); \
             border: none; \
-            color: white;} \
+            color: white; \
+            font-size: 16pt;} \
             QPushButton:hover {background-color: #2e2e2e;} "
         )
+        self.back_button.setStyleSheet(header_buttons_style)
+        self.show_containing_folder_button.setStyleSheet(header_buttons_style)
         
-        self.back_button.setGeometry(10, 0, 60, 40) 
-
+        self.back_button.setFixedSize(60,40) 
+        self.show_containing_folder_button.setFixedSize(60,40)
         self.leftBrowse.setFixedSize(60, self.height())
         self.rightBrowse.setFixedSize(60, self.height())
 
@@ -683,6 +691,35 @@ class ImageViewer(QWidget):
         
         self.close()
         
+    
+    
+
+    def show_containing_folder(self,file_path):
+        image_path=self.file_list[self.current_index]
+        
+        dir_path=image_path[0:image_path.rfind('/')]
+
+        commands = [
+            f"xdg-open {dir_path}",      # Default for most desktop environments
+            f"nautilus {dir_path}",      # Default for GNOME desktop environment
+            f"nemo {dir_path}",          # Default for Cinnamon desktop environment
+            f"thunar {dir_path}"         # Default for XFCE desktop environment
+        ]
+
+        for command in commands:
+            try:
+                subprocess.run(command.split(), check=True)
+                return True
+            except subprocess.CalledProcessError:
+                continue
+
+        # If none of the commands were successful
+        print("Unable to open file manager")
+        return False
+
+
+
+    
     def closeEvent(self, event):
         # Override the closeEvent method to handle the window close event
         self.finishedSignal.emit()
@@ -724,7 +761,7 @@ class SavingMessageBox(QMessageBox):
 
     def handle_overwrite(self):
         cv2.imwrite(self.image_path, self.edited_image)
-
+        print(self.image_path)
     def handle_copy(self):
         mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
