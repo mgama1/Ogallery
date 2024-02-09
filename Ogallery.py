@@ -32,7 +32,7 @@ class MainWidget(QWidget):
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 650)
-        icon = qta.icon('fa5b.periscope')
+        icon = qta.icon('fa5s.map-pin',color='#212121',scale_factor=1.2)
         self.setWindowIcon(icon)
        
         #buttons instantiation
@@ -333,8 +333,15 @@ class ImageViewer(QWidget):
         #fix for scale issue
         self.remove_bg_button.setIconSize(QSize(25,25))
         self.rotate_button.setIconSize(QSize(25,25))
-
-        self.rotate_button.setToolTip('rotate')
+        #tooltip
+        self.rotate_button.setToolTip('Rotate')
+        self.undo_button.setToolTip('Undo')
+        self.gray_button.setToolTip('Gray scale')
+        self.gaussianBlur_button.setToolTip('Blur')
+        self.remove_bg_button.setToolTip('Remove Background')
+        self.sharpen_button.setToolTip('Sharpen')
+        self.set_exposure_button.setToolTip('Exposure')
+        self.show_containing_folder_button.setToolTip('Show containing folder')
         
         self.exposure_slider = QSlider(Qt.Horizontal)
         self.exposure_slider.setMinimum(0)
@@ -776,7 +783,8 @@ class SavingMessageBox(QMessageBox):
         self.edited_image=edited_image
         self.overwrite_button = QPushButton("Overwrite")
         self.copy_button = QPushButton("Copy")
-       
+        self.overwrite_button.setFocusPolicy(Qt.NoFocus)
+        self.copy_button.setFocusPolicy(Qt.NoFocus)
         self.addButton(self.overwrite_button, QMessageBox.ActionRole)
         self.addButton(self.copy_button, QMessageBox.ActionRole)
                        
