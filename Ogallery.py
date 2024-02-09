@@ -38,8 +38,16 @@ class MainWidget(QWidget):
         #buttons instantiation
         self.query = QLineEdit(self)
         self.search_button = QPushButton('➤', self)
-        self.info_button=QPushButton('ⓘ',self)
-        self.settings_button=QPushButton('⚙',self)
+        self.info_button=QPushButton()
+        self.settings_button=QPushButton()
+        
+        #icons
+        info_icon=qta.icon('ei.info-circle',color='#999999')
+        self.info_button.setIcon(info_icon)
+        self.info_button.setIconSize(QSize(25,25))
+        settings_icon=qta.icon('fa.cog',color='#999999')
+        self.settings_button.setIcon(settings_icon)
+        self.settings_button.setIconSize(QSize(25,25))
         
         #Autocomplete using QCompleter
         completer = QCompleter(classesNames, self)
@@ -302,9 +310,9 @@ class ImageViewer(QWidget):
         self.gray_button = QPushButton()
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
+        self.flip_button=QPushButton()
         self.set_exposure_button = QPushButton()
         self.remove_bg_button = QPushButton()
-        
         self.undo_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
         
@@ -319,7 +327,7 @@ class ImageViewer(QWidget):
         rembg_icon=qta.icon('fa5s.user-times',color='white',scale_factor=.7)
         sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
         exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1.3)
-
+        flip_icon=qta.icon('mdi.reflect-horizontal',color='white',scale_factor=1)
         
         self.save_button.setIcon(save_icon)
         self.undo_button.setIcon(undo_icon)
@@ -329,10 +337,11 @@ class ImageViewer(QWidget):
         self.remove_bg_button.setIcon(rembg_icon)
         self.sharpen_button.setIcon(sharpen_icon)
         self.set_exposure_button.setIcon(exposure_icon)
-        
-        #fix for scale issue
+        self.flip_button.setIcon(flip_icon)
+        #some icons don't fit into defauly icons size
         self.remove_bg_button.setIconSize(QSize(25,25))
         self.rotate_button.setIconSize(QSize(25,25))
+        self.flip_button.setIconSize(QSize(25,25))
         #tooltip
         self.rotate_button.setToolTip('Rotate')
         self.undo_button.setToolTip('Undo')
@@ -352,7 +361,7 @@ class ImageViewer(QWidget):
         
         
         editing_buttons=[self.sharpen_button,self.gray_button,
-                self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
+                self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
                  self.remove_bg_button,self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
@@ -381,6 +390,7 @@ class ImageViewer(QWidget):
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
+        self.flip_button.clicked.connect(self.flipH)
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
@@ -619,7 +629,18 @@ class ImageViewer(QWidget):
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
         
-
+    def flipH(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        
+        flipped_img=cv2.flip(img, 1)
+        self.edited_image=flipped_img
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+    
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
         self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
