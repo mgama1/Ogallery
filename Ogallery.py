@@ -302,20 +302,23 @@ class ImageViewer(QWidget):
         self.gray_button = QPushButton()
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
-        self.set_exposure_button = QPushButton('Exposure', self)
+        self.set_exposure_button = QPushButton()
         self.remove_bg_button = QPushButton()
         
         self.undo_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
         
         self.save_button = QPushButton()
+        
+        #icons initialization
         save_icon = qta.icon('fa5.save', color='white',scale_factor=1.5)
         undo_icon = qta.icon('mdi.undo-variant', color='white',scale_factor=1.5)
-        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=1.5)
-        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.5)
+        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=.8)
+        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.4)
         blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1.5)
         rembg_icon=qta.icon('fa5s.user-times',color='white',scale_factor=.7)
         sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
+        exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1.3)
 
         
         self.save_button.setIcon(save_icon)
@@ -325,8 +328,12 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.setIcon(blur_icon)
         self.remove_bg_button.setIcon(rembg_icon)
         self.sharpen_button.setIcon(sharpen_icon)
+        self.set_exposure_button.setIcon(exposure_icon)
         
+        #fix for scale issue
         self.remove_bg_button.setIconSize(QSize(25,25))
+        self.rotate_button.setIconSize(QSize(25,25))
+
         self.rotate_button.setToolTip('rotate')
         
         self.exposure_slider = QSlider(Qt.Horizontal)
@@ -392,9 +399,9 @@ class ImageViewer(QWidget):
         #self.back_button.setFont(mediumFont)
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
-        
-        button_style = "QPushButton { background-color: #212121; color: white;border-left:none; border-right: none; border-top: none; border-bottom: none; } \
-                        QPushButton:hover {background-color: #00347d; }"
+        border_color='#2b2b2b'
+        button_style = "QPushButton {{ background-color: #212121; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}} \
+                        QPushButton:hover {{background-color: #00347d; }}".format(border_color=border_color)
         for button in editing_buttons:
             button.setStyleSheet(button_style)
         
@@ -805,7 +812,7 @@ if __name__ == '__main__':
     
 
 
-    
+
     
     
     
