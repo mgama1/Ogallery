@@ -399,8 +399,8 @@ class ImageViewer(QWidget):
         #self.back_button.setFont(mediumFont)
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
-        border_color='#2b2b2b'
-        button_style = "QPushButton {{ background-color: #212121; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}} \
+        border_color='#242424'
+        button_style = "QPushButton {{ background-color: #1f1f1f; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}} \
                         QPushButton:hover {{background-color: #00347d; }}".format(border_color=border_color)
         for button in editing_buttons:
             button.setStyleSheet(button_style)
@@ -790,8 +790,8 @@ class SavingMessageBox(QMessageBox):
         self.setWindowTitle("Save Image")
         self.setText("Do you want to overwrite the existing image or save a copy?")
         self.setStyleSheet("background-color: #212121;color:white;")
-        self.overwrite_button.setStyleSheet("QPushButton:hover {background-color: #cc0e14; }")
-        self.copy_button.setStyleSheet("QPushButton:hover {background-color: #0e90cc; }")
+        self.overwrite_button.setStyleSheet("QPushButton:hover {background-color: #7d0000; }")
+        self.copy_button.setStyleSheet("QPushButton:hover {background-color: #00347d; }")
 
     def handle_overwrite(self):
         cv2.imwrite(self.image_path, self.edited_image)
