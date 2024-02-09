@@ -7,7 +7,7 @@ import time
 import datetime
 import subprocess
 
-
+import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
 from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
@@ -251,8 +251,8 @@ class ImageViewer(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
-        self.setGeometry(300, 100, 800, 600)
-        self.setStyleSheet("background-color: #222324;")
+        self.setGeometry(300, 0, 750, 550)
+        self.setStyleSheet("background-color: #212121;")
         
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
@@ -283,8 +283,12 @@ class ImageViewer(QWidget):
         self.leftBrowse = QPushButton('〈', self)
         self.rightBrowse = QPushButton('〉', self)
         self.back_button = QPushButton('↩', self)
-        self.show_containing_folder_button=QPushButton('find',self)
         
+        #SCF_icon = qta.icon("fa5s.search-location",color="white")  # Use the correct icon name here
+        SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  # Use the correct icon name here
+        
+        self.show_containing_folder_button=QPushButton(SCF_icon,'')
+        self.show_containing_folder_button.setIconSize(SCF_icon.actualSize(QSize(20,  20)))  # Set the size of the icon
         Hlayout.addWidget(self.leftBrowse)
         Hlayout.addWidget(self.image_view)
         Hlayout.addWidget(self.rightBrowse)
@@ -294,16 +298,31 @@ class ImageViewer(QWidget):
         header_layout.addWidget(self.show_containing_folder_button)
         
         self.sharpen_button = QPushButton('Sharpen', self)
-        self.gray_button = QPushButton('Gray scale', self)
-        self.gaussianBlur_button = QPushButton('Smooth', self)
-        self.rotate_button = QPushButton('↶', self)
+        self.gray_button = QPushButton()
+        self.gaussianBlur_button = QPushButton()
+        self.rotate_button = QPushButton()
         self.set_exposure_button = QPushButton('Exposure', self)
         self.remove_bg_button = QPushButton('Remove Background', self)
         
-        self.undo_button=QPushButton('undo',self)
+        self.undo_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
-        self.save_button = QPushButton('💾', self)
+        
+        self.save_button = QPushButton()
+        save_icon = qta.icon('fa5.save', color='white')
+        undo_icon = qta.icon('mdi.undo-variant', color='white')
+        rotate_icon = qta.icon('mdi.crop-rotate', color='white')
+        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.4)
+        blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1.5)
+        
+        self.save_button.setIcon(save_icon)
+        self.undo_button.setIcon(undo_icon)
+        self.rotate_button.setIcon(rotate_icon)
+        self.gray_button.setIcon(gray_icon)
+        self.gaussianBlur_button.setIcon(blur_icon)
+        #self.gaussianBlur_button.setIconSize(QSize(32,  32))
 
+        self.rotate_button.setToolTip('rotate')
+        
         self.exposure_slider = QSlider(Qt.Horizontal)
         self.exposure_slider.setMinimum(0)
         self.exposure_slider.setMaximum(200)
@@ -314,9 +333,9 @@ class ImageViewer(QWidget):
         
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.set_exposure_button ,
-                 self.undo_button,self.remove_bg_button,self.revert_button,self.save_button
+                 self.remove_bg_button,self.revert_button,self.undo_button,self.save_button
                 ]
-        navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button]
+        navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
         #setting focus policy for all buttons
         for button in editing_buttons+navigation_buttons:
@@ -324,8 +343,10 @@ class ImageViewer(QWidget):
 
         
         self.image_view.setFocusPolicy(Qt.NoFocus)
-        #adding editing buttons to th editing buttons layout
+        #adding editing buttons to th editing buttons layout2+++++++
         for  button in editing_buttons:
+            button.setFixedHeight(40)
+
             editing_buttons_layout.addWidget(button)
    
         layout.addLayout(header_layout)
@@ -366,7 +387,7 @@ class ImageViewer(QWidget):
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
         
-        button_style = "QPushButton { background-color: #212121; color: white; } \
+        button_style = "QPushButton { background-color: #212121; color: white;border-left:none; border-right: none; border-top: none; border-bottom: none; } \
                         QPushButton:hover {background-color: #00347d; }"
         for button in editing_buttons:
             button.setStyleSheet(button_style)
@@ -769,13 +790,14 @@ class SavingMessageBox(QMessageBox):
         
 if __name__ == '__main__':
     app = QApplication([])
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")
+    
+    
+    
+    
+    
+    
 
-    
-    
-    
-    
-    
-    
 
     
     
