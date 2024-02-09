@@ -32,7 +32,8 @@ class MainWidget(QWidget):
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 650)
-        
+        icon = qta.icon('fa5b.periscope')
+        self.setWindowIcon(icon)
        
         #buttons instantiation
         self.query = QLineEdit(self)
@@ -297,30 +298,35 @@ class ImageViewer(QWidget):
         header_layout.addStretch(1)
         header_layout.addWidget(self.show_containing_folder_button)
         
-        self.sharpen_button = QPushButton('Sharpen', self)
+        self.sharpen_button = QPushButton()
         self.gray_button = QPushButton()
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
         self.set_exposure_button = QPushButton('Exposure', self)
-        self.remove_bg_button = QPushButton('Remove Background', self)
+        self.remove_bg_button = QPushButton()
         
         self.undo_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
         
         self.save_button = QPushButton()
-        save_icon = qta.icon('fa5.save', color='white')
-        undo_icon = qta.icon('mdi.undo-variant', color='white')
-        rotate_icon = qta.icon('mdi.crop-rotate', color='white')
-        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.4)
+        save_icon = qta.icon('fa5.save', color='white',scale_factor=1.5)
+        undo_icon = qta.icon('mdi.undo-variant', color='white',scale_factor=1.5)
+        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=1.5)
+        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.5)
         blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1.5)
+        rembg_icon=qta.icon('fa5s.user-times',color='white',scale_factor=.7)
+        sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
+
         
         self.save_button.setIcon(save_icon)
         self.undo_button.setIcon(undo_icon)
         self.rotate_button.setIcon(rotate_icon)
         self.gray_button.setIcon(gray_icon)
         self.gaussianBlur_button.setIcon(blur_icon)
-        #self.gaussianBlur_button.setIconSize(QSize(32,  32))
-
+        self.remove_bg_button.setIcon(rembg_icon)
+        self.sharpen_button.setIcon(sharpen_icon)
+        
+        self.remove_bg_button.setIconSize(QSize(25,25))
         self.rotate_button.setToolTip('rotate')
         
         self.exposure_slider = QSlider(Qt.Horizontal)
