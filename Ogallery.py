@@ -250,6 +250,7 @@ class ImageViewer(QWidget):
 
         self.file_list = []
         self.current_index = 0
+        self.exposure_state=1
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
@@ -644,7 +645,11 @@ class ImageViewer(QWidget):
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
         self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
-
+        colors=['#1f1f1f','#00347d']
+        border_color='#242424'
+        self.exposure_state=not self.exposure_state
+        exposure_button_style=f"QPushButton {{ background-color: {colors[not self.exposure_state]}; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}}"
+        self.set_exposure_button.setStyleSheet(exposure_button_style)
     def update_exposure(self, gamma1e2):
 
         image_path = self.file_list[self.current_index]
