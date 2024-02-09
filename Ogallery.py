@@ -315,6 +315,7 @@ class ImageViewer(QWidget):
         self.set_exposure_button = QPushButton()
         self.remove_bg_button = QPushButton()
         self.undo_button=QPushButton()
+        self.compare_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
         
         self.save_button = QPushButton()
@@ -329,6 +330,7 @@ class ImageViewer(QWidget):
         sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
         exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1.3)
         flip_icon=qta.icon('mdi.reflect-horizontal',color='white',scale_factor=1)
+        compare_icon=qta.icon('mdi.select-compare',color='white',scale_factor=1)
         
         self.save_button.setIcon(save_icon)
         self.undo_button.setIcon(undo_icon)
@@ -339,6 +341,8 @@ class ImageViewer(QWidget):
         self.sharpen_button.setIcon(sharpen_icon)
         self.set_exposure_button.setIcon(exposure_icon)
         self.flip_button.setIcon(flip_icon)
+        self.compare_button.setIcon(compare_icon)
+        
         #some icons don't fit into defauly icons size
         self.remove_bg_button.setIconSize(QSize(25,25))
         self.rotate_button.setIconSize(QSize(25,25))
@@ -363,7 +367,7 @@ class ImageViewer(QWidget):
         
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
-                 self.remove_bg_button,self.revert_button,self.undo_button,self.save_button
+                 self.remove_bg_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
@@ -401,6 +405,9 @@ class ImageViewer(QWidget):
         self.leftBrowse.clicked.connect(self.next_image)
         self.rightBrowse.clicked.connect(self.previous_image)
         self.show_containing_folder_button.clicked.connect(self.show_containing_folder)
+        self.compare_button.pressed.connect(self.show_image)
+        self.compare_button.released.connect(self.show_edited_image)
+        
         ###############################
         
         self.rightBrowse.enterEvent = self.on_enter_event
