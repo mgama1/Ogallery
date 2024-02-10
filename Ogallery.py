@@ -313,7 +313,7 @@ class ImageViewer(QWidget):
         self.rotate_button = QPushButton()
         self.flip_button=QPushButton()
         self.set_exposure_button = QPushButton()
-        self.remove_bg_button = QPushButton()
+        self.blur_background_button = QPushButton()
         self.undo_button=QPushButton()
         self.compare_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
@@ -326,7 +326,7 @@ class ImageViewer(QWidget):
         rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=.8)
         gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.4)
         blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1.5)
-        rembg_icon=qta.icon('fa5s.user-times',color='white',scale_factor=.7)
+        blurbg_icon=qta.icon('fa.user',color='white',scale_factor=.7)
         sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
         exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1.3)
         flip_icon=qta.icon('mdi.reflect-horizontal',color='white',scale_factor=1)
@@ -337,14 +337,14 @@ class ImageViewer(QWidget):
         self.rotate_button.setIcon(rotate_icon)
         self.gray_button.setIcon(gray_icon)
         self.gaussianBlur_button.setIcon(blur_icon)
-        self.remove_bg_button.setIcon(rembg_icon)
+        self.blur_background_button.setIcon(blurbg_icon)
         self.sharpen_button.setIcon(sharpen_icon)
         self.set_exposure_button.setIcon(exposure_icon)
         self.flip_button.setIcon(flip_icon)
         self.compare_button.setIcon(compare_icon)
         
         #some icons don't fit into defauly icons size
-        self.remove_bg_button.setIconSize(QSize(25,25))
+        self.blur_background_button.setIconSize(QSize(25,25))
         self.rotate_button.setIconSize(QSize(25,25))
         self.flip_button.setIconSize(QSize(25,25))
         #tooltip
@@ -352,7 +352,8 @@ class ImageViewer(QWidget):
         self.undo_button.setToolTip('Undo')
         self.gray_button.setToolTip('Gray scale')
         self.gaussianBlur_button.setToolTip('Blur')
-        self.remove_bg_button.setToolTip('Remove Background')
+        self.blur_background_button.setToolTip('Portrait')
+        self.flip_button.setToolTip('Flip horizontally')
         self.sharpen_button.setToolTip('Sharpen')
         self.set_exposure_button.setToolTip('Exposure')
         self.show_containing_folder_button.setToolTip('Show containing folder')
@@ -367,7 +368,7 @@ class ImageViewer(QWidget):
         
         editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
-                 self.remove_bg_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
+                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
@@ -399,7 +400,7 @@ class ImageViewer(QWidget):
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
-        self.remove_bg_button.clicked.connect(self.removeBackground)
+        self.blur_background_button.clicked.connect(self.blurBackground)
         self.undo_button.clicked.connect(self.undo)
         self.revert_button.clicked.connect(self.revert)
         self.leftBrowse.clicked.connect(self.next_image)
@@ -670,14 +671,20 @@ class ImageViewer(QWidget):
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
     
-    def removeBackground(self):
+    def blurBackground(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
-        removed_bg_image=rembg.remove(img,bgcolor=(2555,255,0,1))
-        self.edited_image=removed_bg_image
+        mask = rembg.remove(img,only_mask=True)
+        mask_3c=cv2.merge([mask,mask,mask])
+        inv_mask_3c=255-np.copy(mask_3c)
+        foreground=cv2.bitwise_and(img,mask_3c)
+        background=cv2.bitwise_and(img,inv_mask_3c)
+        blurred_background=cv2.blur(background,(9,9))
+        blurred_bg_image=foreground+blurred_background
+        self.edited_image=blurred_bg_image
         self.show_edited_image()
         
     def convert_cv_image_to_qpixmap(self, cv_image):
