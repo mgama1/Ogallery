@@ -40,15 +40,8 @@ class MainWidget(QWidget):
         self.search_button = QPushButton('➤', self)
         self.info_button=QPushButton()
         self.settings_button=QPushButton()
-        
-        #icons
-        info_icon=qta.icon('ei.info-circle',color='#999999')
-        self.info_button.setIcon(info_icon)
-        self.info_button.setIconSize(QSize(25,25))
-        settings_icon=qta.icon('fa.cog',color='#999999')
-        self.settings_button.setIcon(settings_icon)
-        self.settings_button.setIconSize(QSize(25,25))
-        
+        self.gallery_button=QPushButton()
+       
         #Autocomplete using QCompleter
         completer = QCompleter(classesNames, self)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -66,6 +59,7 @@ class MainWidget(QWidget):
         header_layout=QHBoxLayout()
         
         header_layout.addWidget(self.settings_button)
+        header_layout.addWidget(self.gallery_button)
         header_layout.addStretch(1)
         header_layout.addWidget(self.info_button)
                 
@@ -80,7 +74,7 @@ class MainWidget(QWidget):
         #connect button signals to their respective functions
         self.search_button.clicked.connect(self.openImageViewer)
         self.info_button.clicked.connect(self.showAppInfo)
-        
+        self.gallery_button.clicked.connect(self.openGallery)
         # Elements font
         font = QFont()
         font.setPointSize(16)
@@ -127,12 +121,24 @@ class MainWidget(QWidget):
         self.search_button.setStyleSheet(button_style) 
         self.info_button.setStyleSheet(header_buttons_style)
         self.settings_button.setStyleSheet(header_buttons_style)   
+        self.gallery_button.setStyleSheet(header_buttons_style)
         self.query.setStyleSheet(qline_style)
         completer.popup().setStyleSheet("background-color: #2e2e2e; \
                                         color: white; \
                                         font-size: 12pt;")
 
         
+        #icons
+        info_icon=qta.icon('ei.info-circle',color='#999999')
+        self.info_button.setIcon(info_icon)
+        self.info_button.setIconSize(QSize(25,25))
+        settings_icon=qta.icon('fa.cog',color='#999999')
+        self.settings_button.setIcon(settings_icon)
+        self.settings_button.setIconSize(QSize(25,25))
+        
+        gallery_icon=qta.icon('mdi.folder-image',color='#999999')
+        self.gallery_button.setIcon(gallery_icon)
+        self.gallery_button.setIconSize(QSize(25,25))
         
         self.show()
 
@@ -145,7 +151,9 @@ class MainWidget(QWidget):
             self.viewer.show()
             self.hide()
         
-
+    def openGallery(self):
+        self.image_gallery=ImageGalleryApp()
+        self.image_gallery.show()
     def showMainWidget(self):
         """
         Show the main widget when the ImageViewer is closed
@@ -261,7 +269,7 @@ class ImageViewer(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
-        self.setGeometry(300, 0, 750, 550)
+        self.setGeometry(300, 100, 750, 550)
         self.setStyleSheet("background-color: #212121;")
         
         self.image_view = QGraphicsView(self)
@@ -849,6 +857,110 @@ class SavingMessageBox(QMessageBox):
         cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
                     self.edited_image)
         
+        
+        
+        
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
+import glob
+
+import sys
+import os
+
+class ImageThumbnailWidget(QWidget):
+    def __init__(self, image_path):
+        super().__init__()
+
+        self.image_path = image_path
+        self.bg_color="#222324"
+        
+        self.init_ui()
+    def init_ui(self):
+        layout = QVBoxLayout()
+        self.setStyleSheet(f"background-color: {self.bg_color};")
+
+        pixmap = QPixmap(self.image_path)
+        pixmap = pixmap.scaledToWidth(200)  
+
+        self.label = QLabel()
+        self.label.setPixmap(pixmap)
+        self.label.setAlignment(Qt.AlignCenter)
+
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+        file_types=['jpg','jpeg','png']
+        
+        self.image_files=[]
+        for file_type in file_types:
+            self.image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
+
+    def enterEvent(self, event):
+        # Change background color when the mouse enters
+        self.setStyleSheet("background-color: #606162;")
+
+    def leaveEvent(self, event):
+        # Reset background color when the mouse leaves
+        self.setStyleSheet(f"background-color: {self.bg_color};")
+
+    def mousePressEvent(self, event):
+        self.setStyleSheet("background-color: #0f68db;")
+        #print(os.path.dirname(self.image_path), os.path.basename(self.image_path))
+        self.image_files.remove(self.image_path)
+        self.image_files.insert(0,self.image_path)
+        self.viewer = ImageViewer(self.image_files, main_widget)
+        
+    def mouseReleaseEvent(self, event):
+            self.setStyleSheet(f"background-color: {self.bg_color};")
+            
+            
+            
+            
+class ImageGalleryApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.bg_color="#222324"
+        self.init_ui()
+
+    def init_ui(self):
+        central_widget = QWidget()
+        self.setStyleSheet(f"background-color: {self.bg_color};")
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        scroll_content = QWidget(scroll_area)
+        scroll_area.setWidget(scroll_content)
+
+        layout = QGridLayout(scroll_content)
+
+        #current_directory = os.getcwd()
+        file_types=['jpg','jpeg','png']
+        self.image_files=[]
+        for file_type in file_types:
+            self.image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
+
+        row, col = 0, 0
+        for index, image_file in enumerate(self.image_files):
+            
+            thumbnail_widget = ImageThumbnailWidget(image_file)
+            layout.addWidget(thumbnail_widget, row, col)
+            col += 1
+
+            if col == round(self.width()/200):
+                col = 0
+                row += 1
+
+        central_widget.setLayout(layout)
+        scroll_area.setWidget(central_widget)
+
+        self.setCentralWidget(scroll_area)
+
+        self.setGeometry(300, 100, 800, 650)
+        self.setWindowTitle('OGallery')
+        self.show()
+
+
 if __name__ == '__main__':
     app = QApplication([])
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")
@@ -866,6 +978,6 @@ if __name__ == '__main__':
     
     
     main_widget = MainWidget()
-
+    
     app.exec_()
 
