@@ -253,11 +253,11 @@ Mahmoud gamal \
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    def __init__(self, result, main_widget):
+    def __init__(self, result, main_widget,current_index=0):
         super().__init__()
 
         self.file_list = []
-        self.current_index = 0
+        self.current_index = current_index
         self.exposure_state=1
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
@@ -287,7 +287,7 @@ class ImageViewer(QWidget):
         
         self.keylist = []
         self.file_list = []
-        self.current_index = 0
+        #self.current_index = 0
         self.setMouseTracking(True)
         self.load_images()
 
@@ -900,10 +900,8 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet("background-color: #0f68db;")
-        #print(os.path.dirname(self.image_path), os.path.basename(self.image_path))
-        self.image_files.remove(self.image_path)
-        self.image_files.insert(0,self.image_path)
-        self.viewer = ImageViewer(self.image_files, main_widget)
+        self.viewer = ImageViewer(self.image_files, main_widget,
+                                  current_index=self.image_files.index(self.image_path))
 
 
 class ImageGalleryApp(QMainWindow):
