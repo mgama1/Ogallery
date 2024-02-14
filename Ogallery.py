@@ -1,12 +1,11 @@
-classesNames=['bicycle','boat','building','bus','car','forest',
-             'glacier','helicopter','motorcycle', 'mountain',
-             'plane','sea','street','train','truck']
 
 import os
 import time
 import datetime
 import subprocess
 import glob
+from urllib.parse import urlparse
+
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
@@ -24,6 +23,16 @@ import rembg
 
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
+classesNames=['bicycle','boat','building','bus','car','forest',
+             'glacier','helicopter','motorcycle', 'mountain',
+             'plane','sea','street','train','truck']
+
+file_types=['jpg','jpeg','png']
+parent_dir_files=[]
+for file_type in file_types:
+    parent_dir_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
+#parent_dir_files.sort()
+
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -866,29 +875,24 @@ class SavingMessageBox(QMessageBox):
 class ImageThumbnailWidget(QWidget):
     def __init__(self, image_path):
         super().__init__()
-        self.image_path = image_path
-        self.bg_color = "#222324"
-        self.init_ui()
 
+        self.image_path = image_path
+        self.bg_color="#222324"
+        
+        self.init_ui()
     def init_ui(self):
         layout = QVBoxLayout()
         self.setStyleSheet(f"background-color: {self.bg_color};")
 
+        pixmap = QPixmap(self.image_path)
+        pixmap = pixmap.scaledToWidth(200)  
+
         self.label = QLabel()
+        self.label.setPixmap(pixmap)
         self.label.setAlignment(Qt.AlignCenter)
 
         layout.addWidget(self.label)
         self.setLayout(layout)
-        file_types=['jpg','jpeg','png']
-        
-        self.image_files=[]
-        for file_type in file_types:
-            self.image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
-
-    def load_thumbnail(self):
-        pixmap = QPixmap(self.image_path)
-        pixmap = pixmap.scaledToWidth(200)
-        self.label.setPixmap(pixmap)
 
     def enterEvent(self, event):
         # Change background color when the mouse enters
@@ -900,21 +904,38 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet("background-color: #0f68db;")
-        self.viewer = ImageViewer(self.image_files, main_widget,
-                                  current_index=self.image_files.index(self.image_path))
+        thumb=Image.open(self.image_path)
+        original_image_path=self.strip_scheme(thumb.info['Thumb::URI'])
+        self.viewer = ImageViewer(parent_dir_files, main_widget,
+                                  current_index=parent_dir_files.index(original_image_path))
+        
+  
+    def mouseReleaseEvent(self, event):
+            self.setStyleSheet(f"background-color: {self.bg_color};")
+            
+            
+    def strip_scheme(self,uri):
+        """
+        Strips the scheme (e.g., 'file://', 'https://') from a URI.
 
+        Args:
+            uri (str): The URI string to process.
+
+        Returns:
+            str: The URI path without the scheme.
+        """
+        parsed_uri = urlparse(uri)
+        if parsed_uri.scheme:
+            return parsed_uri.geturl().replace(parsed_uri.scheme + '://', '', 1)
+        return uri 
 
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.bg_color = "#222324"
-        self.scroll_value =   0  # Initialize scroll_value
-        self.batch_size =   3  # Number of thumbnails to load per batch
-        self.loaded_count =   0  # Counter for thumbnails loaded in the current batch
-        self.scrollbar_threshold =   600  # Scrollbar threshold for loading thumbnails
-        self.thumbnails_to_load = []  # List of thumbnails to load
-        self.init_ui()
+        self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
 
+        self.bg_color="#222324"
+        self.init_ui()
     def init_ui(self):
         central_widget = QWidget()
         self.setStyleSheet(f"background-color: {self.bg_color};")
@@ -927,52 +948,28 @@ class ImageGalleryApp(QMainWindow):
 
         layout = QGridLayout(scroll_content)
 
-        file_types = ['jpg', 'jpeg', 'png']
-        image_files = []
-        for file_type in file_types:
-            image_files += (glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}", recursive=True))
-
-        row, col =   0,   0
-        for index, image_file in enumerate(image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file)
+        #check for png only as we already expect png thumnail. this is slightly faster
+        thumbnail_files=glob.glob(f"{self.cache_dir}/*.png")
+        #thumbnail_files.sort()
+        row, col = 0, 0
+        for index, thumbnail_file in enumerate(thumbnail_files):
+            
+            thumbnail_widget = ImageThumbnailWidget(thumbnail_file)
             layout.addWidget(thumbnail_widget, row, col)
-            col +=   1
+            col += 1
 
-            if col == round(self.width() /   200):
-                col =   0
-                row +=   1
-
-            self.thumbnails_to_load.append(thumbnail_widget)
+            if col == round(self.width()/200):
+                col = 0
+                row += 1
 
         central_widget.setLayout(layout)
         scroll_area.setWidget(central_widget)
 
         self.setCentralWidget(scroll_area)
 
-        self.scroll = scroll_area.verticalScrollBar()
-        self.scroll.valueChanged.connect(self.update_thumbnails)
-
-        self.setGeometry(100,   100,   800,   600)
+        self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
-
-        # Load the first batch of thumbnails immediately
-        self.load_initial_batch()
-
-    def load_initial_batch(self):
-        for i in range(9):
-            self.thumbnails_to_load[i].load_thumbnail()
-            self.loaded_count +=   1
-        del self.thumbnails_to_load[:self.batch_size]
-
-    def update_thumbnails(self):
-        self.scroll_value = self.scroll.value()
-        if self.scroll_value >= self.scrollbar_threshold or self.thumbnails_to_load:
-            for i in range(min(len(self.thumbnails_to_load), self.batch_size)):
-                self.thumbnails_to_load[i].load_thumbnail()
-                self.loaded_count +=   1
-            del self.thumbnails_to_load[:self.batch_size]
-            self.scrollbar_threshold += self.scrollbar_threshold
 
 
 if __name__ == '__main__':
@@ -986,6 +983,7 @@ if __name__ == '__main__':
     
 
 
+    
 
     
     
