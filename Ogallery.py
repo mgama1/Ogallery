@@ -31,7 +31,7 @@ file_types=['jpg','jpeg','png']
 parent_dir_files=[]
 for file_type in file_types:
     parent_dir_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
-#parent_dir_files.sort()
+parent_dir_files.sort(key=lambda x: os.path.getmtime(x))
 
 class MainWidget(QWidget):
     def __init__(self):
@@ -950,7 +950,8 @@ class ImageGalleryApp(QMainWindow):
 
         #check for png only as we already expect png thumnail. this is slightly faster
         thumbnail_files=glob.glob(f"{self.cache_dir}/*.png")
-        #thumbnail_files.sort()
+        thumbnail_files.sort(key=lambda x: os.path.getmtime(x))
+
         row, col = 0, 0
         for index, thumbnail_file in enumerate(thumbnail_files):
             
