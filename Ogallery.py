@@ -961,7 +961,7 @@ class ImageGalleryApp(QMainWindow):
 
         layout = QGridLayout(scroll_content)
 
-        file_types=['jpg','jpeg','png']
+        file_types=['jpg','jpeg','png','gif']
         image_files=[]
         for file_type in file_types:
             image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
