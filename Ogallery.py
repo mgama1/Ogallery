@@ -18,6 +18,7 @@ from Levenshtein import distance as lev_distance
 from __future__ import print_function
 import argparse
 import rembg
+from Othumbnails import ThumbnailMaker
 
 
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
@@ -954,12 +955,11 @@ class ImageGalleryApp(QMainWindow):
 
         layout = QGridLayout(scroll_content)
 
-        #check for png only as we already expect png thumnail. this is slightly faster
         file_types=['jpg','jpeg','png']
         image_files=[]
         for file_type in file_types:
             image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
-        image_files.sort(key=lambda x: os.path.getmtime(x))
+        image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
 
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
@@ -989,7 +989,7 @@ if __name__ == '__main__':
     
     
     
-    
+
     
 
 
