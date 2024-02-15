@@ -29,11 +29,7 @@ classesNames=['bicycle','boat','building','bus','car','forest',
              'glacier','helicopter','motorcycle', 'mountain',
              'plane','sea','street','train','truck']
 
-file_types=['jpg','jpeg','png']
-parent_dir_files=[]
-for file_type in file_types:
-    parent_dir_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
-parent_dir_files.sort(key=lambda x: os.path.getmtime(x))
+
 
 
 class MainWidget(QWidget):
@@ -864,21 +860,21 @@ class SavingMessageBox(QMessageBox):
         cv2.imwrite(self.image_path, self.edited_image)
         print(self.image_path)
     def handle_copy(self):
-        mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
         cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
                     self.edited_image)
         
-        print(self.image_path)
         
         
 
 
 
 class ImageThumbnailWidget(QWidget):
-    def __init__(self, image_path):
+    def __init__(self, image_path,image_files):
         super().__init__()
         self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
         self.image_path = image_path
+        self.image_files=image_files
         self.bg_color="#222324"
         
         self.init_ui()
@@ -889,11 +885,18 @@ class ImageThumbnailWidget(QWidget):
         #3141
         thumbnail_name=tm.compute_md5(tm.add_file_scheme(self.image_path))+".png"
         thumbnail_path=self.cache_dir+thumbnail_name
-        thumb_pil=Image.open(thumbnail_path)
-        thumb_MTime=int(float(thumb_pil.info['Thumb::MTime']))
-        image_MTime=int(os.path.getmtime(self.image_path))
-        if os.path.exists(thumbnail_path) and image_MTime==thumb_MTime:
-            pixmap = QPixmap(thumbnail_path)
+        
+        if os.path.exists(thumbnail_path):
+            thumb_pil=Image.open(thumbnail_path)
+            thumb_MTime=int(float(thumb_pil.info['Thumb::MTime']))
+            image_MTime=int(os.path.getmtime(self.image_path))
+            if image_MTime==thumb_MTime:
+                pixmap = QPixmap(thumbnail_path)
+        
+            else:
+                tm.create_thumbnail(self.image_path)
+                pixmap = QPixmap(thumbnail_path)
+       
         else:
             tm.create_thumbnail(self.image_path)
             pixmap = QPixmap(thumbnail_path)
@@ -916,10 +919,8 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet("background-color: #0f68db;")
-        #thumb=Image.open(self.image_path)
-        #original_image_path=self.strip_scheme(thumb.info['Thumb::URI'])
-        self.viewer = ImageViewer(parent_dir_files, main_widget,
-                                  current_index=parent_dir_files.index(self.image_path))
+        self.viewer = ImageViewer(self.image_files, main_widget,
+                                  current_index=self.image_files.index(self.image_path))
         
   
     def mouseReleaseEvent(self, event):
@@ -969,7 +970,7 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
             
-            thumbnail_widget = ImageThumbnailWidget(image_file)
+            thumbnail_widget = ImageThumbnailWidget(image_file,image_files)
             layout.addWidget(thumbnail_widget, row, col)
             col += 1
 
