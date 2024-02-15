@@ -1,4 +1,3 @@
-
 import os
 import time
 import datetime
@@ -32,6 +31,7 @@ parent_dir_files=[]
 for file_type in file_types:
     parent_dir_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
 parent_dir_files.sort(key=lambda x: os.path.getmtime(x))
+
 
 class MainWidget(QWidget):
     def __init__(self):
@@ -798,9 +798,8 @@ class ImageViewer(QWidget):
         dir_path=image_path[0:image_path.rfind('/')]
 
         commands = [
+            f"nautilus --select {image_path}",  # Default for GNOME desktop environment            f"nemo {dir_path}",          # Default for Cinnamon desktop environment
             f"xdg-open {dir_path}",      # Default for most desktop environments
-            f"nautilus {dir_path}",      # Default for GNOME desktop environment
-            f"nemo {dir_path}",          # Default for Cinnamon desktop environment
             f"thunar {dir_path}"         # Default for XFCE desktop environment
         ]
 
@@ -866,7 +865,7 @@ class SavingMessageBox(QMessageBox):
         cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
                     self.edited_image)
         
-        
+        print(self.image_path)
         
         
 
@@ -875,18 +874,25 @@ class SavingMessageBox(QMessageBox):
 class ImageThumbnailWidget(QWidget):
     def __init__(self, image_path):
         super().__init__()
-
+        self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
         self.image_path = image_path
         self.bg_color="#222324"
         
         self.init_ui()
     def init_ui(self):
         layout = QVBoxLayout()
+        tm=ThumbnailMaker(self.cache_dir)
         self.setStyleSheet(f"background-color: {self.bg_color};")
-
-        pixmap = QPixmap(self.image_path)
+        #3141
+        thumbnail_name=tm.compute_md5(tm.add_file_scheme(self.image_path))+".png"
+        thumbnail_path=self.cache_dir+thumbnail_name
+        if os.path.exists(thumbnail_path):
+            pixmap = QPixmap(thumbnail_path)
+        else:
+            tm.create_thumbnail(self.image_path)
+            pixmap = QPixmap(thumbnail_path)
+            
         pixmap = pixmap.scaledToWidth(200)  
-
         self.label = QLabel()
         self.label.setPixmap(pixmap)
         self.label.setAlignment(Qt.AlignCenter)
@@ -904,10 +910,10 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet("background-color: #0f68db;")
-        thumb=Image.open(self.image_path)
-        original_image_path=self.strip_scheme(thumb.info['Thumb::URI'])
+        #thumb=Image.open(self.image_path)
+        #original_image_path=self.strip_scheme(thumb.info['Thumb::URI'])
         self.viewer = ImageViewer(parent_dir_files, main_widget,
-                                  current_index=parent_dir_files.index(original_image_path))
+                                  current_index=parent_dir_files.index(self.image_path))
         
   
     def mouseReleaseEvent(self, event):
@@ -932,7 +938,7 @@ class ImageThumbnailWidget(QWidget):
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
+        
 
         self.bg_color="#222324"
         self.init_ui()
@@ -949,13 +955,16 @@ class ImageGalleryApp(QMainWindow):
         layout = QGridLayout(scroll_content)
 
         #check for png only as we already expect png thumnail. this is slightly faster
-        thumbnail_files=glob.glob(f"{self.cache_dir}/*.png")
-        thumbnail_files.sort(key=lambda x: os.path.getmtime(x))
+        file_types=['jpg','jpeg','png']
+        image_files=[]
+        for file_type in file_types:
+            image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
+        image_files.sort(key=lambda x: os.path.getmtime(x))
 
         row, col = 0, 0
-        for index, thumbnail_file in enumerate(thumbnail_files):
+        for index, image_file in enumerate(image_files):
             
-            thumbnail_widget = ImageThumbnailWidget(thumbnail_file)
+            thumbnail_widget = ImageThumbnailWidget(image_file)
             layout.addWidget(thumbnail_widget, row, col)
             col += 1
 
