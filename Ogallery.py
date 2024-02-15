@@ -4,6 +4,8 @@ import datetime
 import subprocess
 import glob
 from urllib.parse import urlparse
+from PIL.PngImagePlugin import PngInfo
+from PIL import Image
 
 import qtawesome as qta
 from PyQt5.QtWidgets import *
@@ -887,7 +889,10 @@ class ImageThumbnailWidget(QWidget):
         #3141
         thumbnail_name=tm.compute_md5(tm.add_file_scheme(self.image_path))+".png"
         thumbnail_path=self.cache_dir+thumbnail_name
-        if os.path.exists(thumbnail_path):
+        thumb_pil=Image.open(thumbnail_path)
+        thumb_MTime=int(float(thumb_pil.info['Thumb::MTime']))
+        image_MTime=int(os.path.getmtime(self.image_path))
+        if os.path.exists(thumbnail_path) and image_MTime==thumb_MTime:
             pixmap = QPixmap(thumbnail_path)
         else:
             tm.create_thumbnail(self.image_path)
