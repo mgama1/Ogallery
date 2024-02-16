@@ -21,7 +21,7 @@ from __future__ import print_function
 import argparse
 import rembg
 from Othumbnails import ThumbnailMaker
-
+from custom import *
 
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
@@ -177,7 +177,7 @@ class MainWidget(QWidget):
         self.queryText=self.query.text()
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText==None:
-            self.showErrorMessage("No images found (⌣̩̩́_⌣̩̩̀)")
+            self.showErrorMessage("No images found")
             
         db=pd.read_csv("log.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
@@ -236,7 +236,11 @@ class MainWidget(QWidget):
             None
         """
         msg_box = InfoMessageBox()
-        msg_box.setIcon(QMessageBox.Warning)
+        #error_icon=qta.icon('mdi.robot',color='#bfa708')
+        pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
+        pixmap2 = QPixmap(qta.icon('fa.exclamation',color='#fde01a').pixmap(50,50))
+        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2)
+        msg_box.setIconPixmap(combined_pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
@@ -873,13 +877,6 @@ class InfoMessageBox(QMessageBox):
         self.OK_button = QPushButton("OK")
         self.OK_button.setFocusPolicy(Qt.NoFocus)
         self.addButton(self.OK_button, QMessageBox.ActionRole)
-                       
-        
-        #self.overwrite_button.clicked.connect(self.handle_overwrite)
-        
-        #################
-
-       
         self.setWindowTitle("Info")
         self.setStyleSheet("background-color: #212121;color:white;")
         self.OK_button.setStyleSheet("QPushButton:hover {background-color: #00347d; }")
