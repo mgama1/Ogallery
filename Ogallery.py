@@ -251,8 +251,9 @@ class MainWidget(QWidget):
         Returns:
             None
         """
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Information)
+        msg_box = InfoMessageBox()
+        msg_info_icon=qta.icon('fa.space-shuttle',color='white')
+        msg_box.setIconPixmap(msg_info_icon.pixmap(50, 50))
         msg_box.setText(f"This application is created and maintained by \
 Mahmoud gamal \
         current supported search classes are {', '.join(classesNames)}")
@@ -866,7 +867,24 @@ class SavingMessageBox(QMessageBox):
         
         
         
+class InfoMessageBox(QMessageBox):
+    def __init__(self,*args, **kwargs):
+        super(InfoMessageBox, self).__init__(*args, **kwargs)
+        self.OK_button = QPushButton("OK")
+        self.OK_button.setFocusPolicy(Qt.NoFocus)
+        self.addButton(self.OK_button, QMessageBox.ActionRole)
+                       
+        
+        #self.overwrite_button.clicked.connect(self.handle_overwrite)
+        
+        #################
 
+       
+        self.setWindowTitle("Info")
+        self.setStyleSheet("background-color: #212121;color:white;")
+        self.OK_button.setStyleSheet("QPushButton:hover {background-color: #00347d; }")
+
+    
 
 
 class ImageThumbnailWidget(QWidget):
@@ -986,7 +1004,9 @@ class ImageGalleryApp(QMainWindow):
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
-
+    def keyPressEvent(self, event):
+            if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+                self.close()
 
 if __name__ == '__main__':
     app = QApplication([])
