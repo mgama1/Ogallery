@@ -239,7 +239,7 @@ class MainWidget(QWidget):
         #error_icon=qta.icon('mdi.robot',color='#bfa708')
         pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
         pixmap2 = QPixmap(qta.icon('fa.exclamation',color='#fde01a').pixmap(50,50))
-        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2)
+        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,1.5)
         msg_box.setIconPixmap(combined_pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
@@ -775,7 +775,11 @@ class ImageViewer(QWidget):
             None
         '''
         msg_box = InfoMessageBox()
-        msg_box.setIcon(QMessageBox.Warning)
+        #msg_box.setIcon(QMessageBox.Warning)
+        pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
+        pixmap2 = QPixmap(qta.icon('mdi.fullscreen-exit',color='#e2172b').pixmap(50,50))
+        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,2)
+        msg_box.setIconPixmap(combined_pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
@@ -856,7 +860,7 @@ class SavingMessageBox(QMessageBox):
         
         
         self.setWindowTitle("Save Image")
-        self.setText("Do you want to overwrite the existing image or save a copy?!")
+        self.setText("Do you want to overwrite the existing image or save a copy?")
         self.setStyleSheet(f"background-color: {style.color.background};color:white;")
         self.overwrite_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.red}; }}")
         self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
@@ -874,12 +878,13 @@ class SavingMessageBox(QMessageBox):
 class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
+        style = OStyle()
         self.OK_button = QPushButton("OK")
         self.OK_button.setFocusPolicy(Qt.NoFocus)
         self.addButton(self.OK_button, QMessageBox.ActionRole)
         self.setWindowTitle("Info")
-        self.setStyleSheet("background-color: #212121;color:white;")
-        self.OK_button.setStyleSheet("QPushButton:hover {background-color: #00347d; }")
+        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
+        self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
 
     
 
@@ -1006,6 +1011,7 @@ if __name__ == '__main__':
 
     
     
+
     
     
     main_widget = MainWidget()
