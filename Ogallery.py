@@ -950,47 +950,47 @@ class ImageThumbnailWidget(QWidget):
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        
+        self.bg_color="#212121"
+        self.file_types=['jpg','jpeg','png','gif']
 
-        self.bg_color="#222324"
         self.init_ui()
+        
     def init_ui(self):
+        #layout
         central_widget = QWidget()
         self.setStyleSheet(f"background-color: {self.bg_color};")
-
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-
         scroll_content = QWidget(scroll_area)
         scroll_area.setWidget(scroll_content)
+        layout = QGridLayout()
+        scroll_content.setLayout(layout)
 
-        layout = QGridLayout(scroll_content)
 
-        file_types=['jpg','jpeg','png','gif']
         image_files=[]
-        for file_type in file_types:
-            image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",recursive=True))
+        for file_type in self.file_types:
+            image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",
+                                    recursive=True))
         image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
 
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
-            
             thumbnail_widget = ImageThumbnailWidget(image_file,image_files)
             layout.addWidget(thumbnail_widget, row, col)
+            
             col += 1
-
             if col == round(self.width()/200):
                 col = 0
                 row += 1
 
         central_widget.setLayout(layout)
         scroll_area.setWidget(central_widget)
-
         self.setCentralWidget(scroll_area)
 
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
+    
     def keyPressEvent(self, event):
             if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
                 self.close()
