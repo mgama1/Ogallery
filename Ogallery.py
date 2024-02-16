@@ -22,7 +22,7 @@ import argparse
 import rembg
 from Othumbnails import ThumbnailMaker
 from custom import *
-
+from styles import *
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 classesNames=['bicycle','boat','building','bus','car','forest',
@@ -838,7 +838,7 @@ class ImageViewer(QWidget):
 class SavingMessageBox(QMessageBox):
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super(SavingMessageBox, self).__init__(*args, **kwargs)
-
+        style = OStyle()
         self.image_path=image_path
         self.edited_image=edited_image
         self.overwrite_button = QPushButton("Overwrite")
@@ -853,13 +853,13 @@ class SavingMessageBox(QMessageBox):
         self.copy_button.clicked.connect(self.handle_copy)
         
         #################
-
-       
+        
+        
         self.setWindowTitle("Save Image")
-        self.setText("Do you want to overwrite the existing image or save a copy?")
-        self.setStyleSheet("background-color: #212121;color:white;")
-        self.overwrite_button.setStyleSheet("QPushButton:hover {background-color: #7d0000; }")
-        self.copy_button.setStyleSheet("QPushButton:hover {background-color: #00347d; }")
+        self.setText("Do you want to overwrite the existing image or save a copy?!")
+        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
+        self.overwrite_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.red}; }}")
+        self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
 
     def handle_overwrite(self):
         cv2.imwrite(self.image_path, self.edited_image)
@@ -888,16 +888,15 @@ class ImageThumbnailWidget(QWidget):
     def __init__(self, image_path,image_files):
         super().__init__()
         self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
+        self.style=OStyle()
         self.image_path = image_path
         self.image_files=image_files
-        self.bg_color="#222324"
         
         self.init_ui()
     def init_ui(self):
         layout = QVBoxLayout()
         tm=ThumbnailMaker(self.cache_dir)
-        self.setStyleSheet(f"background-color: {self.bg_color};")
-        #3141
+        self.setStyleSheet(f"background-color: {self.style.color.background};")
         thumbnail_name=tm.compute_md5(tm.add_file_scheme(self.image_path))+".png"
         thumbnail_path=self.cache_dir+thumbnail_name
         
@@ -926,20 +925,19 @@ class ImageThumbnailWidget(QWidget):
 
     def enterEvent(self, event):
         # Change background color when the mouse enters
-        self.setStyleSheet("background-color: #606162;")
+        self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
 
     def leaveEvent(self, event):
         # Reset background color when the mouse leaves
-        self.setStyleSheet(f"background-color: {self.bg_color};")
+        self.setStyleSheet(f"background-color: {self.style.color.background};")
 
     def mousePressEvent(self, event):
-        self.setStyleSheet("background-color: #0f68db;")
+        self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
         self.viewer = ImageViewer(self.image_files, main_widget,
                                   current_index=self.image_files.index(self.image_path))
-        
   
     def mouseReleaseEvent(self, event):
-            self.setStyleSheet(f"background-color: {self.bg_color};")
+            self.setStyleSheet(f"background-color: {self.style.color.background};")
             
             
     
@@ -947,7 +945,8 @@ class ImageThumbnailWidget(QWidget):
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.bg_color="#212121"
+        self.style=OStyle()
+        
         self.file_types=['jpg','jpeg','png','gif']
 
         self.init_ui()
@@ -955,7 +954,7 @@ class ImageGalleryApp(QMainWindow):
     def init_ui(self):
         #layout
         central_widget = QWidget()
-        self.setStyleSheet(f"background-color: {self.bg_color};")
+        self.setStyleSheet(f"background-color: {self.style.color.background};")
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget(scroll_area)
