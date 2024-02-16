@@ -945,20 +945,7 @@ class ImageThumbnailWidget(QWidget):
             self.setStyleSheet(f"background-color: {self.bg_color};")
             
             
-    def strip_scheme(self,uri):
-        """
-        Strips the scheme (e.g., 'file://', 'https://') from a URI.
-
-        Args:
-            uri (str): The URI string to process.
-
-        Returns:
-            str: The URI path without the scheme.
-        """
-        parsed_uri = urlparse(uri)
-        if parsed_uri.scheme:
-            return parsed_uri.geturl().replace(parsed_uri.scheme + '://', '', 1)
-        return uri 
+    
 
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
