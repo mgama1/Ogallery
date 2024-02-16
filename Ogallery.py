@@ -235,7 +235,7 @@ class MainWidget(QWidget):
         Returns:
             None
         """
-        msg_box = QMessageBox()
+        msg_box = InfoMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
@@ -770,7 +770,7 @@ class ImageViewer(QWidget):
         Returns:
             None
         '''
-        msg_box = QMessageBox()
+        msg_box = InfoMessageBox()
         msg_box.setIcon(QMessageBox.Warning)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
