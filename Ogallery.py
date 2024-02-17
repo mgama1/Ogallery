@@ -271,6 +271,7 @@ class ImageViewer(QWidget):
     def __init__(self, result, main_widget,current_index=0,from_gallery=False):
         super().__init__()
         self.from_gallery=from_gallery
+        self.style=OStyle()
         self.file_list = []
         self.current_index = current_index
         self.exposure_state=1
@@ -344,14 +345,14 @@ class ImageViewer(QWidget):
         self.save_button = QPushButton()
         
         #icons initialization
-        save_icon = qta.icon('fa5.save', color='white',scale_factor=1.5)
-        undo_icon = qta.icon('mdi.undo-variant', color='white',scale_factor=1.5)
-        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=.8)
-        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1.4)
-        blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1.5)
-        blurbg_icon=qta.icon('fa.user',color='white',scale_factor=.7)
-        sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1.5)
-        exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1.3)
+        save_icon = qta.icon('fa5.save', color='white',scale_factor=1)
+        undo_icon = qta.icon('mdi.undo-variant', color='white',scale_factor=1)
+        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=1)
+        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1)
+        blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1)
+        blurbg_icon=qta.icon('fa.user',color='white',scale_factor=1)
+        sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1)
+        exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1)
         flip_icon=qta.icon('mdi.reflect-horizontal',color='white',scale_factor=1)
         compare_icon=qta.icon('mdi.select-compare',color='white',scale_factor=1)
         
@@ -366,10 +367,7 @@ class ImageViewer(QWidget):
         self.flip_button.setIcon(flip_icon)
         self.compare_button.setIcon(compare_icon)
         
-        #some icons don't fit into defauly icons size
-        self.blur_background_button.setIconSize(QSize(25,25))
-        self.rotate_button.setIconSize(QSize(25,25))
-        self.flip_button.setIconSize(QSize(25,25))
+       
         #tooltip
         self.rotate_button.setToolTip('Rotate')
         self.undo_button.setToolTip('Undo')
@@ -453,6 +451,7 @@ class ImageViewer(QWidget):
         button_style = ("QPushButton {{"
                 "background-color: #1f1f1f; "
                 "color: white; "
+                "icon-size:{icon_size};"
                 "border-top: 2px solid {border_color}; "
                 "border-bottom: 2px solid {border_color}; "
                 "border-right: 2px solid {border_color}; "
@@ -460,7 +459,7 @@ class ImageViewer(QWidget):
                 "}} "
                 "QPushButton:hover {{"
                 "background-color: #00347d; "
-                "}}").format(border_color=border_color)
+                "}}").format(border_color=border_color,icon_size=self.style.size.standard_icon_size)
 
         
         
