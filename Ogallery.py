@@ -27,7 +27,7 @@ os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 classesNames=['bicycle','boat','building','bus','car','forest',
              'glacier','helicopter','motorcycle', 'mountain',
-             'plane','sea','street','train','truck']
+             'plane','sea','street','train','truck','cat']
 
 
 
@@ -40,6 +40,7 @@ class MainWidget(QWidget):
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 650)
+        self.style=OStyle()
         icon = qta.icon('fa5s.map-pin',color='#212121',scale_factor=1.2)
         self.setWindowIcon(icon)
        
@@ -101,29 +102,30 @@ class MainWidget(QWidget):
         self.info_button.setFixedWidth(45)
         self.settings_button.setFixedSize(45,45)
 
-        button_style = "QPushButton { background-color: #212121; \
+        button_style = f"QPushButton {{ background-color: {self.style.color.background}; \
                                         color: white; \
                                         border: 2px solid #2e2e2e; \
-                                        border-radius: 18px;padding: 5px;} \
-                                        QPushButton:hover {  \
-                                        background-color: #2e2e2e; }"
+                                        border-radius: 18px;padding: 5px;}} \
+                                        QPushButton:hover {{  \
+                                        background-color: {self.style.color.hover_default}; }}"
         
-        header_buttons_style = "QPushButton { background-color: #212121; \
+        header_buttons_style = f"QPushButton {{ background-color: {self.style.color.background}; \
                                         color: #999999; \
-                                        border: 2px solid #212121; \
-                                        border-radius: 18px;padding: 5px;} \
-                                        QPushButton:hover {  \
-                                        background-color: #2e2e2e; }"
+                                        icon-size: {self.style.size.standard_icon_size}; \
+                                        border: 2px solid {self.style.color.background}; \
+                                        border-radius: 18px;padding: 5px;}} \
+                                        QPushButton:hover {{  \
+                                        background-color: {self.style.color.hover_default}; }}"
         
         qline_style = (
-            "QLineEdit { \
-             background-color: #212121; \
+            f"QLineEdit {{ \
+             background-color: {self.style.color.background}; \
              color: white; \
              border-radius: 15px; \
              padding: 5px; \
-             border: 2px solid #2e2e2e; \
+             border: 2px solid {self.style.color.light_gray}; \
              font-size: 12pt; \
-             }"
+             }}"
         )
         
         self.search_button.setStyleSheet(button_style) 
@@ -131,7 +133,7 @@ class MainWidget(QWidget):
         self.settings_button.setStyleSheet(header_buttons_style)   
         self.gallery_button.setStyleSheet(header_buttons_style)
         self.query.setStyleSheet(qline_style)
-        completer.popup().setStyleSheet("background-color: #2e2e2e; \
+        completer.popup().setStyleSheet(f"background-color: {self.style.color.light_gray}; \
                                         color: white; \
                                         font-size: 12pt;")
 
@@ -139,14 +141,11 @@ class MainWidget(QWidget):
         #icons
         info_icon=qta.icon('ei.info-circle',color='#999999')
         self.info_button.setIcon(info_icon)
-        self.info_button.setIconSize(QSize(25,25))
         settings_icon=qta.icon('fa.cog',color='#999999')
         self.settings_button.setIcon(settings_icon)
-        self.settings_button.setIconSize(QSize(25,25))
-        
+
         gallery_icon=qta.icon('mdi.folder-image',color='#999999')
         self.gallery_button.setIcon(gallery_icon)
-        self.gallery_button.setIconSize(QSize(25,25))
         
         self.show()
 
@@ -450,8 +449,21 @@ class ImageViewer(QWidget):
         self.leftBrowse.setFont(bigFont)
         self.rightBrowse.setFont(bigFont)
         border_color='#242424'
-        button_style = "QPushButton {{ background-color: #1f1f1f; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}} \
-                        QPushButton:hover {{background-color: #00347d; }}".format(border_color=border_color)
+        
+        button_style = ("QPushButton {{"
+                "background-color: #1f1f1f; "
+                "color: white; "
+                "border-top: 2px solid {border_color}; "
+                "border-bottom: 2px solid {border_color}; "
+                "border-right: 2px solid {border_color}; "
+                "border-left: 2px solid {border_color}; "
+                "}} "
+                "QPushButton:hover {{"
+                "background-color: #00347d; "
+                "}}").format(border_color=border_color)
+
+        
+        
         for button in editing_buttons:
             button.setStyleSheet(button_style)
         
