@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QSize
+#from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QFont
 
 class OStyle:
     def __init__(self):
@@ -17,3 +18,7 @@ class Color:
 class Size:
     def __init__(self):
         self.standard_icon_size="25px"
+
+        self.large_font = QFont()
+        self.large_font.setPointSize(20)
+

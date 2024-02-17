@@ -86,17 +86,12 @@ class MainWidget(QWidget):
         self.gallery_button.clicked.connect(self.openGallery)
         # Elements font
         font = QFont()
-        font.setPointSize(16)
-        medium_font = QFont()
-        medium_font.setPointSize(22)
-        
+        font.setPointSize(16)        
         self.search_button.setFont(font)
-        self.info_button.setFont(font)
-        self.settings_button.setFont(medium_font)
         
         
         #Elements style
-        self.setStyleSheet("background-color: #212121;color:white;")
+        self.setStyleSheet(f"background-color: {self.style.color.background};color:white;")
         self.query.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
@@ -286,7 +281,6 @@ class ImageViewer(QWidget):
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(300, 100, 750, 550)
-        self.setStyleSheet("background-color: #212121;")
         
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
@@ -426,15 +420,10 @@ class ImageViewer(QWidget):
         self.leftBrowse.enterEvent = self.on_enter_event
         self.leftBrowse.leaveEvent = self.on_leave_event
       
-        # ---------------Setting styles----------------------------
-        mediumFont = QFont()
-        mediumFont.setPointSize(16)
-        bigFont = QFont()
-        bigFont.setPointSize(20)
-        
-        #self.back_button.setFont(mediumFont)
-        self.leftBrowse.setFont(bigFont)
-        self.rightBrowse.setFont(bigFont)
+        #Setting styles
+        self.setStyleSheet(f"background-color: {self.style.color.background};")
+        self.leftBrowse.setFont(self.style.size.large_font)
+        self.rightBrowse.setFont(self.style.size.large_font)
         border_color='#242424'
         
         button_style = ("QPushButton {{"
