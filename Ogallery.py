@@ -344,28 +344,17 @@ class ImageViewer(QWidget):
         
         self.save_button = QPushButton()
         
-        #icons initialization
-        save_icon = qta.icon('fa5.save', color='white',scale_factor=1)
-        undo_icon = qta.icon('mdi.undo-variant', color='white',scale_factor=1)
-        rotate_icon = qta.icon('mdi.crop-rotate', color='white',scale_factor=1)
-        gray_icon=qta.icon('mdi.image-filter-black-white',color='white',scale_factor=1)
-        blur_icon=qta.icon('mdi.blur',color='white',scale_factor=1)
-        blurbg_icon=qta.icon('fa.user',color='white',scale_factor=1)
-        sharpen_icon=qta.icon('mdi.details',color='white',scale_factor=1)
-        exposure_icon=qta.icon('mdi.camera-iris',color='white',scale_factor=1)
-        flip_icon=qta.icon('mdi.reflect-horizontal',color='white',scale_factor=1)
-        compare_icon=qta.icon('mdi.select-compare',color='white',scale_factor=1)
-        
-        self.save_button.setIcon(save_icon)
-        self.undo_button.setIcon(undo_icon)
-        self.rotate_button.setIcon(rotate_icon)
-        self.gray_button.setIcon(gray_icon)
-        self.gaussianBlur_button.setIcon(blur_icon)
-        self.blur_background_button.setIcon(blurbg_icon)
-        self.sharpen_button.setIcon(sharpen_icon)
-        self.set_exposure_button.setIcon(exposure_icon)
-        self.flip_button.setIcon(flip_icon)
-        self.compare_button.setIcon(compare_icon)
+        #setting icons       
+        self.save_button.setIcon(qta.icon('fa5.save', color='white'))
+        self.undo_button.setIcon(qta.icon('mdi.undo-variant', color='white'))
+        self.rotate_button.setIcon(qta.icon('mdi.crop-rotate', color='white'))
+        self.gray_button.setIcon(qta.icon('mdi.image-filter-black-white',color='white'))
+        self.gaussianBlur_button.setIcon(qta.icon('mdi.blur',color='white'))
+        self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
+        self.sharpen_button.setIcon(qta.icon('mdi.details',color='white'))
+        self.set_exposure_button.setIcon(qta.icon('mdi.camera-iris',color='white'))
+        self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
+        self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
         
        
         #tooltip
