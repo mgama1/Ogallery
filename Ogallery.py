@@ -906,6 +906,7 @@ class InfoMessageBox(QMessageBox):
 
 
 class ImageThumbnailWidget(QWidget):
+    thumbnailClicked = pyqtSignal()
     def __init__(self, image_path,image_files):
         super().__init__()
         self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
@@ -956,7 +957,7 @@ class ImageThumbnailWidget(QWidget):
         self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
         self.viewer = ImageViewer(self.image_files, main_widget,
                                   current_index=self.image_files.index(self.image_path))
-  
+        self.thumbnailClicked.emit()
     def mouseReleaseEvent(self, event):
             self.setStyleSheet(f"background-color: {self.style.color.background};")
             
@@ -993,6 +994,7 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file,image_files)
+            thumbnail_widget.thumbnailClicked.connect(self.close)
             layout.addWidget(thumbnail_widget, row, col)
             
             col += 1
@@ -1011,7 +1013,7 @@ class ImageGalleryApp(QMainWindow):
     def keyPressEvent(self, event):
             if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
                 self.close()
-
+    
 if __name__ == '__main__':
     app = QApplication([])
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")
