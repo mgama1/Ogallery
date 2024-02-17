@@ -722,7 +722,8 @@ class ImageViewer(QWidget):
         
         
     def undo(self):
-        if len(self.edit_history)>0:
+        if len(self.edit_history)>1:
+            
             self.edit_history.pop()  
             self.edited_image=self.edit_history[-1]
             self.show_edited_image()
@@ -730,6 +731,7 @@ class ImageViewer(QWidget):
 
         else:
             if hasattr(self, 'edited_image'):
+                self.edit_history=[]
                 delattr(self,'edited_image')
                 self.show_image()
             
@@ -1019,6 +1021,7 @@ if __name__ == '__main__':
 
     
     
+
 
 
     
