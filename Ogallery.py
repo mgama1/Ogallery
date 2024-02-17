@@ -570,7 +570,9 @@ class ImageViewer(QWidget):
     
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
             self.goHome()
-
+        
+        if event.key()==Qt.Key_Delete:
+            self.delete_image()
         #saving edited images using key event ctrl&s
         if event.key()== Qt.Key_Control:
             self.keylist.append(Qt.Key_Control)
@@ -752,6 +754,10 @@ class ImageViewer(QWidget):
         else:
             self.showErrorMessage("no changes were made!")
     
+    def delete_image(self):
+        if os.path.exists(self.file_list[self.current_index]):
+            os.remove(self.file_list[self.current_index])
+            self.next_image()
     def show_success_message(self):
         '''
         Display a QMessageBox ("Saved successfully!") with information icon
