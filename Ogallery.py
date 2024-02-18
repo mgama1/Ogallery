@@ -836,64 +836,6 @@ class ImageViewer(QWidget):
         # Override the closeEvent method to handle the window close event
         self.finishedSignal.emit()
         event.accept()
-        #self.closeApp()
-        
-   # @pyqtSlot()
-    #def closeApp(self):
-        #print("Exiting application")
-      #  print(self.file_list)
-      #  app.quit()
-        
-        
-        
-class SavingMessageBox(QMessageBox):
-    def __init__(self, image_path, edited_image, *args, **kwargs):
-        super(SavingMessageBox, self).__init__(*args, **kwargs)
-        style = OStyle()
-        self.image_path=image_path
-        self.edited_image=edited_image
-        self.overwrite_button = QPushButton("Overwrite")
-        self.copy_button = QPushButton("Copy")
-        self.overwrite_button.setFocusPolicy(Qt.NoFocus)
-        self.copy_button.setFocusPolicy(Qt.NoFocus)
-        self.addButton(self.overwrite_button, QMessageBox.ActionRole)
-        self.addButton(self.copy_button, QMessageBox.ActionRole)
-                       
-        
-        self.overwrite_button.clicked.connect(self.handle_overwrite)
-        self.copy_button.clicked.connect(self.handle_copy)
-        
-        #################
-        
-        
-        self.setWindowTitle("Save Image")
-        self.setText("Do you want to overwrite the existing image or save a copy?")
-        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.overwrite_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.red}; }}")
-        self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
-
-    def handle_overwrite(self):
-        cv2.imwrite(self.image_path, self.edited_image)
-        print(self.image_path)
-    def handle_copy(self):
-        mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-        cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
-                    self.edited_image)
-        
-        
-        
-class InfoMessageBox(QMessageBox):
-    def __init__(self,*args, **kwargs):
-        super(InfoMessageBox, self).__init__(*args, **kwargs)
-        style = OStyle()
-        self.OK_button = QPushButton("OK")
-        self.OK_button.setFocusPolicy(Qt.NoFocus)
-        self.addButton(self.OK_button, QMessageBox.ActionRole)
-        self.setWindowTitle("Info")
-        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
-
-    
 
 
 class ImageThumbnailWidget(QWidget):
