@@ -45,7 +45,7 @@ class ThumbnailMaker():
             metadata_dic = {
                 "Thumb::URI": "file://" + input_image_path,
                 "Thumb::MTime": os.path.getmtime(input_image_path),
-                "Software": 'OpenGallery'
+                "Software": 'OpenGallery::ThumbnailMaker'
             }
             metadata = PngInfo()
             for key, value in metadata_dic.items():
