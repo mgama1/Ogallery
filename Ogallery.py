@@ -694,11 +694,14 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         mask = rembg.remove(img,only_mask=True)
         mask_3c=cv2.merge([mask,mask,mask])
-        inv_mask_3c=255-np.copy(mask_3c)
-        foreground=cv2.bitwise_and(img,mask_3c)
-        background=cv2.bitwise_and(img,inv_mask_3c)
-        blurred_background=cv2.blur(background,(9,9))
-        blurred_bg_image=foreground+blurred_background
+        foreground = np.copy(img).astype(float)
+        background = cv2.blur(img,(9,9)).astype(float)
+        alpha = mask_3c
+        alpha = alpha.astype(float)/255
+        foreground = cv2.multiply(alpha, foreground)
+        background = cv2.multiply(1.0 - alpha, background)
+        blurred_bg_image = cv2.add(foreground, background)/255
+        blurred_bg_image = (blurred_bg_image * 255).astype(np.uint8)
         self.edited_image=blurred_bg_image
         self.show_edited_image()
         
