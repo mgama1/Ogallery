@@ -166,9 +166,66 @@ class MainWidget(QWidget):
         """
         self.show()
         
-        
+    
+    def map_arabic_to_english(self,input_string):
+        '''
+        Maps Arabic characters to english characters if any exists
+        Args:
+            input_string (str)
+        Returns:
+            output_string (str)
+
+        '''
+        arabic_to_english = {
+        'ض': 'q',
+        'ص': 'w',
+        'ث': 'e',
+        'ق': 'r',
+        'ف': 't',
+        'غ': 'y',
+        'ع': 'u',
+        'ه': 'i',
+        'خ': 'o',
+        'ح': 'p',
+        'ج': '[',
+        'د': ']',
+        'ش': 'a',
+        'س': 's',
+        'ي': 'd',
+        'ب': 'f',
+        'ل': 'g',
+        'ا': 'h',
+        'ت': 'j',
+        'ن': 'k',
+        'م': 'l',
+        'ك': ';',
+        'ط': "'",
+        'ئ': 'z',
+        'ء': 'x',
+        'ؤ': 'c',
+        'ر': 'v',
+        'ﻻ': 'b',
+        'ى': 'n',
+        'ة': 'm',
+        'و': ',',
+        'ز': '.',
+        'ظ': '/',
+        ' ': ' ' ,
+
+        }
+
+
+        output_string = ''
+        for char in input_string:
+            if char in arabic_to_english:
+                output_string += arabic_to_english[char]
+            else:
+                output_string += char
+        return output_string
+
     def selectImages(self):
         self.queryText=self.query.text()
+        self.queryText=self.map_arabic_to_english(self.queryText)
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText==None:
             self.showErrorMessage("No images found")
@@ -255,9 +312,7 @@ class MainWidget(QWidget):
         pixmap2 = QPixmap(qta.icon('mdi.glasses',color='#000000').pixmap(50,50))
         
         msg_box.setIconPixmap(CustomAwesome().concat_pixmaps(pixmap1, pixmap2,3))
-        msg_box.setText(f"This application is created and maintained by \
-Mahmoud gamal \
-        current supported search classes are {', '.join(classesNames)}")
+        msg_box.setText(f"current supported search classes are {', '.join(classesNames)}")
         msg_box.setWindowTitle('info')
         msg_box.exec_()
 
