@@ -45,7 +45,7 @@ class MainWidget(QWidget):
                                     scale_factor=1.2))
        
         #buttons instantiation
-        self.query = QLineEdit(self)
+        self.query_line = QLineEdit(self)
         self.search_button = QPushButton()
         self.info_button=QPushButton()
         self.settings_button=QPushButton()
@@ -54,7 +54,7 @@ class MainWidget(QWidget):
         #Autocomplete using QCompleter
         completer = QCompleter(classesNames, self)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.query.setCompleter(completer)
+        self.query_line.setCompleter(completer)
         
         #logo QLabel instantiation and settings
         self.logo_label = QLabel(self)
@@ -75,7 +75,7 @@ class MainWidget(QWidget):
         layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
                 
-        horizontal_layout.addWidget(self.query)
+        horizontal_layout.addWidget(self.query_line)
         horizontal_layout.addWidget(self.search_button)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
@@ -89,7 +89,7 @@ class MainWidget(QWidget):
         
         #Elements style
         self.setStyleSheet(f"background-color: {self.style.color.background};color:white;")
-        self.query.setFixedHeight(33)
+        self.query_line.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
         self.settings_button.setFixedSize(45,45)
@@ -119,7 +119,7 @@ class MainWidget(QWidget):
         for button in buttons:
             button.setStyleSheet(button_style)
             
-        self.query.setStyleSheet(qline_style)
+        self.query_line.setStyleSheet(qline_style)
         completer.popup().setStyleSheet(f"background-color: {self.style.color.light_gray}; \
                                         color: white; \
                                         font-size: 12pt;")
@@ -214,7 +214,7 @@ class MainWidget(QWidget):
         return output_string
 
     def selectImages(self):
-        self.queryText=self.query.text()
+        self.queryText=self.query_line.text()
         self.queryText=self.map_arabic_to_english(self.queryText)
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText==None:
