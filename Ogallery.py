@@ -3,23 +3,22 @@ import time
 import datetime
 import subprocess
 import glob
+import numpy as np
+import pandas as pd
+import cv2
 from urllib.parse import urlparse
 from PIL.PngImagePlugin import PngInfo
 from PIL import Image
+import rembg
 
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
 from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
-import numpy as np
-import pandas as pd
-import cv2
-from PIL import Image
-#import imagehash
+
 from Levenshtein import distance as lev_distance
-from __future__ import print_function
-import argparse
-import rembg
+#from __future__ import print_function
+#import argparse
 from Othumbnails import ThumbnailMaker
 from custom import *
 from styles import *
@@ -277,7 +276,6 @@ class MainWidget(QWidget):
             None
         """
         msg_box = InfoMessageBox()
-        #error_icon=qta.icon('mdi.robot',color='#bfa708')
         pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
         pixmap2 = QPixmap(qta.icon('fa.exclamation',color='#fde01a').pixmap(50,50))
         combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,1.5)
@@ -297,7 +295,6 @@ class MainWidget(QWidget):
             None
         """
         msg_box = InfoMessageBox()
-        #msg_info_icon=qta.icon('fa.space-shuttle',color='white')
         pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
         pixmap2 = QPixmap(qta.icon('mdi.glasses',color='#000000').pixmap(50,50))
         
@@ -342,7 +339,6 @@ class ImageViewer(QWidget):
         
         self.keylist = []
         self.file_list = []
-        #self.current_index = 0
         self.setMouseTracking(True)
         self.load_images()
 
@@ -357,7 +353,6 @@ class ImageViewer(QWidget):
         self.rightBrowse = QPushButton('〉', self)
         self.back_button = QPushButton('↩', self)
         
-        #SCF_icon = qta.icon("fa5s.search-location",color="white")  # Use the correct icon name here
         SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  # Use the correct icon name here
         
         self.show_containing_folder_button=QPushButton(SCF_icon,'')
@@ -720,17 +715,35 @@ class ImageViewer(QWidget):
         self.set_exposure_button.setStyleSheet(exposure_button_style)
     def update_exposure(self, gamma1e2):
 
-        image_path = self.file_list[self.current_index]
-        img = cv2.imread(image_path)
+        
+        
+        if hasattr(self, 'exposureImg'):
+            print("there is exposure img")
+            if len(self.edit_history)==1:
+                img=self.edit_history[-1]
+                
+            if len(self.edit_history)>1:
+                self.edit_history.pop()
+                self.exposureImg=self.edit_history[-1]
+                img=self.exposureImg
+            
+        elif hasattr(self, 'edited_image'):
+            print("there is edited image")
+            img=self.edited_image
+        else :
+            print("there was nothing")
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
         gamma=gamma1e2/100
         invGamma = 1.0 / gamma
         table = np.array([((i / 255.0) ** invGamma) * 255
             for i in np.arange(0, 256)]).astype("uint8")
-        exposureImg= cv2.LUT(img, table)
-        self.edited_image=exposureImg
+        self.exposureImg= cv2.LUT(img, table)
+        
+        self.edited_image=self.exposureImg
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
-    
+        
     def blurBackground(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -1004,17 +1017,6 @@ if __name__ == '__main__':
     
     
 
-    
-
-
-    
-
-    
-    
-
-
-
-    
 
     
     main_widget = MainWidget()
