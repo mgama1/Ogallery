@@ -114,10 +114,11 @@ class MainWidget(QWidget):
              }}"
         )
         
-        self.search_button.setStyleSheet(button_style) 
-        self.info_button.setStyleSheet(button_style)
-        self.settings_button.setStyleSheet(button_style)   
-        self.gallery_button.setStyleSheet(button_style)
+       
+        buttons=[self.search_button,self.info_button,self.settings_button,self.gallery_button]
+        for button in buttons:
+            button.setStyleSheet(button_style)
+            
         self.query.setStyleSheet(qline_style)
         completer.popup().setStyleSheet(f"background-color: {self.style.color.light_gray}; \
                                         color: white; \
@@ -127,13 +128,9 @@ class MainWidget(QWidget):
         #icons
         
         self.search_button.setIcon(qta.icon('mdi.send',color='#999999'))
-        info_icon=qta.icon('ei.info-circle',color='#999999')
-        self.info_button.setIcon(info_icon)
-        settings_icon=qta.icon('fa.cog',color='#999999')
-        self.settings_button.setIcon(settings_icon)
-
-        gallery_icon=qta.icon('mdi.folder-image',color='#999999')
-        self.gallery_button.setIcon(gallery_icon)
+        self.info_button.setIcon(qta.icon('ei.info-circle',color='#999999'))
+        self.settings_button.setIcon(qta.icon('fa.cog',color='#999999'))
+        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color='#999999'))
         
         self.show()
 
