@@ -7,6 +7,7 @@ class OStyle:
         self.size = Size()
 class Color:
     def __init__(self):
+        self.foreground="#999999"
         self.background="#212121"
         self.hover_default="#2e2e2e"
         self.gray="#212121"

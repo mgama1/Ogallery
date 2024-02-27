@@ -41,8 +41,8 @@ class MainWidget(QWidget):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 650)
         self.style=OStyle()
-        icon = qta.icon('fa5s.map-pin',color='#212121',scale_factor=1.2)
-        self.setWindowIcon(icon)
+        self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.background,
+                                    scale_factor=1.2))
        
         #buttons instantiation
         self.query = QLineEdit(self)
@@ -95,7 +95,7 @@ class MainWidget(QWidget):
         self.settings_button.setFixedSize(45,45)
 
         button_style = f"QPushButton {{ background-color: {self.style.color.background}; \
-                                        color: #999999; \
+                                        color: {self.style.color.foreground}; \
                                         icon-size: {self.style.size.standard_icon_size}; \
                                         border: 2px solid {self.style.color.background}; \
                                         border-radius: 18px;padding: 5px;}} \
@@ -127,10 +127,10 @@ class MainWidget(QWidget):
         
         #icons
         
-        self.search_button.setIcon(qta.icon('mdi.send',color='#999999'))
-        self.info_button.setIcon(qta.icon('ei.info-circle',color='#999999'))
-        self.settings_button.setIcon(qta.icon('fa.cog',color='#999999'))
-        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color='#999999'))
+        self.search_button.setIcon(qta.icon('mdi.send',color=self.style.color.foreground))
+        self.info_button.setIcon(qta.icon('ei.info-circle',color=self.style.color.foreground))
+        self.settings_button.setIcon(qta.icon('fa.cog',color=self.style.color.foreground))
+        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color=self.style.color.foreground))
         
         self.show()
 
