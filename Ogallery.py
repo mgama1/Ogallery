@@ -95,19 +95,13 @@ class MainWidget(QWidget):
         self.settings_button.setFixedSize(45,45)
 
         button_style = f"QPushButton {{ background-color: {self.style.color.background}; \
-                                        color: white; \
-                                        border: 2px solid #2e2e2e; \
-                                        border-radius: 18px;padding: 5px;}} \
-                                        QPushButton:hover {{  \
-                                        background-color: {self.style.color.hover_default}; }}"
-        
-        header_buttons_style = f"QPushButton {{ background-color: {self.style.color.background}; \
                                         color: #999999; \
                                         icon-size: {self.style.size.standard_icon_size}; \
                                         border: 2px solid {self.style.color.background}; \
                                         border-radius: 18px;padding: 5px;}} \
                                         QPushButton:hover {{  \
                                         background-color: {self.style.color.hover_default}; }}"
+        
         
         qline_style = (
             f"QLineEdit {{ \
@@ -121,9 +115,9 @@ class MainWidget(QWidget):
         )
         
         self.search_button.setStyleSheet(button_style) 
-        self.info_button.setStyleSheet(header_buttons_style)
-        self.settings_button.setStyleSheet(header_buttons_style)   
-        self.gallery_button.setStyleSheet(header_buttons_style)
+        self.info_button.setStyleSheet(button_style)
+        self.settings_button.setStyleSheet(button_style)   
+        self.gallery_button.setStyleSheet(button_style)
         self.query.setStyleSheet(qline_style)
         completer.popup().setStyleSheet(f"background-color: {self.style.color.light_gray}; \
                                         color: white; \
@@ -500,15 +494,15 @@ class ImageViewer(QWidget):
         
         
         
-        header_buttons_style=(
+        button_style=(
             "QPushButton {background-color: rgba(22, 22, 22, .5); \
             border: none; \
             color: white; \
             font-size: 16pt;} \
             QPushButton:hover {background-color: #2e2e2e;} "
         )
-        self.back_button.setStyleSheet(header_buttons_style)
-        self.show_containing_folder_button.setStyleSheet(header_buttons_style)
+        self.back_button.setStyleSheet(button_style)
+        self.show_containing_folder_button.setStyleSheet(button_style)
         
         self.back_button.setFixedSize(60,40) 
         self.show_containing_folder_button.setFixedSize(60,40)
