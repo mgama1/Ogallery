@@ -67,7 +67,7 @@ class InfoMessageBox(QMessageBox):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
         style = OStyle()
         self.OK_button = QPushButton("OK")
-        self.OK_button.setFocusPolicy(Qt.NoFocus)
+        #self.OK_button.setFocusPolicy(Qt.NoFocus)
         self.addButton(self.OK_button, QMessageBox.ActionRole)
         self.setWindowTitle("Info")
         self.setStyleSheet(f"background-color: {style.color.background};color:white;")

@@ -324,7 +324,7 @@ class ImageViewer(QWidget):
         self.style=OStyle()
         self.file_list = []
         self.current_index = current_index
-        self.exposure_state=1
+        self.exposure_state=0
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
@@ -726,7 +726,7 @@ class ImageViewer(QWidget):
         colors=['#1f1f1f','#00347d']
         border_color='#242424'
         self.exposure_state=not self.exposure_state
-        exposure_button_style=f"QPushButton {{ background-color: {colors[not self.exposure_state]}; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}}"
+        exposure_button_style=f"QPushButton {{ background-color: {colors[self.exposure_state]}; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}}"
         self.set_exposure_button.setStyleSheet(exposure_button_style)
     def update_exposure(self, gamma1e2):
 
