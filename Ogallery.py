@@ -46,7 +46,7 @@ class MainWidget(QWidget):
        
         #buttons instantiation
         self.query = QLineEdit(self)
-        self.search_button = QPushButton('➤', self)
+        self.search_button = QPushButton()
         self.info_button=QPushButton()
         self.settings_button=QPushButton()
         self.gallery_button=QPushButton()
@@ -84,10 +84,7 @@ class MainWidget(QWidget):
         self.search_button.clicked.connect(self.openImageViewer)
         self.info_button.clicked.connect(self.showAppInfo)
         self.gallery_button.clicked.connect(self.openGallery)
-        # Elements font
-        font = QFont()
-        font.setPointSize(16)        
-        self.search_button.setFont(font)
+
         
         
         #Elements style
@@ -134,6 +131,8 @@ class MainWidget(QWidget):
 
         
         #icons
+        
+        self.search_button.setIcon(qta.icon('mdi.send',color='#999999'))
         info_icon=qta.icon('ei.info-circle',color='#999999')
         self.info_button.setIcon(info_icon)
         settings_icon=qta.icon('fa.cog',color='#999999')
