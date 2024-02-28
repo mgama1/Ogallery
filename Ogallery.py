@@ -71,9 +71,8 @@ class MainWidget(QWidget):
                 
         layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
-                
-        horizontal_layout.addWidget(self.query_line)
         horizontal_layout.addWidget(self.search_button)
+        horizontal_layout.addWidget(self.query_line)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
@@ -124,7 +123,7 @@ class MainWidget(QWidget):
         
         #icons
         
-        self.search_button.setIcon(qta.icon('mdi.send',color=self.style.color.foreground))
+        self.search_button.setIcon(qta.icon('fa.search',color=self.style.color.foreground))
         self.info_button.setIcon(qta.icon('ei.info-circle',color=self.style.color.foreground))
         self.settings_button.setIcon(qta.icon('fa.cog',color=self.style.color.foreground))
         self.gallery_button.setIcon(qta.icon('mdi.folder-image',color=self.style.color.foreground))
@@ -448,8 +447,8 @@ class ImageViewer(QWidget):
         self.blur_background_button.clicked.connect(self.blurBackground)
         self.undo_button.clicked.connect(self.undo)
         self.revert_button.clicked.connect(self.revert)
-        self.leftBrowse.clicked.connect(self.next_image)
-        self.rightBrowse.clicked.connect(self.previous_image)
+        self.leftBrowse.clicked.connect(self.previous_image)
+        self.rightBrowse.clicked.connect(self.next_image)
         self.show_containing_folder_button.clicked.connect(self.show_containing_folder)
         self.compare_button.pressed.connect(self.show_image)
         self.compare_button.released.connect(self.show_edited_image)
