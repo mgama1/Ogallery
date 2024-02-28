@@ -41,8 +41,11 @@ class MainWidget(QWidget):
         self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.background,
                                     scale_factor=1.2))
        
-        #buttons instantiation
+        
         self.query_line = QLineEdit(self)
+        self.query_line.setFixedWidth(.7*self.width())
+        #buttons instantiation
+        
         self.search_button = QPushButton()
         self.info_button=QPushButton()
         self.settings_button=QPushButton()
@@ -71,8 +74,10 @@ class MainWidget(QWidget):
                 
         layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
+        horizontal_layout.addStretch(1)
         horizontal_layout.addWidget(self.search_button)
         horizontal_layout.addWidget(self.query_line)
+        horizontal_layout.addStretch(1)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
