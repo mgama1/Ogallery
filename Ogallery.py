@@ -17,8 +17,6 @@ from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
 from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
 
 from Levenshtein import distance as lev_distance
-#from __future__ import print_function
-#import argparse
 from Othumbnails import ThumbnailMaker
 from custom import *
 from styles import *
@@ -549,11 +547,12 @@ class ImageViewer(QWidget):
 
 
     def show_edited_image(self):
+        # Clear the scene before adding a new item
         self.scene.clear()
         pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
 
-        # Clear the scene before adding a new item
-        #
+        
+        
 
         # Add a QGraphicsPixmapItem to the scene
         pixmap_item = QGraphicsPixmapItem(pixmap)
@@ -622,7 +621,7 @@ class ImageViewer(QWidget):
         
     def keyReleaseEvent(self, event):
         time.sleep(.2)
-        self.keylist=[] #clear keylist
+        self.keylist=[] 
         
     def next_image(self):
         self.current_index = (self.current_index + 1) % len(self.file_list)
@@ -638,11 +637,9 @@ class ImageViewer(QWidget):
         self.leftBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
 
     def on_enter_event(self, event):
-        # Set transparency when mouse enters
         self.set_transparency(.5)
 
     def on_leave_event(self, event):
-        # Set transparency back to normal when mouse leaves
         self.set_transparency(0)
      
     def copyToClipboard(self):
@@ -732,7 +729,6 @@ class ImageViewer(QWidget):
         
         
         if hasattr(self, 'exposureImg'):
-            print("there is exposure img")
             if len(self.edit_history)==1:
                 img=self.edit_history[-1]
                 
@@ -742,10 +738,8 @@ class ImageViewer(QWidget):
                 img=self.exposureImg
             
         elif hasattr(self, 'edited_image'):
-            print("there is edited image")
             img=self.edited_image
         else :
-            print("there was nothing")
             image_path = self.file_list[self.current_index]
             img = cv2.imread(image_path)
         gamma=gamma1e2/100
@@ -852,7 +846,6 @@ class ImageViewer(QWidget):
             None
         '''
         msg_box = InfoMessageBox()
-        #msg_box.setIcon(QMessageBox.Warning)
         pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
         pixmap2 = QPixmap(qta.icon('mdi.fullscreen-exit',color='#e2172b').pixmap(50,50))
         combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,2)
@@ -903,7 +896,6 @@ class ImageViewer(QWidget):
                 continue
 
         # If none of the commands were successful
-        print("Unable to open file manager")
         return False
 
 
@@ -956,11 +948,9 @@ class ImageThumbnailWidget(QWidget):
         self.setLayout(layout)
 
     def enterEvent(self, event):
-        # Change background color when the mouse enters
         self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
 
     def leaveEvent(self, event):
-        # Reset background color when the mouse leaves
         self.setStyleSheet(f"background-color: {self.style.color.background};")
 
     def mousePressEvent(self, event):
