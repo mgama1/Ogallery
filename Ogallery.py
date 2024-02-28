@@ -352,6 +352,7 @@ class ImageViewer(QWidget):
         self.rightBrowse = QPushButton('〉', self)
         self.back_button = QPushButton('↩', self)
         
+
         SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  # Use the correct icon name here
         
         self.show_containing_folder_button=QPushButton(SCF_icon,'')
@@ -361,6 +362,8 @@ class ImageViewer(QWidget):
         Hlayout.addWidget(self.rightBrowse)
 
         header_layout.addWidget(self.back_button)
+        
+
         header_layout.addStretch(1)
         header_layout.addWidget(self.show_containing_folder_button)
         
@@ -402,7 +405,7 @@ class ImageViewer(QWidget):
         self.show_containing_folder_button.setToolTip('Show containing folder')
         
         self.exposure_slider = QSlider(Qt.Horizontal)
-        self.exposure_slider.setMinimum(0)
+        self.exposure_slider.setMinimum(2)
         self.exposure_slider.setMaximum(200)
         self.exposure_slider.setValue(100)  # Set an initial value
         self.exposure_slider.valueChanged.connect(self.update_exposure)
@@ -443,6 +446,7 @@ class ImageViewer(QWidget):
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.goHome)
+
         self.blur_background_button.clicked.connect(self.blurBackground)
         self.undo_button.clicked.connect(self.undo)
         self.revert_button.clicked.connect(self.revert)
@@ -601,21 +605,21 @@ class ImageViewer(QWidget):
         
         if event.key()==Qt.Key_Delete:
             self.delete_image()
+            
         #saving edited images using key event ctrl&s
         if event.key()== Qt.Key_Control:
             self.keylist.append(Qt.Key_Control)
-            print(self.keylist)#to be deleted later
+            
             
         if event.key()==Qt.Key_S :
             self.keylist.append(Qt.Key_S)
-            print(self.keylist)#to be deleted later
+            
         
         if len(self.keylist)==2:
             if (self.keylist[0]*self.keylist[1])==Qt.Key_Control*Qt.Key_S:
                 self.save_image()
          
         
-    
     def keyReleaseEvent(self, event):
         time.sleep(.2)
         self.keylist=[] #clear keylist
@@ -640,6 +644,16 @@ class ImageViewer(QWidget):
     def on_leave_event(self, event):
         # Set transparency back to normal when mouse leaves
         self.set_transparency(0)
+     
+    def copyToClipboard(self):
+        image_path = self.file_list[self.current_index]
+        clipboard = QApplication.clipboard()
+        clipboard.setPixmap(QPixmap(image_path))
+        
+        
+        
+        
+        
         
     def sharpen_image(self):
             if hasattr(self, 'edited_image'):
@@ -785,12 +799,14 @@ class ImageViewer(QWidget):
             if hasattr(self, 'edited_image'):
                 self.edit_history=[]
                 delattr(self,'edited_image')
+                delattr(self,'exposureImg')
                 self.show_image()
             
             
     def revert(self):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
+            delattr(self,'exposureImg')
             self.edit_history=[]
         self.show_image()
     
