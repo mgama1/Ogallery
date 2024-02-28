@@ -80,7 +80,7 @@ class MainWidget(QWidget):
         self.search_button.clicked.connect(self.openImageViewer)
         self.info_button.clicked.connect(self.showAppInfo)
         self.gallery_button.clicked.connect(self.openGallery)
-
+        self.settings_button.clicked.connect(self.showDialog)
         
         
         #Elements style
@@ -130,6 +130,23 @@ class MainWidget(QWidget):
         
         self.show()
 
+        
+    def showDialog(self):
+        username = os.getenv('USER')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        self.selected_directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
+        
+        if self.selected_directory:
+            if os.path.exists(f'/home/{username}/.cache/OpenGallery/')==False:
+                os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                config_file.write(self.selected_directory)
+
+
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                directory = config_file.read()
+            
     def openImageViewer(self):
         self.selectImages()
             
@@ -404,7 +421,7 @@ class ImageViewer(QWidget):
         self.exposure_slider = QSlider(Qt.Horizontal)
         self.exposure_slider.setMinimum(2)
         self.exposure_slider.setMaximum(200)
-        self.exposure_slider.setValue(100)  # Set an initial value
+        self.exposure_slider.setValue(100)  
         self.exposure_slider.valueChanged.connect(self.update_exposure)
         self.exposure_slider.hide()
         
@@ -800,6 +817,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
             delattr(self,'exposureImg')
+            self.exposure_slider.setValue(100)
             self.edit_history=[]
         self.show_image()
     
@@ -910,7 +928,8 @@ class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
     def __init__(self, image_path,image_files):
         super().__init__()
-        self.cache_dir = "/home/mgama1/.cache/OpenGallery/"
+        username = os.getenv('USER')
+        self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
         self.style=OStyle()
         self.image_path = image_path
         self.image_files=image_files
@@ -983,11 +1002,13 @@ class ImageGalleryApp(QMainWindow):
         scroll_area.setWidget(scroll_content)
         layout = QGridLayout()
         scroll_content.setLayout(layout)
-
-
+        
+        username = os.getenv('USER')
+        with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                images_directory = config_file.read()
         image_files=[]
         for file_type in self.file_types:
-            image_files+=(glob.glob(f"/media/mgama1/mgama1/photos/**/*.{file_type}",
+            image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
                                     recursive=True))
         image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
 
@@ -1020,6 +1041,7 @@ if __name__ == '__main__':
     
     
     
+
     
 
 
