@@ -38,15 +38,16 @@ class MainWidget(QWidget):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 600)
         self.style=OStyle()
-        self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
-                                    scale_factor=1.2))
-       
+        #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
+        #                            scale_factor=1.2))
+        self.setWindowIcon(QIcon(QPixmap('icon.png')))
         #buttons instantiation
         self.query_line = QLineEdit(self)
         self.search_button = QPushButton()
-        self.info_button=QPushButton()
-        self.settings_button=QPushButton()
-        self.gallery_button=QPushButton()
+        
+        self.info_button=QPushButtonHighlight()
+        self.settings_button=QPushButtonHighlight()
+        self.gallery_button=QPushButtonHighlight()
        
         #Autocomplete using QCompleter
         completer = QCompleter(classesNames, self)
@@ -128,10 +129,20 @@ class MainWidget(QWidget):
         #icons
         
         self.search_button.setIcon(qta.icon('fa.search',color=self.style.color.foreground))
-        self.info_button.setIcon(qta.icon('ei.info-circle',color=self.style.color.foreground))
-        self.settings_button.setIcon(qta.icon('fa.cog',color=self.style.color.foreground))
-        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color=self.style.color.foreground))
         
+        self.info_button.setIcon(qta.icon('ei.info-circle',color=self.style.color.foreground))
+        self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.style.color.foreground))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.style.color.purple))
+        
+        
+        self.settings_button.setIcon(qta.icon('fa.cog',color=self.style.color.foreground))
+        self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.style.color.foreground))
+        self.settings_button.setIconHover(qta.icon('fa.cog',color=self.style.color.purple))
+        
+        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color=self.style.color.foreground))
+        self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.style.color.foreground))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.style.color.purple))
+     
         self.show()
 
         
