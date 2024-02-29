@@ -43,7 +43,7 @@ class MainWidget(QWidget):
         self.setWindowIcon(QIcon(QPixmap('icon.png')))
         #buttons instantiation
         self.query_line = QLineEdit(self)
-        self.search_button = QPushButton()
+        self.search_button = QPushButtonHighlight()
         
         self.info_button=QPushButtonHighlight()
         self.settings_button=QPushButtonHighlight()
@@ -128,18 +128,16 @@ class MainWidget(QWidget):
         
         #icons
         
-        self.search_button.setIcon(qta.icon('fa.search',color=self.style.color.foreground))
+        self.search_button.setIconNormal(qta.icon('fa.search',color=self.style.color.foreground))
+        self.search_button.setIconHover(qta.icon('fa.search',color=self.style.color.purple,scale_factor=1.1))
         
-        self.info_button.setIcon(qta.icon('ei.info-circle',color=self.style.color.foreground))
         self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.style.color.foreground))
         self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.style.color.purple))
         
         
-        self.settings_button.setIcon(qta.icon('fa.cog',color=self.style.color.foreground))
         self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.style.color.foreground))
         self.settings_button.setIconHover(qta.icon('fa.cog',color=self.style.color.purple))
         
-        self.gallery_button.setIcon(qta.icon('mdi.folder-image',color=self.style.color.foreground))
         self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.style.color.foreground))
         self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.style.color.purple))
      

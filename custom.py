@@ -78,10 +78,10 @@ class QPushButtonHighlight(QPushButton):
     def __init__(self,*args, **kwargs):
         super(QPushButtonHighlight, self).__init__(*args, **kwargs)
 
-        
+    
     def setIconNormal(self,icon_normal):
         self.icon_normal = icon_normal
-        
+        self.setIcon(icon_normal)
     def setIconHover(self,icon_hover):
         self.icon_hover = icon_hover
         
