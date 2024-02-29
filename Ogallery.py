@@ -41,11 +41,8 @@ class MainWidget(QWidget):
         self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.background,
                                     scale_factor=1.2))
        
-        
-        self.query_line = QLineEdit(self)
-        self.query_line.setFixedWidth(.7*self.width())
         #buttons instantiation
-        
+        self.query_line = QLineEdit(self)
         self.search_button = QPushButton()
         self.info_button=QPushButton()
         self.settings_button=QPushButton()
@@ -74,10 +71,8 @@ class MainWidget(QWidget):
                 
         layout.addLayout(header_layout)
         layout.addWidget(self.logo_label)
-        horizontal_layout.addStretch(1)
         horizontal_layout.addWidget(self.search_button)
         horizontal_layout.addWidget(self.query_line)
-        horizontal_layout.addStretch(1)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
@@ -814,16 +809,18 @@ class ImageViewer(QWidget):
             if hasattr(self, 'edited_image'):
                 self.edit_history=[]
                 delattr(self,'edited_image')
-                delattr(self,'exposureImg')
+                if hasattr(self,'exposureImg'):
+                    delattr(self,'exposureImg')
                 self.show_image()
             
             
     def revert(self):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
-            delattr(self,'exposureImg')
-            self.exposure_slider.setValue(100)
-            self.edit_history=[]
+            if hasattr(self,'exposureImg'):
+                    delattr(self,'exposureImg')
+        self.exposure_slider.setValue(100)
+        self.edit_history=[]
         self.show_image()
     
     def save_image(self):
@@ -1050,6 +1047,7 @@ if __name__ == '__main__':
     
 
 
+    
     
     main_widget = MainWidget()
     
