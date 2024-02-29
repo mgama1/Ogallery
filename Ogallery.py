@@ -563,22 +563,24 @@ class ImageViewer(QWidget):
 
 
     def show_edited_image(self):
-        # Clear the scene before adding a new item
-        self.scene.clear()
-        pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
+        if self.edit_history:
+            self.scene.clear()
+            pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
 
-        
-        
 
-        # Add a QGraphicsPixmapItem to the scene
-        pixmap_item = QGraphicsPixmapItem(pixmap)
-        self.scene.addItem(pixmap_item)
 
-        # Set the scene rect to match the pixmap size
-        self.scene.setSceneRect(pixmap_item.boundingRect())
 
-        # Fit the image to the view
-        self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+            # Add a QGraphicsPixmapItem to the scene
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(pixmap_item)
+
+            # Set the scene rect to match the pixmap size
+            self.scene.setSceneRect(pixmap_item.boundingRect())
+
+            # Fit the image to the view
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+            return True
+        return False
 
         
     def handle_timeout(self):
