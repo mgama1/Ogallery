@@ -36,9 +36,9 @@ class MainWidget(QWidget):
         self.init_ui()
     def init_ui(self):
         self.setWindowTitle('OGallery')
-        self.setGeometry(300, 100, 800, 650)
+        self.setGeometry(300, 100, 800, 600)
         self.style=OStyle()
-        self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.background,
+        self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
                                     scale_factor=1.2))
        
         #buttons instantiation
@@ -55,7 +55,7 @@ class MainWidget(QWidget):
         
         #logo QLabel instantiation and settings
         self.logo_label = QLabel(self)
-        pixmap = QPixmap('logo.jpg')
+        pixmap = QPixmap('l2.jpg')
         self.logo_label.setPixmap(pixmap)
         self.logo_label.setAlignment(Qt.AlignCenter)
         
@@ -84,16 +84,16 @@ class MainWidget(QWidget):
         
         
         #Elements style
-        self.setStyleSheet(f"background-color: {self.style.color.background};color:white;")
+        self.setStyleSheet(f"background-color: {self.style.color.dark_background};color:white;")
         self.query_line.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
         self.settings_button.setFixedSize(45,45)
 
-        button_style = f"QPushButton {{ background-color: {self.style.color.background}; \
+        button_style = f"QPushButton {{ background-color: {self.style.color.dark_background}; \
                                         color: {self.style.color.foreground}; \
                                         icon-size: {self.style.size.standard_icon_size}; \
-                                        border: 2px solid {self.style.color.background}; \
+                                        border: 2px solid {self.style.color.dark_background}; \
                                         border-radius: 18px;padding: 5px;}} \
                                         QPushButton:hover {{  \
                                         background-color: {self.style.color.hover_default}; }}"
@@ -101,14 +101,18 @@ class MainWidget(QWidget):
         
         qline_style = (
             f"QLineEdit {{ \
-             background-color: {self.style.color.background}; \
-             color: white; \
-             border-radius: 15px; \
-             padding: 5px; \
-             border: 2px solid {self.style.color.light_gray}; \
-             font-size: 12pt; \
-             }}"
+                background-color: {self.style.color.dark_background}; \
+                color: white; \
+                border-radius: 15px; \
+                padding: 5px; \
+                border: 2px solid {self.style.color.light_gray}; \
+                font-size: 12pt; \
+            }} \
+            QLineEdit:focus {{ \
+                border-color: {self.style.color.dark_purple}; \
+            }}"
         )
+
         
        
         buttons=[self.search_button,self.info_button,self.settings_button,self.gallery_button]
@@ -316,6 +320,7 @@ class MainWidget(QWidget):
         msg_box.setText(f"current supported search classes are {', '.join(classesNames)}")
         msg_box.setWindowTitle('info')
         msg_box.exec_()
+
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
