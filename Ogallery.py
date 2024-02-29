@@ -563,7 +563,7 @@ class ImageViewer(QWidget):
 
 
     def show_edited_image(self):
-        if self.edit_history:
+        try:
             self.scene.clear()
             pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
 
@@ -579,8 +579,9 @@ class ImageViewer(QWidget):
 
             # Fit the image to the view
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
-            return True
-        return False
+        except:
+            self.show_image()
+        
 
         
     def handle_timeout(self):
