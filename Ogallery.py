@@ -14,7 +14,8 @@ import rembg
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel
+
 
 from Levenshtein import distance as lev_distance
 from Othumbnails import ThumbnailMaker
@@ -81,7 +82,7 @@ class MainWidget(QWidget):
         self.search_button.clicked.connect(self.openImageViewer)
         self.info_button.clicked.connect(self.showAppInfo)
         self.gallery_button.clicked.connect(self.openGallery)
-        self.settings_button.clicked.connect(self.showDialog)
+        self.settings_button.clicked.connect(self.openSettings)
         
         
         #Elements style
@@ -136,30 +137,18 @@ class MainWidget(QWidget):
         
         
         self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.style.color.foreground))
-        self.settings_button.setIconHover(qta.icon('fa.cog',color=self.style.color.purple))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.style.color.purple))
         
         self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.style.color.foreground))
         self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.style.color.purple))
      
         self.show()
 
-        
-    def showDialog(self):
-        username = os.getenv('USER')
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        self.selected_directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
-        
-        if self.selected_directory:
-            if os.path.exists(f'/home/{username}/.cache/OpenGallery/')==False:
-                os.makedirs(f'/home/{username}/.cache/OpenGallery/')
-            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
-                config_file.write(self.selected_directory)
-
-
-            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
-                directory = config_file.read()
-            
+    def openSettings(self):
+        self.settings=SettingsWidget()
+        self.settings.show()
+    
+           
     def openImageViewer(self):
         self.selectImages()
             
@@ -942,7 +931,64 @@ class ImageViewer(QWidget):
         self.finishedSignal.emit()
         event.accept()
 
+class SettingsWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.style=OStyle()
+        self.init_ui()
+        
+    def init_ui(self):
+        self.setWindowTitle('Settings')
+        self.setGeometry(100, 100, 700, 600)
+        self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
 
+        layout = QVBoxLayout()
+        
+        self.model = QStringListModel()
+        self.model.setStringList(self.getDirectories())
+        
+        self.listView = QListView()
+        self.listView.setModel(self.model)
+        self.add_dir_button=QPushButton('add directory')
+        self.add_dir_button.clicked.connect(self.addItem)
+        layout.addWidget(self.listView)
+        layout.addWidget(self.add_dir_button)
+        self.setLayout(layout)
+        
+    def getDirectories(self):
+        username = os.getenv('USER')
+        if  os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                images_directories = config_file.readlines()
+        else:       
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                config_file.write('\n')
+        
+        return images_directories
+        
+    def addItem(self):
+        self.showDialog()
+        if self.selected_directory:
+            self.model.insertRow(self.model.rowCount())
+            index = self.model.index(self.model.rowCount() - 1)
+            self.model.setData(index, self.selected_directory)
+
+            
+    def showDialog(self):
+        username = os.getenv('USER')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        self.selected_directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
+        
+        if self.selected_directory:
+            if os.path.exists(f'/home/{username}/.cache/OpenGallery/')==False:
+                os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'a') as config_file:
+                config_file.write(self.selected_directory+'\n')
+
+       
+            
+            
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
     def __init__(self, image_path,image_files):
@@ -1023,12 +1069,16 @@ class ImageGalleryApp(QMainWindow):
         scroll_content.setLayout(layout)
         
         username = os.getenv('USER')
-        with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
-                images_directory = config_file.read()
+        config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
+
+        with open(config_file_path, 'r') as config_file:
+            images_directories = [line.strip() for line in config_file.readlines() if line.strip()]
+        
         image_files=[]
-        for file_type in self.file_types:
-            image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
-                                    recursive=True))
+        for images_directory in images_directories:
+            for file_type in self.file_types:
+                image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
+                                        recursive=True))
         image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
 
         row, col = 0, 0
@@ -1063,6 +1113,7 @@ if __name__ == '__main__':
 
     
 
+    
 
     
     
