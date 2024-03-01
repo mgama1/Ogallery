@@ -931,41 +931,48 @@ class ImageViewer(QWidget):
         self.finishedSignal.emit()
         event.accept()
 
+        
 class SettingsWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.style=OStyle()
+        self.style = OStyle()
         self.init_ui()
-        
+
     def init_ui(self):
         self.setWindowTitle('Settings')
         self.setGeometry(100, 100, 700, 600)
         self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
 
         layout = QVBoxLayout()
-        
+
         self.model = QStringListModel()
         self.model.setStringList(self.getDirectories())
-        
+
         self.listView = QListView()
         self.listView.setModel(self.model)
-        self.add_dir_button=QPushButton('add directory')
-        self.add_dir_button.clicked.connect(self.addItem)
         layout.addWidget(self.listView)
+
+        # Add a button to remove directories
+        self.remove_dir_button = QPushButton('Remove Directory')
+        self.remove_dir_button.clicked.connect(self.removeSelectedItems)
+        layout.addWidget(self.remove_dir_button)
+
+        self.add_dir_button = QPushButton('Add Directory')
+        self.add_dir_button.clicked.connect(self.addItem)
         layout.addWidget(self.add_dir_button)
         self.setLayout(layout)
-        
+
     def getDirectories(self):
         username = os.getenv('USER')
-        if  os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
+        if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
                 images_directories = config_file.readlines()
-        else:       
+        else:
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
                 config_file.write('\n')
-        
+
         return images_directories
-        
+
     def addItem(self):
         self.showDialog()
         if self.selected_directory:
@@ -973,20 +980,39 @@ class SettingsWidget(QWidget):
             index = self.model.index(self.model.rowCount() - 1)
             self.model.setData(index, self.selected_directory)
 
-            
+    def removeSelectedItems(self):
+        indexes = self.listView.selectedIndexes()
+        for index in sorted(indexes, reverse=True):
+            # Get the data at the index with DisplayRole
+            item_data = self.model.data(index, Qt.DisplayRole)
+            self.model.removeRow(index.row())
+            # Also remove from the config file
+            username = os.getenv('USER')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                lines = config_file.readlines()
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                for line in lines:
+                    if line.strip() != item_data.strip():
+                        config_file.write(line)
+
+
     def showDialog(self):
         username = os.getenv('USER')
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         self.selected_directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
-        
+
         if self.selected_directory:
-            if os.path.exists(f'/home/{username}/.cache/OpenGallery/')==False:
+            if not os.path.exists(f'/home/{username}/.cache/OpenGallery/'):
                 os.makedirs(f'/home/{username}/.cache/OpenGallery/')
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'a') as config_file:
-                config_file.write(self.selected_directory+'\n')
+                config_file.write(self.selected_directory + '\n')
+   
+    
 
-       
+    
+    
+  
             
             
 class ImageThumbnailWidget(QWidget):
@@ -1048,6 +1074,7 @@ class ImageThumbnailWidget(QWidget):
             
     
 
+    
 class ImageGalleryApp(QMainWindow):
     def __init__(self):
         super().__init__()
