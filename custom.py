@@ -65,6 +65,7 @@ class SavingMessageBox(QMessageBox):
 class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
+        
         style = OStyle()
         self.OK_button = QPushButton("OK")
         #self.OK_button.setFocusPolicy(Qt.NoFocus)

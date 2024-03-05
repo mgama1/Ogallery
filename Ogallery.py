@@ -13,8 +13,8 @@ import rembg
 
 import qtawesome as qta
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel
+from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel,QObject,QEvent
 
 
 from Levenshtein import distance as lev_distance
@@ -38,6 +38,9 @@ class MainWidget(QWidget):
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 600)
+
+        
+        
         self.style=OStyle()
         #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
         #                            scale_factor=1.2))
@@ -334,7 +337,12 @@ class ImageViewer(QWidget):
         self.result = result
         self.edit_history=[]
         self.main_widget = main_widget  
+        
         self.init_ui()
+        self.menu = Menu(self.file_list,self.current_index)
+        self.menu.copy_signal.connect(self.copyToClipboard)
+        self.menu.delete_signal.connect(self.delete_image)
+        qApp.installEventFilter(self.menu)
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
@@ -472,6 +480,7 @@ class ImageViewer(QWidget):
         self.show_containing_folder_button.clicked.connect(self.show_containing_folder)
         self.compare_button.pressed.connect(self.show_image)
         self.compare_button.released.connect(self.show_edited_image)
+        
         
         ###############################
         
@@ -842,6 +851,7 @@ class ImageViewer(QWidget):
     def delete_image(self):
         if os.path.exists(self.file_list[self.current_index]):
             os.remove(self.file_list[self.current_index])
+            self.file_list.pop(self.current_index)
             self.next_image()
     def show_success_message(self):
         '''
@@ -940,7 +950,7 @@ class SettingsWidget(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Settings')
-        self.setGeometry(100, 100, 700, 600)
+        self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
 
         layout = QVBoxLayout()
@@ -1010,11 +1020,55 @@ class SettingsWidget(QWidget):
    
     
 
+
     
     
-  
-            
-            
+class Menu(QObject):
+    copy_signal=pyqtSignal()
+    delete_signal=pyqtSignal()
+    def __init__(self,file_list,current_index):
+        super().__init__()
+        self.opened_menu = None
+        self.style=OStyle()
+        self.file_list=file_list
+        self.current_index=current_index
+        #self.setStyleSheet(f"background-color: {self.style.color.dark_background};color:white;")
+        
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
+            if self.opened_menu is not None:
+                self.opened_menu.close()
+            menu = QMenu()
+            action1 = QAction("copy", menu)
+            action1.triggered.connect(self.copyToClipboardSignal)
+            menu.addAction(action1)
+            action2 = QAction("delete", menu)
+            action2.triggered.connect(self.deleteSignal)
+            menu.addAction(action2)
+            self.opened_menu = menu
+            menu.setStyleSheet(f"""
+                QMenu {{
+                    background-color: {self.style.color.background}; color:white;
+                }}
+                QMenu::item:selected {{
+                    background-color: {self.style.color.light_gray};  
+                }}
+            """)
+            menu.exec_(QCursor.pos())
+            return True
+        return False
+
+   
+
+    def deleteSignal(self):
+        self.delete_signal.emit()
+        
+    def copyToClipboardSignal(self):
+            self.copy_signal.emit()
+            #image_path = self.file_list[self.current_index]
+            #clipboard = QApplication.clipboard()
+            #clipboard.setPixmap(QPixmap(image_path))      
+
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
     def __init__(self, image_path,image_files):
@@ -1132,17 +1186,10 @@ class ImageGalleryApp(QMainWindow):
                 self.close()
     
 if __name__ == '__main__':
-    app = QApplication([])
+    app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")
     
-    
-    
 
-    
-
-    
-
-    
     
     main_widget = MainWidget()
     
