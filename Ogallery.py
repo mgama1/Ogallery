@@ -23,10 +23,9 @@ from custom import *
 from styles import *
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
-classesNames=['bicycle','boat','building','bus','car','forest',
-             'glacier','helicopter','motorcycle', 'mountain',
-             'plane','sea','street','train','truck','cat']
-
+classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog',
+         'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea',
+          'street', 'train', 'truck']
 
 
 
@@ -238,7 +237,7 @@ class MainWidget(QWidget):
         if self.queryText==None:
             self.showErrorMessage("No images found")
             
-        db=pd.read_csv("log.csv")
+        db=pd.read_csv("db.csv")
         self.result=db[db["class"]==self.queryText]["directory"].to_list()
                 
     
@@ -252,7 +251,7 @@ class MainWidget(QWidget):
         Returns: 
             suggested class (str) or None
         '''
-        classes=['plane','car','cat','dog','food','sea','documents']
+        classes=[class_.lower() for class_ in classesNames]
         query=query.lower()
         
         #check for exact match
@@ -1032,7 +1031,6 @@ class Menu(QObject):
         self.style=OStyle()
         self.file_list=file_list
         self.current_index=current_index
-        #self.setStyleSheet(f"background-color: {self.style.color.dark_background};color:white;")
         
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
@@ -1065,9 +1063,8 @@ class Menu(QObject):
         
     def copyToClipboardSignal(self):
             self.copy_signal.emit()
-            #image_path = self.file_list[self.current_index]
-            #clipboard = QApplication.clipboard()
-            #clipboard.setPixmap(QPixmap(image_path))      
+            
+            
 
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
@@ -1135,9 +1132,10 @@ class ImageGalleryApp(QMainWindow):
         self.style=OStyle()
         
         self.file_types=['jpg','jpeg','png','gif']
-
+        t1=time.time()
         self.init_ui()
-        
+        t2=time.time()
+        print(f"total loading time: {t2-t1}")
     def init_ui(self):
         #layout
         central_widget = QWidget()
@@ -1160,8 +1158,10 @@ class ImageGalleryApp(QMainWindow):
             for file_type in self.file_types:
                 image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
                                         recursive=True))
+        t1=time.time()
         image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
-
+        t2=time.time()
+        print(f"sorting time: {t2-t1}")
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file,image_files)

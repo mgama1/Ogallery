@@ -6,13 +6,11 @@ class Model:
     def __init__(self,directory,threshold):
         self.directory= directory
         self.threshold=threshold
-        self.savedModel = keras.models.load_model("ogalleryv1.h5")
-
+        self.savedModel = keras.models.load_model("ogalleryv2.h5")
+        self.classes=['bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'id', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
 
     def predict(self):
-        classes=['bicycle','boat','building','bus','car','forest',
-                'glacier','helicopter','motorcycle', 'mountain',
-                'plane','sea','street','train','truck']
+        
         np_image = Image.open(self.directory)
         np_image = np.array(np_image).astype('float32')
         np_image = transform.resize(np_image, (160, 160, 3))
@@ -20,7 +18,7 @@ class Model:
         prediction=self.savedModel.predict(np_image)
         pn=np.argmax(prediction)
         conf=np.max(prediction)
-        p=classes[pn]
+        p=self.classes[pn]
 
         if conf>self.threshold:
             return p
