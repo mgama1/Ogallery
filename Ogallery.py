@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from PIL.PngImagePlugin import PngInfo
 from PIL import Image
 import rembg
-
+from MobileNet import Model
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor
@@ -43,7 +43,7 @@ class MainWidget(QWidget):
         self.style=OStyle()
         #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
         #                            scale_factor=1.2))
-        self.setWindowIcon(QIcon(QPixmap('icon.png')))
+        self.setWindowIcon(QIcon('icon.ico'))
         #buttons instantiation
         self.query_line = QLineEdit(self)
         self.search_button = QPushButtonHighlight()
@@ -345,7 +345,7 @@ class ImageViewer(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
-        self.setGeometry(300, 100, 750, 550)
+        self.setGeometry(300, 100, 800, 550)
         
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
@@ -849,7 +849,11 @@ class ImageViewer(QWidget):
     
     def delete_image(self):
         if os.path.exists(self.file_list[self.current_index]):
-            os.remove(self.file_list[self.current_index])
+            try:
+                os.system(f"gio trash '{self.file_list[self.current_index]}'")
+            except OSError as e:
+                print(f"Error moving file to trash: {e.filename} - {e.strerror}")
+            
             self.file_list.pop(self.current_index)
             self.next_image()
     def show_success_message(self):
@@ -1165,7 +1169,7 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file,image_files)
-            thumbnail_widget.thumbnailClicked.connect(self.close)
+            thumbnail_widget.thumbnailClicked.connect(self.hide)
             layout.addWidget(thumbnail_widget, row, col)
             
             col += 1
