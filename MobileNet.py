@@ -10,6 +10,13 @@ class Model:
         self.savedModel = keras.models.load_model("ogalleryv2.h5")
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
+        #spaces before and after words are intentional to avoid retreiving unintentional substring 
+        self.classes_synonyms={"ID":" identity card , id card ",'bicycle':" bike ", 'boat':" ship ", 
+                  'building':" house , home , apartment ", 'bus':' autobus ', 'car':' automobile ', 
+                  'cat':' kitty , kitten ', 'document':" docs , text ", 'dog':" puppy , pupper , doggo , doggy ",
+         'forest':" tree ", 'glacier':' ice , iceberg ', 'helicopter':" chopper ", 'motorcycle': " bike ",
+                  'mountain':' nature ', 'plane':' airplane , aeroplane , aircraft', 'reciept':' bill ',
+                  'sea':' beach , water ','street':' ', 'train':' ', 'truck': ' '}
 
 
     def predict_batch(self,files_list):
@@ -29,7 +36,7 @@ class Model:
         confidences = np.max(predictions, axis=1)
         results = []
         for i, idx in enumerate(classes_indices):
-            if confidences[i] > 0.60:
+            if confidences[i] > 0.70:
                 results.append((files_list[i], self.classes[idx]))
             else:
                 results.append((files_list[i], None))
@@ -38,7 +45,7 @@ class Model:
 
     def predictAndSave(self):
         if not os.path.exists("./db.csv"):
-            self.db = pd.DataFrame(columns=['directory', 'class'])
+            self.db = pd.DataFrame(columns=['directory', 'class',"synonyms"])
             self.db.to_csv('db.csv', index=False)
 
         self.db=pd.read_csv("db.csv")
@@ -61,8 +68,13 @@ class Model:
             return 0
 
         for filename, prediction in batch_results:
-            if prediction is not None:
-                new_row = {"directory":filename,"class":prediction.lower()}
+            if prediction is None:
+                new_row = {"directory":filename,"class":None,"synonyms":None}
+                self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
+                
+            else:
+                new_row = {"directory":filename,"class":prediction.lower(),"synonyms":self.classes_synonyms[prediction]}
+
                 self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
 
         self.db.to_csv("db.csv",index=False)

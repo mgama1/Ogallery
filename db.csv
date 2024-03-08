@@ -1,12 +1,101 @@
-directory,class
-/home/mgama1/Desktop/Ogallery/s/Cat_August_2010-4.jpg,cat
-/home/mgama1/Desktop/Ogallery/s/cat-separation-anxiety-boston-ma.jpg,cat
-/home/mgama1/Desktop/Ogallery/s/dog-puppy-on-garden-royalty-free-image-1586966191.jpg,dog
-/home/mgama1/Desktop/Ogallery/s/german-shepherd-gallery-6-min.jpg,dog
-/home/mgama1/Desktop/Ogallery/s/12370172185_67e66f65d6_b.jpg,plane
-/home/mgama1/Desktop/Ogallery/s/landscape-1458672432-f35.jpg,plane
-/home/mgama1/Desktop/Ogallery/s/Cat_August_2010-4_2024-02-11-14:54:23.jpg,cat
-/home/mgama1/Desktop/Ogallery/s/Cat_November_2010-1a.jpg,cat
-/home/mgama1/Desktop/Ogallery/s/whaaat.jpeg,cat
-/home/mgama1/Desktop/Ogallery/s/photo-1625321483581-e4b662b8abf1.jpeg,dog
-/home/mgama1/Desktop/Ogallery/s/11-dogs-like-german-shepherd.png,cat
+directory,class,synonyms
+/media/mgama1/mgama1/photos/ezgif-2-272bda7e7a.jpg,,
+/media/mgama1/mgama1/photos/11047637_LVFrKVYUG-lQ15G7m5sEer0O2jg2IWQIDGnlPV4elXo.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/180612-F-MT955-918.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/5w83o8.jpg,street, 
+/media/mgama1/mgama1/photos/80944-batman-steampunk-superheroes-hd-4k-5k.jpg,motorcycle, bike 
+/media/mgama1/mgama1/photos/Cat_August_2010-4.jpg,cat," kitty , kitten "
+/media/mgama1/mgama1/photos/cyberpunk-aesthetic-girl-profile-kedrokauohps917i.jpg,,
+/media/mgama1/mgama1/photos/dr.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/Jingoji_Kyoto_Kyoto35n4592 .jpg,,
+/media/mgama1/mgama1/photos/Nara_Irie_KyuKyo_BookRoom.jpg,,
+/media/mgama1/mgama1/photos/OCZDOGBN3BGZBFU4VH3WSDKZOA.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/Okochi_Denjiro_garden_tea_house_(7123924157).jpg,,
+/media/mgama1/mgama1/photos/photo_2023-11-01_09-47-38.jpg,,
+/media/mgama1/mgama1/photos/ezgif-2-d42ca057b0.jpg,helicopter, chopper 
+/media/mgama1/mgama1/photos/ezgif-2-d84467ce4e.jpg,,
+/media/mgama1/mgama1/photos/geometric_dragon_by_akumuumbreonx_dblpypb-fullview.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/github-office-design-13-1200x800.jpg,,
+/media/mgama1/mgama1/photos/gl.jpg,,
+/media/mgama1/mgama1/photos/riccard.jpg,,
+/media/mgama1/mgama1/photos/TAL-turquoise-blue-tropical-water-WHYTURQ0323-741b0f8d4d8849f38f10a96ebef6c8d5.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/These-Mexico-Beaches-Have-Been-Deemed-Unsafe-For-Swimming-Due-To-Contaminated-Water-.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/mug/404.jpg,helicopter, chopper 
+/media/mgama1/mgama1/photos/mug/codercat.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/mug/dojocat.jpg,,
+/media/mgama1/mgama1/photos/mug/finalMugContext.jpg,,
+/media/mgama1/mgama1/photos/mug/mark1.jpg,helicopter, chopper 
+/media/mgama1/mgama1/photos/mug/mug.jpg,,
+/media/mgama1/mgama1/photos/mug/mugblack.jpg,,
+/media/mgama1/mgama1/photos/mug/thor.jpg,helicopter, chopper 
+/media/mgama1/mgama1/photos/mug/wallpaperflare.com_wallpaper - Copy.jpg,,
+/media/mgama1/mgama1/photos/outfit/bloggerharry-24166091394142013.jpg,street, 
+/media/mgama1/mgama1/photos/outfit/german-grey-classic-shirt-2_1200x.jpg,,
+/media/mgama1/mgama1/photos/GP/spotmini-1200x630_2024-02-18-005520_2024-02-18-005716.jpg,helicopter, chopper 
+/media/mgama1/mgama1/photos/shelf/support1.jpg,boat, ship 
+/media/mgama1/mgama1/photos/slideshow/2020-BAC-Mono-1.jpg,car, automobile 
+/media/mgama1/mgama1/photos/slideshow/42kr8g.jpg,,
+/media/mgama1/mgama1/photos/slideshow/4772dv.jpg,car, automobile 
+/media/mgama1/mgama1/photos/slideshow/4gjkjd.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/slideshow/5deo11.jpg,motorcycle, bike 
+/media/mgama1/mgama1/photos/slideshow/8x23py.jpg,motorcycle, bike 
+/media/mgama1/mgama1/photos/slideshow/BAC_Mono_ 2716.jpg,car, automobile 
+/media/mgama1/mgama1/photos/slideshow/FA18.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/slideshow/First_F-35_headed_for_USAF_service.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/slideshow/k96m91.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/slideshow/nkm31q.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/slideshow/nrgvvm.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/slideshow/odxk17.jpg,,
+/media/mgama1/mgama1/photos/slideshow/ym2jvk.jpg,car, automobile 
+/media/mgama1/mgama1/photos/wall gallery/84040_bFR7O9BLc5zA-bcZEU_YUTjUcjkG8WvX_ZbuoTXTR8Y.jpg,,
+/media/mgama1/mgama1/photos/wall gallery/i3x7tnc8rrj71.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/00_Edit_2.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/1079865.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/wallpaper/20204.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/wallpaper/26-264097_m.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/30-301290_dji-mavic-pro-hd.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/34635.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/wallpaper/38228804_2145838919025298_7085211285385641984_n.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/wallpaper/403711.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/418575.jpg,motorcycle, bike 
+/media/mgama1/mgama1/photos/wallpaper/69061801_1983324578436489_6865726632515076096_o.jpg,building," house , home , apartment "
+/media/mgama1/mgama1/photos/wallpaper/736692.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/ayoub-zgaren-untitled-70.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/wallpaper/c0bb4ac27f6cb95f86edcc10aedc2c7e.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/fc7cf0550c307b1ffaa90eed46d4de6c.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/hi-tech-3d-blox-interface-wallpaper-3554x1999_53.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/maxresdefault.jpg,sea," beach , water "
+/media/mgama1/mgama1/photos/wallpaper/thumb-1920-534472.jpg,bicycle, bike 
+/media/mgama1/mgama1/photos/wallpaper/wallpaperflare.com_wallpaper.jpg,,
+/media/mgama1/mgama1/photos/wallpaper/wp3082255.jpg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/wallpaper/wp5277659.jpg,,
+/media/mgama1/mgama1/photos/images (1) (1).jpeg,,
+/media/mgama1/mgama1/photos/190529-N-XD935-010X.jpeg,sea," beach , water "
+/media/mgama1/mgama1/photos/210728-F-AR942-9386.jpeg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/210919-F-AF248-9084.jpeg,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/230106-D-D0478-1002.jpeg,,
+/media/mgama1/mgama1/photos/mug1.jpeg,,
+/media/mgama1/mgama1/photos/GCAr881WAAAQsGP.jpeg,,
+/media/mgama1/mgama1/photos/GCBoiXaWAAAyrwd.jpeg,bus, autobus 
+/media/mgama1/mgama1/photos/GCBV61mWAAA4Kdb.jpeg,,
+/media/mgama1/mgama1/photos/GCBWqjIWkAAB3J6.jpeg,building," house , home , apartment "
+/media/mgama1/mgama1/photos/8bit/moon.jpeg,building," house , home , apartment "
+/media/mgama1/mgama1/photos/mug/images (1) (3).jpeg,,
+/media/mgama1/mgama1/photos/wall gallery/shoji lantern/s685062094443420367_p1_i3_w668.jpeg,building," house , home , apartment "
+/media/mgama1/mgama1/photos/wallpaper/8251a9a59e1646dc8e97e32f28eb0254.jpeg,motorcycle, bike 
+/media/mgama1/mgama1/photos/Picture1.png,building," house , home , apartment "
+/media/mgama1/mgama1/photos/Screenshot+2021-12-11+at+10.18.51.png,,
+/media/mgama1/mgama1/photos/tmpwk3z1sf8.png,,
+/media/mgama1/mgama1/photos/8bit/Fc4GdglWIAc7fJU.png,sea," beach , water "
+/media/mgama1/mgama1/photos/8bit/UP.png,bicycle, bike 
+/media/mgama1/mgama1/photos/mug/a.png,bicycle, bike 
+/media/mgama1/mgama1/photos/mug/Background.png,plane," airplane , aeroplane , aircraft"
+/media/mgama1/mgama1/photos/mug/femalecodertocat.png,,
+/media/mgama1/mgama1/photos/mug/rec.png,,
+/media/mgama1/mgama1/photos/mug/Robotocat.png,,
+/media/mgama1/mgama1/photos/outfit/Screenshot from 2023-08-25 13-05-30.png,street, 
+/media/mgama1/mgama1/photos/outfit/Screenshot from 2023-08-25 13-07-02.png,,
+/media/mgama1/mgama1/photos/outfit/Screenshot from 2023-08-25 13-09-55.png,bus, autobus 
+/media/mgama1/mgama1/photos/slideshow/498y68.png,motorcycle, bike 
+/media/mgama1/mgama1/photos/slideshow/vm182m.png,helicopter, chopper 
+/media/mgama1/mgama1/photos/wall gallery/shoji lantern/f709ed1e89d5ffa3e94c3ab65e43fdfd.png,building," house , home , apartment "
