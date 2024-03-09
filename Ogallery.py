@@ -48,7 +48,7 @@ class MainWidget(QWidget):
         # Flatten keys and values of model.classes_synonyms
         self.classes_plus = chain(self.model.classes_synonyms.keys(), self.model.classes_synonyms.values())
         # Split, strip, and filter empty strings.
-        self.classes_plus = [item.strip() for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
+        self.classes_plus = [item.strip().replace("q_",'') for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
         self.style=OStyle()
         #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
@@ -255,7 +255,7 @@ class MainWidget(QWidget):
             
         db=pd.read_csv("db.csv")
         
-        self.result=db[db["class"].str.contains(self.queryText) | db["synonyms"].str.contains(self.queryText) ]["directory"].to_list()
+        self.result=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
 
     
     
@@ -270,7 +270,7 @@ class MainWidget(QWidget):
         Returns: 
             suggested class (str) or None
         '''
-        classes=[class_.lower() for class_ in self.classes_plus] 
+        classes=[class_.lower().replace("q_",'') for class_ in self.classes_plus] 
         query=query.lower()
         
         #check for exact match
