@@ -11,12 +11,12 @@ class Model:
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
         #spaces before and after words are intentional to avoid retreiving unintentional substring 
-        self.classes_synonyms={"ID":" identity card , id card ",'bicycle':" bike ", 'boat':" ship ", 
-                  'building':" house , home , apartment ", 'bus':' autobus ', 'car':' automobile ', 
-                  'cat':' kitty , kitten ', 'document':" docs , text ", 'dog':" puppy , pupper , doggo , doggy ",
-         'forest':" tree ", 'glacier':' ice , iceberg ', 'helicopter':" chopper ", 'motorcycle': " bike ",
-                  'mountain':' nature ', 'plane':' airplane , aeroplane , aircraft', 'reciept':' bill ',
-                  'sea':' beach , water ','street':' ', 'train':' ', 'truck': ' '}
+        self.classes_synonyms={"ID":"q_identity card,q_id card ",'bicycle':"q_bike", 'boat':"q_ship", 
+                  'building':"q_house , q_home , q_apartment", 'bus':'q_autobus', 'car':'q_automobile ', 
+                  'cat':'q_kitty ,q_kitten ', 'document':"q_docs , q_text ", 'dog':"q_puppy ,q_pupper ,q_doggo ,q_doggy ",
+         'forest':"q_tree ", 'glacier':'q_ice ,q_iceberg ', 'helicopter':"q_chopper ", 'motorcycle': "q_bike ",
+                  'mountain':'q_nature ', 'plane':'q_airplane ,q_aeroplane , q_aircraft', 'reciept':' q_bill ',
+                  'sea':'q_beach ,q_water ','street':' ', 'train':' ', 'truck': ' '}
 
 
     def predict_batch(self,files_list):
@@ -73,7 +73,7 @@ class Model:
                 self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
                 
             else:
-                new_row = {"directory":filename,"class":prediction.lower(),"synonyms":self.classes_synonyms[prediction]}
+                new_row = {"directory":filename,"class":"q_"+prediction.lower(),"synonyms":self.classes_synonyms[prediction]}
 
                 self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
 

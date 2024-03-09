@@ -22,6 +22,7 @@ from Levenshtein import distance as lev_distance
 from Othumbnails import ThumbnailMaker
 from custom import *
 from styles import *
+from core import *
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog',
@@ -34,8 +35,10 @@ from MobileNet import Model
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
-
+        
         self.init_ui()
+
+
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 800, 600)
@@ -164,13 +167,17 @@ class MainWidget(QWidget):
         self.selectImages()
             
         if self.result:
-            self.viewer = ImageViewer(self.result, self)
-            self.viewer.finishedSignal.connect(self.showMainWidget)
-            self.viewer.show()
-            self.hide()
-        
+            #self.viewer = ImageViewer(self.result, self)
+            #self.viewer.finishedSignal.connect(self.showMainWidget)
+            #self.viewer.show()
+            #self.hide()
+            core=Core()
+            self.image_gallery=ImageGalleryApp(self.result)
+            self.image_gallery.show()
+            
     def openGallery(self):
-        self.image_gallery=ImageGalleryApp()
+        core=Core()
+        self.image_gallery=ImageGalleryApp(core.getDirectories())
         self.image_gallery.show()
     def showMainWidget(self):
         """
@@ -252,6 +259,8 @@ class MainWidget(QWidget):
 
     
     
+        
+        
     def suggestClasses(self,query):
         '''
         find the levenshtein distance between existing classes and 
@@ -329,7 +338,7 @@ class MainWidget(QWidget):
         pixmap2 = QPixmap(qta.icon('mdi.glasses',color='#000000').pixmap(50,50))
         
         msg_box.setIconPixmap(CustomAwesome().concat_pixmaps(pixmap1, pixmap2,3))
-        msg_box.setText(f"current supported search classes are {', '.join(classesNames)}")
+        msg_box.setText(f"OGallery is an open source gallery")
         msg_box.setWindowTitle('info')
         msg_box.exec_()
 
@@ -933,10 +942,10 @@ class ImageViewer(QWidget):
         Returns:
             None
         '''
-        
+        core=Core()
         self.close()
         if self.from_gallery:
-            self.image_gallery=ImageGalleryApp()
+            self.image_gallery=ImageGalleryApp(core.getDirectories())
             self.image_gallery.show()
     
     
@@ -1169,17 +1178,17 @@ class ImageThumbnailWidget(QWidget):
 
     
 class ImageGalleryApp(QMainWindow):
-    def __init__(self):
+    def __init__(self,directories):
         super().__init__()
         self.style=OStyle()
+        self.image_files=directories
         
-        self.file_types=['jpg','jpeg','png','gif']
         t1=time.time()
         self.init_ui()
         t2=time.time()
         print(f"total loading time: {t2-t1}")
     def init_ui(self):
-        #layout
+        
         central_widget = QWidget()
         self.setStyleSheet(f"background-color: {self.style.color.background};")
         scroll_area = QScrollArea()
@@ -1189,24 +1198,11 @@ class ImageGalleryApp(QMainWindow):
         layout = QGridLayout()
         scroll_content.setLayout(layout)
         
-        username = os.getenv('USER')
-        config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
-
-        with open(config_file_path, 'r') as config_file:
-            images_directories = [line.strip() for line in config_file.readlines() if line.strip()]
         
-        image_files=[]
-        for images_directory in images_directories:
-            for file_type in self.file_types:
-                image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
-                                        recursive=True))
-        t1=time.time()
-        image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
-        t2=time.time()
-        print(f"sorting time: {t2-t1}")
+        
         row, col = 0, 0
-        for index, image_file in enumerate(image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file,image_files)
+        for index, image_file in enumerate(self.image_files):
+            thumbnail_widget = ImageThumbnailWidget(image_file,self.image_files)
             thumbnail_widget.thumbnailClicked.connect(self.hide)
             layout.addWidget(thumbnail_widget, row, col)
             
