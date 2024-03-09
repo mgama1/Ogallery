@@ -673,11 +673,18 @@ class ImageViewer(QWidget):
         if event.button() == Qt.LeftButton:
             if not self.fullscreen:
                 self.showFullScreen()
-                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                if self.edit_history:
+                    QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+                else:
+                    QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                    
                 self.fullscreen = True
             else:
                 self.showNormal()
-                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                if self.edit_history:
+                    QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+                else:
+                    QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
                 self.fullscreen = False
         
     def next_image(self):
@@ -1233,4 +1240,5 @@ if __name__ == '__main__':
     main_widget = MainWidget()
     
     app.exec_()
+
 
