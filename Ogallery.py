@@ -375,7 +375,6 @@ class ImageViewer(QWidget):
         self.image_view.wheelEvent = self.zoom_image
 
         
-        self.keylist = []
         self.file_list = []
         self.setMouseTracking(True)
         self.load_images()
@@ -650,43 +649,40 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_Delete:
             self.delete_image()
             
-        #saving edited images using key event ctrl&s
-        if event.key()== Qt.Key_Control:
-            self.keylist.append(Qt.Key_Control)
-            
-            
+        #saving edited images         
         if event.key()==Qt.Key_S :
-            self.keylist.append(Qt.Key_S)
+            self.save_image()
             
+        if event.key()==Qt.Key_F:
+            self.toggleFullScreen()
         
-        if len(self.keylist)==2:
-            if (self.keylist[0]*self.keylist[1])==Qt.Key_Control*Qt.Key_S:
-                self.save_image()
+                
          
-        
-    def keyReleaseEvent(self, event):
-        time.sleep(.2)
-        self.keylist=[] 
+
         
     
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
-            if not self.fullscreen:
-                self.showFullScreen()
-                if self.edit_history:
-                    QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
-                else:
-                    QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
-                    
-                self.fullscreen = True
+            self.toggleFullScreen()
+    
+    def toggleFullScreen(self):
+        if not self.fullscreen:
+            self.showFullScreen()
+            if self.edit_history:
+                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
             else:
-                self.showNormal()
-                if self.edit_history:
-                    QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
-                else:
-                    QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
-                self.fullscreen = False
-        
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+
+            self.fullscreen = True
+        else:
+            self.showNormal()
+            if self.edit_history:
+                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+            else:
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+            self.fullscreen = False
+    
+    
     def next_image(self):
         self.current_index = (self.current_index + 1) % len(self.file_list)
         self.show_image()
