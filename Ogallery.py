@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor
 from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel,QObject,QEvent
 
+from itertools import chain
 
 from Levenshtein import distance as lev_distance
 from Othumbnails import ThumbnailMaker
@@ -27,6 +28,7 @@ classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'documen
          'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea',
           'street', 'train', 'truck']
 
+from MobileNet import Model
 
 
 class MainWidget(QWidget):
@@ -39,6 +41,11 @@ class MainWidget(QWidget):
         self.setGeometry(300, 100, 800, 600)
 
         
+        self.model=Model()
+        # Flatten keys and values of model.classes_synonyms
+        self.classes_plus = chain(self.model.classes_synonyms.keys(), self.model.classes_synonyms.values())
+        # Split, strip, and filter empty strings.
+        self.classes_plus = [item.strip() for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
         self.style=OStyle()
         #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
@@ -53,7 +60,9 @@ class MainWidget(QWidget):
         self.gallery_button=QPushButtonHighlight()
        
         #Autocomplete using QCompleter
-        completer = QCompleter(classesNames, self)
+        
+              
+        completer = QCompleter(self.classes_plus, self)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.query_line.setCompleter(completer)
         
@@ -238,8 +247,9 @@ class MainWidget(QWidget):
             self.showErrorMessage("No images found")
             
         db=pd.read_csv("db.csv")
-        self.result=db[db["class"]==self.queryText]["directory"].to_list()
-                
+        
+        self.result=db[db["class"].str.contains(self.queryText) | db["synonyms"].str.contains(self.queryText) ]["directory"].to_list()
+
     
     
     def suggestClasses(self,query):
@@ -251,12 +261,14 @@ class MainWidget(QWidget):
         Returns: 
             suggested class (str) or None
         '''
-        classes=[class_.lower() for class_ in classesNames]
+        classes=[class_.lower() for class_ in self.classes_plus] 
         query=query.lower()
         
         #check for exact match
         if query in classes:
             return query
+        
+        
         #check for lev distance of 1 with avg words length
         for classi in classes:
             if lev_distance(query,classi)==1:
@@ -335,12 +347,15 @@ class ImageViewer(QWidget):
         self.screen_height = self.primary_screen.height()
         self.result = result
         self.edit_history=[]
+        self.fullscreen = False
         self.main_widget = main_widget  
         
         self.init_ui()
         self.menu = Menu(self.file_list,self.current_index)
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
+        self.menu.show_folder.connect(self.show_containing_folder)
+        
         qApp.installEventFilter(self.menu)
 
     def init_ui(self):
@@ -653,6 +668,18 @@ class ImageViewer(QWidget):
         time.sleep(.2)
         self.keylist=[] 
         
+    
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            if not self.fullscreen:
+                self.showFullScreen()
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                self.fullscreen = True
+            else:
+                self.showNormal()
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                self.fullscreen = False
+        
     def next_image(self):
         self.current_index = (self.current_index + 1) % len(self.file_list)
         self.show_image()
@@ -672,6 +699,7 @@ class ImageViewer(QWidget):
     def on_leave_event(self, event):
         self.set_transparency(0)
      
+    
     def copyToClipboard(self):
         image_path = self.file_list[self.current_index]
         clipboard = QApplication.clipboard()
@@ -910,7 +938,7 @@ class ImageViewer(QWidget):
     
     
 
-    def show_containing_folder(self,file_path):
+    def show_containing_folder(self):
         image_path=(self.file_list[self.current_index])
         dir_path=image_path[0:image_path.rfind('/')]
 
@@ -1029,6 +1057,7 @@ class SettingsWidget(QWidget):
 class Menu(QObject):
     copy_signal=pyqtSignal()
     delete_signal=pyqtSignal()
+    show_folder=pyqtSignal()
     def __init__(self,file_list,current_index):
         super().__init__()
         self.opened_menu = None
@@ -1041,12 +1070,17 @@ class Menu(QObject):
             if self.opened_menu is not None:
                 self.opened_menu.close()
             menu = QMenu()
-            action1 = QAction("copy", menu)
-            action1.triggered.connect(self.copyToClipboardSignal)
-            menu.addAction(action1)
-            action2 = QAction("delete", menu)
-            action2.triggered.connect(self.deleteSignal)
-            menu.addAction(action2)
+            copy_action = QAction("copy", menu)
+            copy_action.triggered.connect(self.copyToClipboardSignal)
+            menu.addAction(copy_action)
+            delete_action = QAction("delete", menu)
+            delete_action.triggered.connect(self.deleteSignal)
+            menu.addAction(delete_action)
+            
+            show_folder_action = QAction("show containing folder", menu)
+            show_folder_action.triggered.connect(self.showContainingFolderSignal)
+            menu.addAction(show_folder_action)
+            
             self.opened_menu = menu
             menu.setStyleSheet(f"""
                 QMenu {{
@@ -1066,9 +1100,10 @@ class Menu(QObject):
         self.delete_signal.emit()
         
     def copyToClipboardSignal(self):
-            self.copy_signal.emit()
+        self.copy_signal.emit()
             
-            
+    def showContainingFolderSignal(self):
+        self.show_folder.emit()
 
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
