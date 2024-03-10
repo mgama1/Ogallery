@@ -345,9 +345,8 @@ class MainWidget(QWidget):
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    def __init__(self, result, main_widget,current_index=0,from_gallery=False):
+    def __init__(self, result, main_widget,current_index=0):
         super().__init__()
-        self.from_gallery=from_gallery
         self.style=OStyle()
         self.file_list = []
         self.current_index = current_index
@@ -944,9 +943,9 @@ class ImageViewer(QWidget):
         '''
         core=Core()
         self.close()
-        if self.from_gallery:
-            self.image_gallery=ImageGalleryApp(core.getDirectories())
-            self.image_gallery.show()
+        
+        self.image_gallery=ImageGalleryApp(core.getDirectories())
+        self.image_gallery.show()
     
     
 
@@ -1167,8 +1166,7 @@ class ImageThumbnailWidget(QWidget):
     def mousePressEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
         self.viewer = ImageViewer(self.image_files, main_widget,
-                                  current_index=self.image_files.index(self.image_path),
-                                 from_gallery=True)
+                                  current_index=self.image_files.index(self.image_path))
         self.thumbnailClicked.emit()
     def mouseReleaseEvent(self, event):
             self.setStyleSheet(f"background-color: {self.style.color.background};")

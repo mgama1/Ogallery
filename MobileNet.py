@@ -5,8 +5,10 @@ from tensorflow import keras
 import os
 import glob
 import pandas as pd
+from core import *#EEE
 class Model:
     def __init__(self):
+        self.core=Core()
         self.savedModel = keras.models.load_model("ogalleryv2.h5")
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
@@ -20,14 +22,22 @@ class Model:
 
 
     def predict_batch(self,files_list):
+        if not os.path.exists("./db.csv"):
+            self.db = pd.DataFrame(columns=['directory', 'class',"synonyms"])
+            self.db.to_csv('db.csv', index=False)
+
+        self.db=pd.read_csv("db.csv")
         
         images_list = []
+        pred_files_list=[]
         for filename in files_list:
             if filename not in self.db["directory"].values:
+                pred_files_list.append(filename)
                 image = Image.open(filename)
                 np_image = np.array(image).astype('float32')
                 np_image = transform.resize(np_image, (160, 160, 3))
                 images_list.append(np_image)
+        
         if len(images_list)<1:
             return 0    
         images = np.array(images_list)
@@ -37,33 +47,17 @@ class Model:
         results = []
         for i, idx in enumerate(classes_indices):
             if confidences[i] > 0.70:
-                results.append((files_list[i], self.classes[idx]))
+                results.append((pred_files_list[i], self.classes[idx]))
             else:
-                results.append((files_list[i], None))
+                results.append((pred_files_list[i], None))
         return results
 
 
     def predictAndSave(self):
-        if not os.path.exists("./db.csv"):
-            self.db = pd.DataFrame(columns=['directory', 'class',"synonyms"])
-            self.db.to_csv('db.csv', index=False)
-
-        self.db=pd.read_csv("db.csv")
-
-        username = os.getenv('USER')
-        config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
-        with open(config_file_path, 'r') as config_file:
-                    images_directories = [line.strip() for line in config_file.readlines() if line.strip()]
-
         
-        image_files=[]
-        for images_directory in images_directories:
-            for file_type in self.file_types:
-                image_files+=(glob.glob(f"{images_directory}/**/*.{file_type}",
-                                        recursive=True))
-
         
-        batch_results = self.predict_batch(image_files)
+        batch_results = self.predict_batch(self.core.getDirectories())
+        
         if batch_results==0:
             return 0
 
@@ -74,7 +68,6 @@ class Model:
                 
             else:
                 new_row = {"directory":filename,"class":"q_"+prediction.lower(),"synonyms":self.classes_synonyms[prediction]}
-
                 self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
 
         self.db.to_csv("db.csv",index=False)
