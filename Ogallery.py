@@ -167,10 +167,6 @@ class MainWidget(QWidget):
         self.selectImages()
             
         if self.result:
-            #self.viewer = ImageViewer(self.result, self)
-            #self.viewer.finishedSignal.connect(self.showMainWidget)
-            #self.viewer.show()
-            #self.hide()
             core=Core()
             self.image_gallery=ImageGalleryApp(self.result)
             self.image_gallery.show()
@@ -491,7 +487,7 @@ class ImageViewer(QWidget):
         self.flip_button.clicked.connect(self.flipH)
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
-        self.back_button.clicked.connect(self.goHome)
+        self.back_button.clicked.connect(self.close)
 
         self.blur_background_button.clicked.connect(self.blurBackground)
         self.undo_button.clicked.connect(self.undo)
@@ -652,7 +648,7 @@ class ImageViewer(QWidget):
             self.previous_image()
     
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
-            self.goHome()
+            self.close()
         
         if event.key()==Qt.Key_Delete:
             self.delete_image()
@@ -931,21 +927,6 @@ class ImageViewer(QWidget):
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
     
-    def goHome(self):
-        '''
-        Close the current widget (ImageViewer)
-        
-        Args:
-            None
-            
-        Returns:
-            None
-        '''
-        #core=Core()
-        self.close()
-        
-        #self.image_gallery=ImageGalleryApp(core.getDirectories())
-        #self.image_gallery.show()
     
 
     def show_containing_folder(self):
