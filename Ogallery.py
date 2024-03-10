@@ -941,12 +941,11 @@ class ImageViewer(QWidget):
         Returns:
             None
         '''
-        core=Core()
+        #core=Core()
         self.close()
         
-        self.image_gallery=ImageGalleryApp(core.getDirectories())
-        self.image_gallery.show()
-    
+        #self.image_gallery=ImageGalleryApp(core.getDirectories())
+        #self.image_gallery.show()
     
 
     def show_containing_folder(self):
@@ -1118,6 +1117,7 @@ class Menu(QObject):
 
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
+    viewerClosedSig=pyqtSignal()
     def __init__(self, image_path,image_files):
         super().__init__()
         username = os.getenv('USER')
@@ -1156,7 +1156,7 @@ class ImageThumbnailWidget(QWidget):
 
         layout.addWidget(self.label)
         self.setLayout(layout)
-
+    
     def enterEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
 
@@ -1167,12 +1167,15 @@ class ImageThumbnailWidget(QWidget):
         self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
         self.viewer = ImageViewer(self.image_files, main_widget,
                                   current_index=self.image_files.index(self.image_path))
+        self.viewer.finishedSignal.connect(self.viewerClosed)
         self.thumbnailClicked.emit()
     def mouseReleaseEvent(self, event):
             self.setStyleSheet(f"background-color: {self.style.color.background};")
             
-            
-    
+    def viewerClosed(self):
+        self.viewerClosedSig.emit()
+        
+        
 
     
 class ImageGalleryApp(QMainWindow):
@@ -1202,6 +1205,7 @@ class ImageGalleryApp(QMainWindow):
         for index, image_file in enumerate(self.image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file,self.image_files)
             thumbnail_widget.thumbnailClicked.connect(self.hide)
+            thumbnail_widget.viewerClosedSig.connect(self.show)
             layout.addWidget(thumbnail_widget, row, col)
             
             col += 1
@@ -1216,7 +1220,7 @@ class ImageGalleryApp(QMainWindow):
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
-    
+        
     def keyPressEvent(self, event):
             if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
                 self.close()
@@ -1230,5 +1234,6 @@ if __name__ == '__main__':
     main_widget = MainWidget()
     
     app.exec_()
+
 
 
