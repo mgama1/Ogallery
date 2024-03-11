@@ -56,7 +56,7 @@ class Model:
     def predictAndSave(self):
         
         
-        batch_results = self.predict_batch(self.core.getDirectories())
+        batch_results = self.predict_batch(self.core.getImagesPaths())
         
         if batch_results==0:
             return 0

@@ -13,8 +13,8 @@ import rembg
 from MobileNet import Model
 import qtawesome as qta
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel,QObject,QEvent
+from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor,QDesktopServices
+from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel,QObject,QEvent,QUrl    
 
 from itertools import chain
 
@@ -93,7 +93,7 @@ class MainWidget(QWidget):
         layout.addStretch(1)
         
         #connect button signals to their respective functions
-        self.search_button.clicked.connect(self.openImageViewer)
+        self.search_button.clicked.connect(self.openResultsGallery)
         self.info_button.clicked.connect(self.showAppInfo)
         self.gallery_button.clicked.connect(self.openGallery)
         self.settings_button.clicked.connect(self.openSettings)
@@ -163,7 +163,7 @@ class MainWidget(QWidget):
         self.settings.show()
     
            
-    def openImageViewer(self):
+    def openResultsGallery(self):
         self.selectImages()
             
         if self.result:
@@ -173,7 +173,7 @@ class MainWidget(QWidget):
             
     def openGallery(self):
         core=Core()
-        self.image_gallery=ImageGalleryApp(core.getDirectories())
+        self.image_gallery=ImageGalleryApp(core.getImagesPaths())
         self.image_gallery.show()
     def showMainWidget(self):
         """
@@ -300,7 +300,7 @@ class MainWidget(QWidget):
         """
         
         if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
-            self.openImageViewer()
+            self.openResultsGallery()
             
     def showErrorMessage(self,msg):
         """
@@ -321,22 +321,15 @@ class MainWidget(QWidget):
         
     def showAppInfo(self):
         """
-        Displays a QMessageBox containing application information such as maintainers 
-        and supported classes
+        Displays a 
         
         Args:
             None
         Returns:
             None
         """
-        msg_box = InfoMessageBox()
-        pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
-        pixmap2 = QPixmap(qta.icon('mdi.glasses',color='#000000').pixmap(50,50))
-        
-        msg_box.setIconPixmap(CustomAwesome().concat_pixmaps(pixmap1, pixmap2,3))
-        msg_box.setText(f"OGallery is an open source gallery")
-        msg_box.setWindowTitle('info')
-        msg_box.exec_()
+        self.info=InfoWidget()
+        self.info.show()
 
 
 class ImageViewer(QWidget):
@@ -387,7 +380,7 @@ class ImageViewer(QWidget):
         layout = QVBoxLayout(self)
         Hlayout=QHBoxLayout(self)
         header_layout=QHBoxLayout()
-        editing_buttons_layout = QHBoxLayout(self)
+        self.editing_buttons_layout = QHBoxLayout(self)
 
        
         self.leftBrowse = QPushButton('〈', self)
@@ -454,28 +447,28 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         
         
-        editing_buttons=[self.sharpen_button,self.gray_button,
+        self.editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
         #setting focus policy for all buttons
-        for button in editing_buttons+navigation_buttons:
+        for button in self.editing_buttons+navigation_buttons:
             button.setFocusPolicy(Qt.NoFocus)
 
         
         self.image_view.setFocusPolicy(Qt.NoFocus)
         #adding editing buttons to th editing buttons layout2+++++++
-        for  button in editing_buttons:
+        for  button in self.editing_buttons:
             button.setFixedHeight(40)
 
-            editing_buttons_layout.addWidget(button)
+            self.editing_buttons_layout.addWidget(button)
    
         layout.addLayout(header_layout)
         layout.addLayout(Hlayout)
         layout.addWidget(self.exposure_slider)
-        layout.addLayout(editing_buttons_layout)
+        layout.addLayout(self.editing_buttons_layout)
         self.setLayout(layout)
 
         # Connect button signals to their respective functions
@@ -527,7 +520,7 @@ class ImageViewer(QWidget):
 
         
         
-        for button in editing_buttons:
+        for button in self.editing_buttons:
             button.setStyleSheet(button_style)
         
         
@@ -668,8 +661,9 @@ class ImageViewer(QWidget):
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.toggleFullScreen()
-    
+            
     def toggleFullScreen(self):
+        self.toggleButtonsVisibility(self.editing_buttons)
         if not self.fullscreen:
             self.showFullScreen()
             if self.edit_history:
@@ -686,7 +680,10 @@ class ImageViewer(QWidget):
                 QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
             self.fullscreen = False
     
-    
+    def toggleButtonsVisibility(self,buttons_list):
+        for button in buttons_list:
+            button.setVisible(self.fullscreen)
+        
     def next_image(self):
         self.current_index = (self.current_index + 1) % len(self.file_list)
         self.show_image()
@@ -889,8 +886,13 @@ class ImageViewer(QWidget):
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
+            db=pd.read_csv("db.csv")
+            if self.file_list[self.current_index] in db["directory"].values:
+                db=db[db["directory"]!=self.file_list[self.current_index]]
+                db.to_csv("db.csv")
             self.file_list.pop(self.current_index)
             self.next_image()
+            
     def show_success_message(self):
         '''
         Display a QMessageBox ("Saved successfully!") with information icon
@@ -963,7 +965,80 @@ class ImageViewer(QWidget):
         self.finishedSignal.emit()
         event.accept()
 
+
         
+        
+
+class InfoWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.style=OStyle()
+        self.setStyleSheet(f"background-color: {self.style.color.background};color:white;"
+                          )
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle('Info')
+        self.setGeometry(500, 200, 400, 300)
+
+        layout = QVBoxLayout()
+
+        # Horizontal Layout for Image and Text
+        horizontal_layout = QHBoxLayout()
+
+        # Image Label
+        image_label = QLabel(self)
+        pixmap = QPixmap('info.png').scaledToWidth(150)
+        image_label.setPixmap(pixmap)
+        image_label.setMaximumWidth(150)
+        horizontal_layout.addWidget(image_label)
+
+        # Text Label
+        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutinze user experience with images on Desktop """
+
+        text_label = QLabel(self)
+        text_label.setText(info)
+        text_label.setMaximumWidth(300)
+        text_label.setWordWrap(True)
+        horizontal_layout.addWidget(text_label)
+
+        layout.addLayout(horizontal_layout)
+
+        # Footer Buttons
+        footer_layout = QHBoxLayout()
+
+        about_button = QPushButton('About', self)
+        
+        about_button.clicked.connect(lambda: text_label.setText(info))
+        footer_layout.addWidget(about_button)
+
+        authors_button = QPushButton('Authors', self)
+        authors="""-Mahmoud Gamal"""
+        authors_button.clicked.connect(lambda: text_label.setText(authors))
+        footer_layout.addWidget(authors_button)
+
+        website_button = QPushButton('Website', self)
+        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('http://mgama1.github.io')))
+        footer_layout.addWidget(website_button)
+        footer_buttons=[about_button,authors_button,website_button]
+        layout.addLayout(footer_layout)
+
+        self.setLayout(layout)
+        border_color='#242424'
+        button_style = ("QPushButton {{"
+                "background-color: #1f1f1f; "
+                "color: white; "
+                "icon-size:{icon_size};"
+                "border:none"
+                "}} "
+                "QPushButton:hover {{"
+                "background-color: #00347d; "
+                "}}").format(border_color=border_color,icon_size=self.style.size.standard_icon_size)
+        for button in footer_buttons:
+            button.setFixedHeight(50)
+        for button in footer_buttons:
+            button.setStyleSheet(button_style)
+            
 class SettingsWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -978,7 +1053,7 @@ class SettingsWidget(QWidget):
         layout = QVBoxLayout()
 
         self.model = QStringListModel()
-        self.model.setStringList(self.getDirectories())
+        self.model.setStringList(self.getImagesPaths())
 
         self.listView = QListView()
         self.listView.setModel(self.model)
@@ -994,7 +1069,7 @@ class SettingsWidget(QWidget):
         layout.addWidget(self.add_dir_button)
         self.setLayout(layout)
 
-    def getDirectories(self):
+    def getImagesPaths(self):
         username = os.getenv('USER')
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:

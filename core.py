@@ -4,7 +4,7 @@ class Core():
     def __init__(self):
         self.file_types=['jpg','jpeg','png','gif']
     
-    def getDirectories(self):
+    def getImagesPaths(self):
         username = os.getenv('USER')
         config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
 
