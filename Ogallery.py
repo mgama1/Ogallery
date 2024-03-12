@@ -686,10 +686,20 @@ class ImageViewer(QWidget):
             button.setVisible(self.fullscreen)
         
     def next_image(self):
+        if hasattr(self, 'edited_image'):
+            msg_box = SaveDiscardMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+            
         self.current_index = (self.current_index + 1) % len(self.file_list)
         self.show_image()
 
     def previous_image(self):
+        if hasattr(self, 'edited_image'):
+            msg_box = SaveDiscardMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+            
         self.current_index = (self.current_index - 1) % len(self.file_list)
         self.show_image()
         
@@ -867,6 +877,7 @@ class ImageViewer(QWidget):
             if hasattr(self,'exposureImg'):
                     delattr(self,'exposureImg')
         self.exposure_slider.setValue(100)
+        self.exposure_slider.setVisible(False)
         self.edit_history=[]
         self.show_image()
     

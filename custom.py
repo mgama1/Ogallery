@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QPixmap, QPainter
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,pyqtSignal
 from PyQt5.QtWidgets import *
 import datetime
 import os
@@ -29,7 +29,7 @@ class CustomAwesome():
         
 class SavingMessageBox(QMessageBox):
     def __init__(self, image_path, edited_image, *args, **kwargs):
-        super(SavingMessageBox, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         style = OStyle()
         self.image_path=image_path
         self.edited_image=edited_image
@@ -54,30 +54,54 @@ class SavingMessageBox(QMessageBox):
 
     def handle_overwrite(self):
         cv2.imwrite(self.image_path, self.edited_image)
-        print(self.image_path)
+
     def handle_copy(self):
         mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
         cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
                     self.edited_image)
         
         
-        
-class InfoMessageBox(QMessageBox):
-    def __init__(self,*args, **kwargs):
-        super(InfoMessageBox, self).__init__(*args, **kwargs)
-        
+ 
+  
+class SaveDiscardMessageBox(QMessageBox):
+    revert_signal=pyqtSignal()
+    def __init__(self, image_path, edited_image, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         style = OStyle()
-        self.OK_button = QPushButton("OK")
-        #self.OK_button.setFocusPolicy(Qt.NoFocus)
-        self.addButton(self.OK_button, QMessageBox.ActionRole)
-        self.setWindowTitle("Info")
+        self.image_path=image_path
+        self.edited_image=edited_image
+        self.save_button = QPushButton("Save")
+        self.discard_button = QPushButton("Discard")
+        self.save_button.setFocusPolicy(Qt.NoFocus)
+        self.discard_button.setFocusPolicy(Qt.NoFocus)
+        self.addButton(self.save_button, QMessageBox.ActionRole)
+        self.addButton(self.discard_button, QMessageBox.ActionRole)
+                       
+        
+        self.save_button.clicked.connect(self.handle_save)
+        self.discard_button.clicked.connect(self.handle_discard)
+        
+        
+        
+        self.setWindowTitle("Save Image")
+        self.setText("Do you want to overwrite the existing image or save a copy?")
         self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
+        self.save_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.blue}; }}")
+        self.discard_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.red}; }}")
 
-    
+    def handle_save(self):
+        msg_box = SavingMessageBox(self.image_path,self.edited_image)
+        msg_box.exec_()
+
+    def handle_discard(self):
+        self.revert_signal.emit()
+        
+        
+ 
+
 class QPushButtonHighlight(QPushButton):
     def __init__(self,*args, **kwargs):
-        super(QPushButtonHighlight, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     
     def setIconNormal(self,icon_normal):
