@@ -72,4 +72,3 @@ class Model:
 
         self.db.to_csv("db.csv",index=False)
 
-        

@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import time
 import datetime
@@ -1173,38 +1174,39 @@ class Menu(QObject):
 
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
-    viewerClosedSig=pyqtSignal()
-    def __init__(self, image_path,image_files):
+    viewerClosedSig = pyqtSignal()
+    
+    def __init__(self, image_path, image_files, main_widget):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
-        self.style=OStyle()
+        self.style = OStyle()
         self.image_path = image_path
-        self.image_files=image_files
+        self.image_files = image_files
+        self.main_widget = main_widget
         
         self.init_ui()
+    
     def init_ui(self):
         layout = QVBoxLayout()
-        tm=ThumbnailMaker(self.cache_dir)
+        tm = ThumbnailMaker(self.cache_dir)
         self.setStyleSheet(f"background-color: {self.style.color.background};")
-        thumbnail_name=tm.compute_md5(tm.add_file_scheme(self.image_path))+".png"
-        thumbnail_path=self.cache_dir+thumbnail_name
+        thumbnail_name = tm.compute_md5(tm.add_file_scheme(self.image_path)) + ".png"
+        thumbnail_path = self.cache_dir + thumbnail_name
         
         if os.path.exists(thumbnail_path):
-            thumb_pil=Image.open(thumbnail_path)
-            thumb_MTime=int(float(thumb_pil.info['Thumb::MTime']))
-            image_MTime=int(os.path.getmtime(self.image_path))
-            if image_MTime==thumb_MTime:
+            thumb_pil = Image.open(thumbnail_path)
+            thumb_MTime = int(float(thumb_pil.info['Thumb::MTime']))
+            image_MTime = int(os.path.getmtime(self.image_path))
+            if image_MTime == thumb_MTime:
                 pixmap = QPixmap(thumbnail_path)
-        
             else:
                 tm.create_thumbnail(self.image_path)
                 pixmap = QPixmap(thumbnail_path)
-       
         else:
             tm.create_thumbnail(self.image_path)
             pixmap = QPixmap(thumbnail_path)
-            
+        
         pixmap = pixmap.scaledToWidth(200)  
         self.label = QLabel()
         self.label.setPixmap(pixmap)
@@ -1221,31 +1223,30 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
-        self.viewer = ImageViewer(self.image_files, main_widget,
+        self.viewer = ImageViewer(self.image_files, self.main_widget,
                                   current_index=self.image_files.index(self.image_path))
         self.viewer.finishedSignal.connect(self.viewerClosed)
         self.thumbnailClicked.emit()
+    
     def mouseReleaseEvent(self, event):
-            self.setStyleSheet(f"background-color: {self.style.color.background};")
+        self.setStyleSheet(f"background-color: {self.style.color.background};")
             
     def viewerClosed(self):
         self.viewerClosedSig.emit()
         
-        
 
-    
 class ImageGalleryApp(QMainWindow):
-    def __init__(self,directories):
+    def __init__(self, directories):
         super().__init__()
-        self.style=OStyle()
-        self.image_files=directories
+        self.style = OStyle()
+        self.image_files = directories
         
-        t1=time.time()
+        t1 = time.time()
         self.init_ui()
-        t2=time.time()
+        t2 = time.time()
         print(f"total loading time: {t2-t1}")
+    
     def init_ui(self):
-        
         central_widget = QWidget()
         self.setStyleSheet(f"background-color: {self.style.color.background};")
         scroll_area = QScrollArea()
@@ -1255,17 +1256,15 @@ class ImageGalleryApp(QMainWindow):
         layout = QGridLayout()
         scroll_content.setLayout(layout)
         
-        
-        
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file,self.image_files)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self)
             thumbnail_widget.thumbnailClicked.connect(self.hide)
             thumbnail_widget.viewerClosedSig.connect(self.show)
             layout.addWidget(thumbnail_widget, row, col)
             
             col += 1
-            if col == round(self.width()/200):
+            if col == round(self.width() / 200):
                 col = 0
                 row += 1
 
@@ -1276,20 +1275,34 @@ class ImageGalleryApp(QMainWindow):
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
-        
+    
     def keyPressEvent(self, event):
-            if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
-                self.close()
-    
-if __name__ == '__main__':
+        if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
+            self.close()          
+                
+                
+def run_gui():
     app = QApplication([])    
-    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")
-    
-
-    
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
     main_widget = MainWidget()
-    
     app.exec_()
 
+    
+def run_inference_model():
+    model=Model()
+    model.predictAndSave()
+    
+
+                
+if __name__ == '__main__':
+    gui_process = multiprocessing.Process(target=run_gui)
+    inference_process = multiprocessing.Process(target=run_inference_model)
+
+    gui_process.start()
+    inference_process.start()
+
+    gui_process.join()
+    inference_process.join()
+    
 
 
