@@ -335,7 +335,8 @@ class MainWidget(QWidget):
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    def __init__(self, result, main_widget,current_index=0):
+    savedSignal=pyqtSignal(dict)
+    def __init__(self, result,current_index=0):
         super().__init__()
         self.style=OStyle()
         self.file_list = []
@@ -346,7 +347,6 @@ class ImageViewer(QWidget):
         self.result = result
         self.edit_history=[]
         self.fullscreen = False
-        self.main_widget = main_widget  
         
         self.init_ui()
         self.menu = Menu(self.file_list,self.current_index)
@@ -887,6 +887,11 @@ class ImageViewer(QWidget):
             msg_box.exec_()
             delattr(self,'edited_image')
             self.edit_history=[]
+            choice = msg_box.get_choice()
+            file_name=msg_box.getFileName()
+            saved={'index':self.current_index,'choice':choice,'file_name':file_name}
+            time.sleep(.1)
+            self.savedSignal.emit(saved)
             
         else:
             self.showErrorMessage("no changes were made!")
@@ -895,6 +900,7 @@ class ImageViewer(QWidget):
         if os.path.exists(self.file_list[self.current_index]):
             try:
                 os.system(f"gio trash '{self.file_list[self.current_index]}'")
+                self.next_image()
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
@@ -903,7 +909,7 @@ class ImageViewer(QWidget):
                 db=db[db["directory"]!=self.file_list[self.current_index]]
                 db.to_csv("db.csv")
             self.file_list.pop(self.current_index)
-            self.next_image()
+            
             
     def show_success_message(self):
         '''
@@ -1186,15 +1192,14 @@ class Menu(QObject):
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
     viewerClosedSig = pyqtSignal()
-    
-    def __init__(self, image_path, image_files, main_widget):
+    viewerSavedSig=pyqtSignal(dict)
+    def __init__(self, image_path, image_files):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
         self.style = OStyle()
         self.image_path = image_path
         self.image_files = image_files
-        self.main_widget = main_widget
         
         self.init_ui()
     
@@ -1221,6 +1226,7 @@ class ImageThumbnailWidget(QWidget):
         pixmap = pixmap.scaledToWidth(200)  
         self.label = QLabel()
         self.label.setPixmap(pixmap)
+        self.label.update() # Force the label to redraw with the new pixmap
         self.label.setAlignment(Qt.AlignCenter)
 
         layout.addWidget(self.label)
@@ -1234,9 +1240,9 @@ class ImageThumbnailWidget(QWidget):
 
     def mousePressEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
-        self.viewer = ImageViewer(self.image_files, self.main_widget,
-                                  current_index=self.image_files.index(self.image_path))
+        self.viewer = ImageViewer(self.image_files,current_index=self.image_files.index(self.image_path))
         self.viewer.finishedSignal.connect(self.viewerClosed)
+        self.viewer.savedSignal.connect(self.viewerSaved)
         self.thumbnailClicked.emit()
     
     def mouseReleaseEvent(self, event):
@@ -1245,13 +1251,14 @@ class ImageThumbnailWidget(QWidget):
     def viewerClosed(self):
         self.viewerClosedSig.emit()
         
-
+    def viewerSaved(self,saved):
+        self.viewerSavedSig.emit(saved)
 class ImageGalleryApp(QMainWindow):
     def __init__(self, directories):
         super().__init__()
         self.style = OStyle()
         self.image_files = directories
-        
+        self.thumbnail_widgets = []  # To store references to thumbnail widgets
         t1 = time.time()
         self.init_ui()
         t2 = time.time()
@@ -1264,22 +1271,23 @@ class ImageGalleryApp(QMainWindow):
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget(scroll_area)
         scroll_area.setWidget(scroll_content)
-        layout = QGridLayout()
-        scroll_content.setLayout(layout)
+        self.layout = QGridLayout()
+        scroll_content.setLayout(self.layout)
         
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files)
             thumbnail_widget.thumbnailClicked.connect(self.hide)
             thumbnail_widget.viewerClosedSig.connect(self.show)
-            layout.addWidget(thumbnail_widget, row, col)
-            
+            thumbnail_widget.viewerSavedSig.connect(self.get_index)
+            self.layout.addWidget(thumbnail_widget, row, col)
+            self.thumbnail_widgets.append(thumbnail_widget) 
             col += 1
-            if col == round(self.width() / 200):
+            if col == self.width() // 200:
                 col = 0
                 row += 1
 
-        central_widget.setLayout(layout)
+        central_widget.setLayout(self.layout)
         scroll_area.setWidget(central_widget)
         self.setCentralWidget(scroll_area)
 
@@ -1287,11 +1295,57 @@ class ImageGalleryApp(QMainWindow):
         self.setWindowTitle('OGallery')
         self.show()
     
+    def get_index(self, saved):
+        self.updateThumbnail(saved)
+    def remove_thumbnail(self, index):
+        if 0 <= index < len(self.thumbnail_widgets):
+            thumbnail_widget = self.thumbnail_widgets.pop(index)
+            
+            self.layout.removeWidget(thumbnail_widget)
+            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+            
+            return thumbnail_widget
+
+    def updateThumbnail(self, saved):
+        #saved={'index':self.current_index,'choice':choice,'file_name':file_name}
+        index=saved["index"]
+        choice=saved["choice"]
+        file_name=saved["file_name"]
+        
+        if index >= len(self.thumbnail_widgets):
+            return
+        if choice=='overwrite':
+            self.remove_thumbnail(index)
+            #reload the thumbnail widget from disk
+            nthumbnail_widget = ImageThumbnailWidget(self.image_files[index], self.image_files)#THISLINE
+            nthumbnail_widget.viewerClosedSig.connect(self.show)
+            nthumbnail_widget.viewerSavedSig.connect(self.get_index)
+        if choice=='copy':
+            #reload the thumbnail widget from disk
+            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files)#THISLINE
+            self.image_files.insert(0,file_name)
+            nthumbnail_widget.thumbnailClicked.connect(self.hide)
+            nthumbnail_widget.viewerClosedSig.connect(self.show)
+            nthumbnail_widget.viewerSavedSig.connect(self.get_index)
+        else:
+            pass
+        
+        self.thumbnail_widgets.insert(0, nthumbnail_widget)
+        max_cols = round(self.width() / 300)
+    
+        for i, widget in enumerate(self.thumbnail_widgets):
+            r, c = divmod(i, max_cols)
+            self.layout.addWidget(widget, r, c)
+
+       
+        
+
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
-            self.close()          
-                
-                
+            self.close()        
+
+    
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
@@ -1315,5 +1369,3 @@ if __name__ == '__main__':
     gui_process.join()
     inference_process.join()
     
-
-
