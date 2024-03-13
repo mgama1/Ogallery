@@ -247,7 +247,7 @@ class MainWidget(QWidget):
         self.queryText=self.query_line.text()
         self.queryText=self.map_arabic_to_english(self.queryText)
         self.queryText=self.suggestClasses(self.queryText)
-        if self.queryText==None:
+        if self.queryText=='':
             self.showErrorMessage("No images found")
             
         db=pd.read_csv("db.csv")
@@ -286,7 +286,7 @@ class MainWidget(QWidget):
                 return classi
         
         #No matches returned.
-        return None
+        return ''
     
     
     def keyPressEvent(self, event):
@@ -354,7 +354,7 @@ class ImageViewer(QWidget):
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
         
-        qApp.installEventFilter(self.menu)
+        self.installEventFilter(self.menu)
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
@@ -379,9 +379,9 @@ class ImageViewer(QWidget):
 
         # Main layout using QVBoxLayout
         layout = QVBoxLayout(self)
-        Hlayout=QHBoxLayout(self)
+        Hlayout=QHBoxLayout()
         header_layout=QHBoxLayout()
-        self.editing_buttons_layout = QHBoxLayout(self)
+        self.editing_buttons_layout = QHBoxLayout()
 
        
         self.leftBrowse = QPushButton('〈', self)

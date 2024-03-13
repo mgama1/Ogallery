@@ -61,6 +61,18 @@ class SavingMessageBox(QMessageBox):
                     self.edited_image)
         
         
+class InfoMessageBox(QMessageBox):
+    def __init__(self,*args, **kwargs):
+        super(InfoMessageBox, self).__init__(*args, **kwargs)
+        style = OStyle()
+        self.OK_button = QPushButton("OK")
+        #self.OK_button.setFocusPolicy(Qt.NoFocus)
+        self.addButton(self.OK_button, QMessageBox.ActionRole)
+        self.setWindowTitle("Info")
+        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
+        self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
+
+    
  
   
 class SaveDiscardMessageBox(QMessageBox):
