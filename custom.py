@@ -53,14 +53,22 @@ class SavingMessageBox(QMessageBox):
         self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
 
     def handle_overwrite(self):
-        cv2.imwrite(self.image_path, self.edited_image)
+        self.choice = "overwrite"
+        self.file_name=self.image_path
+        cv2.imwrite(self.file_name, self.edited_image)
 
     def handle_copy(self):
+        self.choice = "copy"
         mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-        cv2.imwrite(f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg",
-                    self.edited_image)
+        self.file_name=f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg"
+        cv2.imwrite(self.file_name,self.edited_image)
         
+    def get_choice(self):
+        return self.choice
+    def getFileName(self):
+        return self.file_name
         
+
 class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
