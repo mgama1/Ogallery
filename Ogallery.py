@@ -873,15 +873,16 @@ class ImageViewer(QWidget):
             
             
     def revert(self):
-        if hasattr(self, 'edited_image'):
-            delattr(self,'edited_image')
-            if hasattr(self,'exposureImg'):
-                    delattr(self,'exposureImg')
         self.exposure_slider.setValue(100)
         self.exposure_slider.setVisible(False)
         self.edit_history=[]
+        
+        if hasattr(self, 'edited_image'):
+            delattr(self,'edited_image')
+        if hasattr(self,'exposureImg'):
+                delattr(self,'exposureImg')
+       
         self.show_image()
-    
     def save_image(self):
         if hasattr(self, 'edited_image'):
             msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
@@ -903,6 +904,12 @@ class ImageViewer(QWidget):
             try:
                 os.system(f"gio trash '{file_name}'")
                 self.next_image()
+                db=pd.read_csv("db.csv")
+                if self.file_list[self.current_index] in db["directory"].values:
+                    db=db[db["directory"]!=self.file_list[self.current_index]]
+                    db.to_csv("db.csv")
+                self.file_list.pop(self.current_index)
+
                 deleted={'index':self.current_index,'file_name':file_name}
                 time.sleep(.1)
                 self.deletedSignal.emit(deleted)
@@ -910,11 +917,6 @@ class ImageViewer(QWidget):
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
-            db=pd.read_csv("db.csv")
-            if self.file_list[self.current_index] in db["directory"].values:
-                db=db[db["directory"]!=self.file_list[self.current_index]]
-                db.to_csv("db.csv")
-            self.file_list.pop(self.current_index)
             
             
     def show_success_message(self):
@@ -1018,7 +1020,7 @@ class InfoWidget(QWidget):
         horizontal_layout.addWidget(image_label)
 
         # Text Label
-        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutinze user experience with images on Desktop """
+        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutionize user experience with images on Desktop """
 
         text_label = QLabel(self)
         text_label.setText(info)
@@ -1328,7 +1330,7 @@ class ImageGalleryApp(QMainWindow):
         self.load_initial_batch()#
         
     def load_initial_batch(self):
-        for i in range(9):
+        for i in range(min(len(self.thumbnail_widgets), 9)):
             self.thumbnail_widgets[self.loaded_count].load_thumbnail()
             self.loaded_count += 1
 
@@ -1404,8 +1406,7 @@ class ImageGalleryApp(QMainWindow):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
             self.close()        
-        if event.key() == Qt.Key_M:
-            self.remove_thumbnail(4) 
+ 
     
 def run_gui():
     app = QApplication([])    
