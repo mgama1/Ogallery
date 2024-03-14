@@ -1270,8 +1270,8 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self)
-            thumbnail_widget.thumbnailClicked.connect(self.hide)
-            thumbnail_widget.viewerClosedSig.connect(self.show)
+            thumbnail_widget.thumbnailClicked.connect(self.close)
+            thumbnail_widget.viewerClosedSig.connect(lambda: self.__init__(self.image_files))
             layout.addWidget(thumbnail_widget, row, col)
             
             col += 1
