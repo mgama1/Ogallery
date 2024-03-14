@@ -895,6 +895,7 @@ class ImageViewer(QWidget):
         if os.path.exists(self.file_list[self.current_index]):
             try:
                 os.system(f"gio trash '{self.file_list[self.current_index]}'")
+                self.next_image()
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
@@ -903,7 +904,7 @@ class ImageViewer(QWidget):
                 db=db[db["directory"]!=self.file_list[self.current_index]]
                 db.to_csv("db.csv")
             self.file_list.pop(self.current_index)
-            self.next_image()
+            
             
     def show_success_message(self):
         '''
@@ -1200,8 +1201,19 @@ class ImageThumbnailWidget(QWidget):
     
     def init_ui(self):
         layout = QVBoxLayout()
-        tm = ThumbnailMaker(self.cache_dir)
+        
         self.setStyleSheet(f"background-color: {self.style.color.background};")
+        
+        
+        self.label = QLabel()
+        
+        self.label.setAlignment(Qt.AlignCenter)
+
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+    
+    def load_thumbnail(self):
+        tm = ThumbnailMaker(self.cache_dir)
         thumbnail_name = tm.compute_md5(tm.add_file_scheme(self.image_path)) + ".png"
         thumbnail_path = self.cache_dir + thumbnail_name
         
@@ -1219,13 +1231,9 @@ class ImageThumbnailWidget(QWidget):
             pixmap = QPixmap(thumbnail_path)
         
         pixmap = pixmap.scaledToWidth(200)  
-        self.label = QLabel()
         self.label.setPixmap(pixmap)
-        self.label.setAlignment(Qt.AlignCenter)
-
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-    
+        
+        
     def enterEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
 
@@ -1251,9 +1259,16 @@ class ImageGalleryApp(QMainWindow):
         super().__init__()
         self.style = OStyle()
         self.image_files = directories
+        self.scroll_value =   0 # Initialize scroll_value
+        self.batch_size =   3  # Number of thumbnails to load per batch
+        self.loaded_count =   0  # Counter for thumbnails loaded in the current batch
+        self.scrollbar_threshold =   200  # Scrollbar threshold for loading thumbnails
+        self.thumbnails_to_load = []  # List of thumbnails to load
         
         t1 = time.time()
         self.init_ui()
+        #QTimer.singleShot(0, self.load_initial_batch)
+        
         t2 = time.time()
         print(f"total loading time: {t2-t1}")
     
@@ -1264,8 +1279,7 @@ class ImageGalleryApp(QMainWindow):
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget(scroll_area)
         scroll_area.setWidget(scroll_content)
-        layout = QGridLayout()
-        scroll_content.setLayout(layout)
+        layout = QGridLayout(scroll_content)
         
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
@@ -1273,20 +1287,44 @@ class ImageGalleryApp(QMainWindow):
             thumbnail_widget.thumbnailClicked.connect(self.close)
             thumbnail_widget.viewerClosedSig.connect(lambda: self.__init__(self.image_files))
             layout.addWidget(thumbnail_widget, row, col)
-            
+            self.thumbnails_to_load.append(thumbnail_widget)
             col += 1
             if col == round(self.width() / 200):
                 col = 0
                 row += 1
-
+            
+            
         central_widget.setLayout(layout)
         scroll_area.setWidget(central_widget)
         self.setCentralWidget(scroll_area)
-
+        
+        self.scroll = scroll_area.verticalScrollBar()
+        self.scroll.valueChanged.connect(self.update_thumbnails)
+        
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
+        
         self.show()
-    
+         # Load the first batch of thumbnails immediately
+        
+        self.load_initial_batch()
+        #QTimer.singleShot(500, self.load_initial_batch()) 
+        
+    def load_initial_batch(self):
+        for i in range(9):
+            self.thumbnails_to_load[i].load_thumbnail()
+            self.loaded_count +=   1
+        del self.thumbnails_to_load[:self.batch_size]
+
+    def update_thumbnails(self):
+        self.scroll_value = self.scroll.value()
+        if self.scroll_value >= self.scrollbar_threshold or self.thumbnails_to_load:
+            for i in range(min(len(self.thumbnails_to_load), self.batch_size)):
+                self.thumbnails_to_load[i].load_thumbnail()
+                self.loaded_count +=   1
+            del self.thumbnails_to_load[:self.batch_size]
+            self.scrollbar_threshold += self.scrollbar_threshold
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
             self.close()          
