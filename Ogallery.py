@@ -1146,7 +1146,10 @@ class SettingsWidget(QWidget):
    
     
 
-
+    def keyPressEvent(self, event):    
+        if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+            self.close()
+        
     
     
 class Menu(QObject):
@@ -1212,7 +1215,7 @@ class ImageThumbnailWidget(QWidget):
         self.style = OStyle()
         self.image_path = image_path
         self.image_files = image_files
-        
+        self.right_clicked=False
         self.init_ui()
         
     def init_ui(self):
@@ -1252,25 +1255,32 @@ class ImageThumbnailWidget(QWidget):
         
     
     def enterEvent(self, event):
-        self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
+        if not self.right_clicked:
+            self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
 
     def leaveEvent(self, event):
-        self.setStyleSheet(f"background-color: {self.style.color.background};")
-
+        if not self.right_clicked:
+            self.setStyleSheet(f"background-color: {self.style.color.background};")
+    
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
-            self.viewer = ImageViewer(self.image_files,current_index=self.image_files.index(self.image_path))
+            self.viewer = ImageViewer(self.image_files, current_index=self.image_files.index(self.image_path))
             self.viewer.finishedSignal.connect(self.viewerClosed)
             self.viewer.savedSignal.connect(self.viewerSaved)
             self.viewer.deletedSignal.connect(self.viewerDeleted)
             self.thumbnailClicked.emit()
-
+    
         if event.button() == Qt.RightButton:
-            print(self.image_files.index(self.image_path))
-    def mouseReleaseEvent(self, event):
-        self.setStyleSheet(f"background-color: {self.style.color.background};")
             
+            if hasattr(self,'right_clicked'):
+                self.right_clicked= not self.right_clicked
+            else:
+                self.right_clicked = True
+            colors=[self.style.color.background,self.style.color.royal_blue]
+            self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
+            print(self.image_files.index(self.image_path))
+
     
 
     
@@ -1293,12 +1303,8 @@ class ImageGalleryApp(QMainWindow):
         self.scroll_value =   0 # Initialize scroll_value
         self.batch_size =   3  # Number of thumbnails to load per batch
         self.loaded_count =   0  
-        self.scrollbar_threshold =   200  # Scrollbar threshold for loading thumbnails
-        #self.thumbnail_widgets = []  # List of thumbnails to load
-        t1 = time.time()
+        self.scrollbar_threshold =   300  # Scrollbar threshold for loading thumbnails
         self.init_ui()
-        t2 = time.time()
-        print(f"total loading time: {t2-t1}")
     
     def init_ui(self):
         central_widget = QWidget()
@@ -1351,7 +1357,7 @@ class ImageGalleryApp(QMainWindow):
         if self.scroll_value >= self.scrollbar_threshold or self.loaded_count<len(self.image_files):
             for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
                 self.thumbnail_widgets[self.loaded_count].load_thumbnail()
-                print(self.loaded_count)
+                #print(self.loaded_count)
                 self.loaded_count +=   1
             self.scrollbar_threshold += self.scrollbar_threshold
             
