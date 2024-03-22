@@ -390,7 +390,7 @@ class ImageViewer(QWidget):
         self.back_button = QPushButton('↩', self)
         
 
-        SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  
+        SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  # Use the correct icon name here
         
         self.show_containing_folder_button=QPushButton(SCF_icon,'')
         self.show_containing_folder_button.setIconSize(SCF_icon.actualSize(QSize(20,  20)))  # Set the size of the icon
@@ -873,16 +873,15 @@ class ImageViewer(QWidget):
             
             
     def revert(self):
+        if hasattr(self, 'edited_image'):
+            delattr(self,'edited_image')
+            if hasattr(self,'exposureImg'):
+                    delattr(self,'exposureImg')
         self.exposure_slider.setValue(100)
         self.exposure_slider.setVisible(False)
         self.edit_history=[]
-        
-        if hasattr(self, 'edited_image'):
-            delattr(self,'edited_image')
-        if hasattr(self,'exposureImg'):
-                delattr(self,'exposureImg')
-       
         self.show_image()
+    
     def save_image(self):
         if hasattr(self, 'edited_image'):
             msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
@@ -904,12 +903,6 @@ class ImageViewer(QWidget):
             try:
                 os.system(f"gio trash '{file_name}'")
                 self.next_image()
-                db=pd.read_csv("db.csv")
-                if self.file_list[self.current_index] in db["directory"].values:
-                    db=db[db["directory"]!=self.file_list[self.current_index]]
-                    db.to_csv("db.csv")
-                self.file_list.pop(self.current_index)
-
                 deleted={'index':self.current_index,'file_name':file_name}
                 time.sleep(.1)
                 self.deletedSignal.emit(deleted)
@@ -917,6 +910,11 @@ class ImageViewer(QWidget):
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
+            db=pd.read_csv("db.csv")
+            if self.file_list[self.current_index] in db["directory"].values:
+                db=db[db["directory"]!=self.file_list[self.current_index]]
+                db.to_csv("db.csv")
+            self.file_list.pop(self.current_index)
             
             
     def show_success_message(self):
@@ -1020,7 +1018,7 @@ class InfoWidget(QWidget):
         horizontal_layout.addWidget(image_label)
 
         # Text Label
-        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutionize user experience with images on Desktop """
+        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutinze user experience with images on Desktop """
 
         text_label = QLabel(self)
         text_label.setText(info)
@@ -1100,6 +1098,11 @@ class SettingsWidget(QWidget):
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
                 images_directories = config_file.readlines()
+        elif not os.path.exists(f'/home/{username}/.cache/OpenGallery/'):
+            os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                config_file.write('\n')
+        
         else:
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
                 config_file.write('\n')
@@ -1255,16 +1258,22 @@ class ImageThumbnailWidget(QWidget):
         self.setStyleSheet(f"background-color: {self.style.color.background};")
 
     def mousePressEvent(self, event):
-        self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
-        self.viewer = ImageViewer(self.image_files,current_index=self.image_files.index(self.image_path))
-        self.viewer.finishedSignal.connect(self.viewerClosed)
-        self.viewer.savedSignal.connect(self.viewerSaved)
-        self.viewer.deletedSignal.connect(self.viewerDeleted)
-        self.thumbnailClicked.emit()
-    
+        if event.button() == Qt.LeftButton:
+            self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
+            self.viewer = ImageViewer(self.image_files,current_index=self.image_files.index(self.image_path))
+            self.viewer.finishedSignal.connect(self.viewerClosed)
+            self.viewer.savedSignal.connect(self.viewerSaved)
+            self.viewer.deletedSignal.connect(self.viewerDeleted)
+            self.thumbnailClicked.emit()
+
+        if event.button() == Qt.RightButton:
+            print(self.image_files.index(self.image_path))
     def mouseReleaseEvent(self, event):
         self.setStyleSheet(f"background-color: {self.style.color.background};")
             
+    
+
+    
     def viewerClosed(self):
         self.viewerClosedSig.emit()
         
@@ -1285,6 +1294,7 @@ class ImageGalleryApp(QMainWindow):
         self.batch_size =   3  # Number of thumbnails to load per batch
         self.loaded_count =   0  
         self.scrollbar_threshold =   200  # Scrollbar threshold for loading thumbnails
+        #self.thumbnail_widgets = []  # List of thumbnails to load
         t1 = time.time()
         self.init_ui()
         t2 = time.time()
@@ -1310,6 +1320,7 @@ class ImageGalleryApp(QMainWindow):
             self.layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
             
+            #self.thumbnail_widgets.append(thumbnail_widget)#
             
             col += 1
             if col == 3:
@@ -1330,15 +1341,17 @@ class ImageGalleryApp(QMainWindow):
         self.load_initial_batch()#
         
     def load_initial_batch(self):
-        for i in range(min(len(self.thumbnail_widgets), 9)):
+        for i in range(min(9,len(self.thumbnail_widgets))):
             self.thumbnail_widgets[self.loaded_count].load_thumbnail()
             self.loaded_count += 1
+        #del self.thumbnail_widgets[:self.batch_size]
 
     def update_thumbnails(self):
         self.scroll_value = self.scroll.value()
-        if self.scroll_value >= self.scrollbar_threshold or self.thumbnail_widgets:
+        if self.scroll_value >= self.scrollbar_threshold or self.loaded_count<len(self.image_files):
             for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
                 self.thumbnail_widgets[self.loaded_count].load_thumbnail()
+                print(self.loaded_count)
                 self.loaded_count +=   1
             self.scrollbar_threshold += self.scrollbar_threshold
             
@@ -1402,11 +1415,25 @@ class ImageGalleryApp(QMainWindow):
                 col = 0
                 row += 1
 
-
+    def removeThumbnails(self,thumbnails_indices_list):
+        for thumbnail_index in thumbnails_indices_list:
+            self.remove_thumbnail(thumbnail_index)
+        
+        self.loaded_count =   0  
+        row, col = 0, 0
+        for i, widget in enumerate(self.thumbnail_widgets):
+            self.layout.addWidget(widget, row, col)
+            col += 1
+            if col == 3:
+                col = 0
+                row += 1
+        
+        
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
             self.close()        
- 
+        if event.key() == Qt.Key_M:
+            self.removeThumbnails([6,7,8]) 
     
 def run_gui():
     app = QApplication([])    
