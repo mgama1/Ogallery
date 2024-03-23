@@ -350,12 +350,12 @@ class ImageViewer(QWidget):
         self.fullscreen = False
         
         self.init_ui()
-        self.menu = Menu(self.file_list,self.current_index)
-        self.menu.copy_signal.connect(self.copyToClipboard)
-        self.menu.delete_signal.connect(self.delete_image)
-        self.menu.show_folder.connect(self.show_containing_folder)
+        #self.menu = Menu(self.file_list,self.current_index)
         
-        self.installEventFilter(self.menu)
+        
+        
+        
+        #self.installEventFilter(self.menu)
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
@@ -368,6 +368,12 @@ class ImageViewer(QWidget):
         
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
+        
+        self.menu = Menu(self.file_list, self.current_index, self.image_view)
+        self.menu.copy_signal.connect(self.copyToClipboard)
+        self.menu.delete_signal.connect(self.delete_image)
+        self.menu.show_folder.connect(self.show_containing_folder)
+        self.image_view.installEventFilter(self.menu)
         
         # this is to fix weird behaviour similar to stackoverflow Q #68182395
         QTimer.singleShot(0, self.handle_timeout)
@@ -480,6 +486,9 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
         self.flip_button.clicked.connect(self.flipH)
+        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.flip_button.customContextMenuRequested.connect(self.flipV)
+        
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.close)
@@ -788,7 +797,19 @@ class ImageViewer(QWidget):
         self.edited_image=flipped_img
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
-    
+
+    def flipV(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        
+        flipped_img=cv2.flip(img, 0)
+        self.edited_image=flipped_img
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+        
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
         self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
@@ -1151,57 +1172,57 @@ class SettingsWidget(QWidget):
             self.close()
         
     
-    
 class Menu(QObject):
-    copy_signal=pyqtSignal()
-    delete_signal=pyqtSignal()
-    show_folder=pyqtSignal()
-    def __init__(self,file_list,current_index):
+    copy_signal = pyqtSignal()
+    delete_signal = pyqtSignal()
+    show_folder = pyqtSignal()
+
+    def __init__(self, file_list, current_index, graphics_view):
         super().__init__()
         self.opened_menu = None
-        self.style=OStyle()
-        self.file_list=file_list
-        self.current_index=current_index
-        
+        self.style = OStyle()
+        self.file_list = file_list
+        self.current_index = current_index
+        self.graphics_view = graphics_view
+
     def eventFilter(self, obj, event):
-        if event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
+        if obj is self.graphics_view and event.type() == QEvent.ContextMenu:
             if self.opened_menu is not None:
                 self.opened_menu.close()
             menu = QMenu()
-            copy_action = QAction("copy", menu)
+            copy_action = QAction("Copy", menu)
             copy_action.triggered.connect(self.copyToClipboardSignal)
             menu.addAction(copy_action)
-            delete_action = QAction("delete", menu)
+            delete_action = QAction("Delete", menu)
             delete_action.triggered.connect(self.deleteSignal)
             menu.addAction(delete_action)
-            
-            show_folder_action = QAction("show containing folder", menu)
+            show_folder_action = QAction("Show Containing Folder", menu)
             show_folder_action.triggered.connect(self.showContainingFolderSignal)
             menu.addAction(show_folder_action)
-            
+
             self.opened_menu = menu
             menu.setStyleSheet(f"""
                 QMenu {{
-                    background-color: {self.style.color.background}; color:white;
+                    background-color: {self.style.color.background};
+                    color: white;
                 }}
                 QMenu::item:selected {{
-                    background-color: {self.style.color.light_gray};  
+                    background-color: {self.style.color.light_gray};
                 }}
             """)
             menu.exec_(QCursor.pos())
             return True
         return False
 
-   
-
     def deleteSignal(self):
         self.delete_signal.emit()
-        
+
     def copyToClipboardSignal(self):
         self.copy_signal.emit()
-            
+
     def showContainingFolderSignal(self):
         self.show_folder.emit()
+
 
 class ImageThumbnailWidget(QWidget):
     thumbnailClicked = pyqtSignal()
@@ -1277,7 +1298,7 @@ class ImageThumbnailWidget(QWidget):
                 self.right_clicked= not self.right_clicked
             else:
                 self.right_clicked = True
-            colors=[self.style.color.background,self.style.color.royal_blue]
+            colors=[self.style.color.background,'#220026']
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
             print(self.image_files.index(self.image_path))
 
