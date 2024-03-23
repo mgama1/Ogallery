@@ -4,6 +4,7 @@
 ![quickdemo](https://github.com/mgama1/Ogallery/assets/40968723/45aeccd1-16df-4ca1-8a0a-4b3801eeaf13)
 ### Viewer features:
  - fullscreen mode
+ - show containing folder
  - copy to clipboard
  - move to trash
    
@@ -15,6 +16,7 @@
  - blur
  - portrait(blur background)
  - exposure
+
 ### Dependencies
 
 ```bash
