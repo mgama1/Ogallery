@@ -442,7 +442,7 @@ class ImageViewer(QWidget):
         self.gray_button.setToolTip('Gray scale')
         self.gaussianBlur_button.setToolTip('Blur')
         self.blur_background_button.setToolTip('Portrait')
-        self.flip_button.setToolTip('Flip horizontally')
+        self.flip_button.setToolTip('Right click to flip vertically')
         self.sharpen_button.setToolTip('Sharpen')
         self.set_exposure_button.setToolTip('Exposure')
         self.show_containing_folder_button.setToolTip('Show containing folder')
@@ -488,6 +488,9 @@ class ImageViewer(QWidget):
         self.flip_button.clicked.connect(self.flipH)
         self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
         self.flip_button.customContextMenuRequested.connect(self.flipV)
+        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
+
         
         self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
         self.save_button.clicked.connect(self.save_image)
@@ -785,7 +788,19 @@ class ImageViewer(QWidget):
         self.edited_image=rotatedImg
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
+
+    def rotateCW(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
         
+        rotatedImg=cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        self.edited_image=rotatedImg
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+    
     def flipH(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -1229,6 +1244,7 @@ class ImageThumbnailWidget(QWidget):
     viewerClosedSig = pyqtSignal()
     viewerSavedSig=pyqtSignal(dict)
     viewerDeletedSig=pyqtSignal(dict)
+    selectedSig=pyqtSignal(int)
     def __init__(self, image_path, image_files):
         super().__init__()
         username = os.getenv('USER')
@@ -1237,6 +1253,7 @@ class ImageThumbnailWidget(QWidget):
         self.image_path = image_path
         self.image_files = image_files
         self.right_clicked=False
+        
         self.init_ui()
         
     def init_ui(self):
@@ -1300,7 +1317,8 @@ class ImageThumbnailWidget(QWidget):
                 self.right_clicked = True
             colors=[self.style.color.background,'#220026']
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
-            print(self.image_files.index(self.image_path))
+            #print(self.image_files.index(self.image_path))
+            self.selectedSig.emit(self.image_files.index(self.image_path))
 
     
 
@@ -1316,15 +1334,16 @@ class ImageThumbnailWidget(QWidget):
         
         
 class ImageGalleryApp(QMainWindow):
-    def __init__(self, directories):
+    def __init__(self, image_files):
         super().__init__()
         self.style = OStyle()
-        self.image_files = directories
+        self.image_files = image_files
         self.thumbnail_widgets = []  # To store references to thumbnail widgets
         self.scroll_value =   0 # Initialize scroll_value
-        self.batch_size =   3  # Number of thumbnails to load per batch
+        self.batch_size =   9  # Number of thumbnails to load per batch
         self.loaded_count =   0  
         self.scrollbar_threshold =   300  # Scrollbar threshold for loading thumbnails
+        self.selected_indices=[]
         self.init_ui()
     
     def init_ui(self):
@@ -1344,6 +1363,7 @@ class ImageGalleryApp(QMainWindow):
             thumbnail_widget.viewerClosedSig.connect(self.showGallery)
             thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
             thumbnail_widget.viewerDeletedSig.connect(self.getDeletedData)
+            thumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
             self.layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
             
@@ -1368,10 +1388,9 @@ class ImageGalleryApp(QMainWindow):
         self.load_initial_batch()#
         
     def load_initial_batch(self):
-        for i in range(min(9,len(self.thumbnail_widgets))):
+        for i in range(min(12,len(self.thumbnail_widgets))):
             self.thumbnail_widgets[self.loaded_count].load_thumbnail()
             self.loaded_count += 1
-        #del self.thumbnail_widgets[:self.batch_size]
 
     def update_thumbnails(self):
         self.scroll_value = self.scroll.value()
@@ -1397,15 +1416,7 @@ class ImageGalleryApp(QMainWindow):
         print(deleted["index"])
         self.remove_thumbnail(deleted["index"])
         
-    def remove_thumbnail(self, index):
-        if 0 <= index < len(self.thumbnail_widgets):
-            thumbnail_widget = self.thumbnail_widgets.pop(index)
-            
-            self.layout.removeWidget(thumbnail_widget)
-            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
-            
-            return thumbnail_widget
-
+    
     def updateThumbnail(self, saved):
         self.edited_index=saved["index"]
         choice=saved["choice"]
@@ -1414,13 +1425,16 @@ class ImageGalleryApp(QMainWindow):
         if self.edited_index >= len(self.thumbnail_widgets):
             return
         if choice=='overwrite':
-            self.remove_thumbnail(self.edited_index)
+            thumbnail_widget = self.thumbnail_widgets.pop(self.edited_index)
+            self.layout.removeWidget(thumbnail_widget)
+            thumbnail_widget.deleteLater()  
             #reload the thumbnail widget from disk
             nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files)
             nthumbnail_widget.load_thumbnail()
             nthumbnail_widget.thumbnailClicked.connect(self.hide)
             nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
             nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         if choice=='copy':
             #reload the thumbnail widget from disk
             nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files)
@@ -1429,6 +1443,7 @@ class ImageGalleryApp(QMainWindow):
             nthumbnail_widget.thumbnailClicked.connect(self.hide)
             nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
             nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         else:
             pass
         
@@ -1442,11 +1457,30 @@ class ImageGalleryApp(QMainWindow):
                 col = 0
                 row += 1
 
-    def removeThumbnails(self,thumbnails_indices_list):
+
+
+    def remove_thumbnail(self, index):
+        if 0 <= index < len(self.thumbnail_widgets):
+            thumbnail_widget = self.thumbnail_widgets.pop(index)
+            #self.image_files.pop(index)
+            self.layout.removeWidget(thumbnail_widget)
+            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+            
+            return thumbnail_widget
+    def removeThumbnails(self, thumbnails_indices_list):
+        # Sort indices in reverse order to avoid index shifting issues
+        thumbnails_indices_list.sort(reverse=True)
         for thumbnail_index in thumbnails_indices_list:
-            self.remove_thumbnail(thumbnail_index)
-        
-        self.loaded_count =   0  
+            thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
+            self.image_files.pop(thumbnail_index)
+            self.layout.removeWidget(thumbnail_widget)
+            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+    
+        # Clear the layout
+        for i in reversed(range(self.layout.count())):
+            self.layout.itemAt(i).widget().setParent(None)
+    
+        # Re-add remaining thumbnails to the layout
         row, col = 0, 0
         for i, widget in enumerate(self.thumbnail_widgets):
             self.layout.addWidget(widget, row, col)
@@ -1454,13 +1488,19 @@ class ImageGalleryApp(QMainWindow):
             if col == 3:
                 col = 0
                 row += 1
-        
-        
+    
+        self.selected_indices = []
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
             self.close()        
         if event.key() == Qt.Key_M:
-            self.removeThumbnails([6,7,8]) 
+            print(self.selected_indices)
+
+        if event.key() == Qt.Key_Delete:
+            print(self.selected_indices)
+            self.removeThumbnails(self.selected_indices)
+            
     
 def run_gui():
     app = QApplication([])    
