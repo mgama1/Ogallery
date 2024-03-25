@@ -936,21 +936,25 @@ class ImageViewer(QWidget):
     def delete_image(self):
         file_name=self.file_list[self.current_index]
         if os.path.exists(file_name):
+            
             try:
-                os.system(f"gio trash '{file_name}'")
-                self.next_image()
-                deleted={'index':self.current_index,'file_name':file_name}
+                os.system(f"gio trash '{self.file_list[self.current_index]}'")
+                
+                deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
+                self.file_list.pop(self.current_index)
+                self.show_image()
+                
                 time.sleep(.1)
                 self.deletedSignal.emit(deleted)
-            
+                print(self.file_list[self.current_index])
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
             db=pd.read_csv("db.csv")
-            if self.file_list[self.current_index] in db["directory"].values:
-                db=db[db["directory"]!=self.file_list[self.current_index]]
+            if file_name in db["directory"].values:
+                db=db[db["directory"]!=file_name]
                 db.to_csv("db.csv")
-            self.file_list.pop(self.current_index)
+            #self.file_list.pop(self.current_index)
             
             
     def show_success_message(self):
@@ -1315,11 +1319,11 @@ class ImageThumbnailWidget(QWidget):
                 self.right_clicked= not self.right_clicked
             else:
                 self.right_clicked = True
-            colors=[self.style.color.background,'#220026']
+            colors=[self.style.color.background,'#3f5b63']
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
             #print(self.image_files.index(self.image_path))
             self.selectedSig.emit(self.image_files.index(self.image_path))
-
+#852
     
 
     
@@ -1359,7 +1363,7 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files)
-            thumbnail_widget.thumbnailClicked.connect(self.hide)
+            #thumbnail_widget.thumbnailClicked.connect(self.hide)
             thumbnail_widget.viewerClosedSig.connect(self.showGallery)
             thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
             thumbnail_widget.viewerDeletedSig.connect(self.getDeletedData)
@@ -1412,9 +1416,9 @@ class ImageGalleryApp(QMainWindow):
         self.savedData=saved
         
     def getDeletedData(self, deleted):
-        self.deleted_data=deleted
-        print(deleted["index"])
-        self.remove_thumbnail(deleted["index"])
+        #self.deleted_data=deleted
+        print([deleted["index"]])
+        self.removeThumbnails([deleted["index"]])
         
     
     def updateThumbnail(self, saved):
@@ -1472,6 +1476,7 @@ class ImageGalleryApp(QMainWindow):
         thumbnails_indices_list.sort(reverse=True)
         for thumbnail_index in thumbnails_indices_list:
             thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
+            #os.system(f"gio trash '{self.image_files[thumbnail_index]}'")
             self.image_files.pop(thumbnail_index)
             self.layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  # Delete the widget to free up resources
