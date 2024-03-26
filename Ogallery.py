@@ -26,7 +26,7 @@ from custom import *
 from styles import *
 from core import *
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
-#os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog',
          'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea',
@@ -669,7 +669,8 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_F:
             self.toggleFullScreen()
         
-                
+        if event.key()==Qt.Key_C:
+            self.copyToClipboard()
          
 
         
@@ -1053,7 +1054,7 @@ class InfoWidget(QWidget):
 
         # Image Label
         image_label = QLabel(self)
-        pixmap = QPixmap('info.png').scaledToWidth(150)
+        pixmap = QPixmap('media/info.png').scaledToWidth(150)
         image_label.setPixmap(pixmap)
         image_label.setMaximumWidth(150)
         horizontal_layout.addWidget(image_label)
@@ -1324,7 +1325,6 @@ class ImageThumbnailWidget(QWidget):
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
             #print(self.image_files.index(self.image_path))
             self.selectedSig.emit(self.image_files.index(self.image_path))
-#852
     
 
     
@@ -1345,6 +1345,7 @@ class ImageGalleryApp(QMainWindow):
         self.image_files = image_files
         self.thumbnail_widgets = []  # To store references to thumbnail widgets
         self.scroll_value =   0 # Initialize scroll_value
+        self.initial_batch=12
         self.batch_size =   9  # Number of thumbnails to load per batch
         self.loaded_count =   0  
         self.scrollbar_threshold =   300  # Scrollbar threshold for loading thumbnails
@@ -1372,7 +1373,6 @@ class ImageGalleryApp(QMainWindow):
             self.layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
             
-            #self.thumbnail_widgets.append(thumbnail_widget)#
             
             col += 1
             if col == 3:
@@ -1393,7 +1393,7 @@ class ImageGalleryApp(QMainWindow):
         self.load_initial_batch()#
         
     def load_initial_batch(self):
-        for i in range(min(12,len(self.thumbnail_widgets))):
+        for i in range(min(self.initial_batch,len(self.thumbnail_widgets))):
             self.thumbnail_widgets[self.loaded_count].load_thumbnail()
             self.loaded_count += 1
 
