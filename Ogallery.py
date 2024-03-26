@@ -1,3 +1,4 @@
+
 import multiprocessing
 import os
 import time
@@ -24,7 +25,8 @@ from Othumbnails import ThumbnailMaker
 from custom import *
 from styles import *
 from core import *
-os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
+#os.environ['QT_QPA_PLATFORM'] = 'wayland'
+#os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
 classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog',
          'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea',
@@ -595,7 +597,7 @@ class ImageViewer(QWidget):
 
 
             self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
-
+            
 
 
     def show_edited_image(self):
@@ -939,22 +941,21 @@ class ImageViewer(QWidget):
             
             try:
                 os.system(f"gio trash '{self.file_list[self.current_index]}'")
-                
-                deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
-                self.file_list.pop(self.current_index)
-                self.show_image()
-                
-                time.sleep(.1)
-                self.deletedSignal.emit(deleted)
-                print(self.file_list[self.current_index])
+
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
-            db=pd.read_csv("db.csv")
-            if file_name in db["directory"].values:
-                db=db[db["directory"]!=file_name]
-                db.to_csv("db.csv")
-            #self.file_list.pop(self.current_index)
+            deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
+            self.file_list.pop(self.current_index)
+            self.show_image()
+            
+            time.sleep(.1)
+            self.deletedSignal.emit(deleted)
+            
+            #db=pd.read_csv("db.csv")
+            #if file_name in db["directory"].values:
+            #    db=db[db["directory"]!=file_name]
+             #   db.to_csv("db.csv")
             
             
     def show_success_message(self):
@@ -1416,11 +1417,12 @@ class ImageGalleryApp(QMainWindow):
         self.savedData=saved
         
     def getDeletedData(self, deleted):
-        #self.deleted_data=deleted
-        print([deleted["index"]])
-        self.removeThumbnails([deleted["index"]])
+        print(deleted)
+        self.removeThumbnail(deleted["index"])
         
     
+
+        
     def updateThumbnail(self, saved):
         self.edited_index=saved["index"]
         choice=saved["choice"]
@@ -1463,20 +1465,52 @@ class ImageGalleryApp(QMainWindow):
 
 
 
-    def remove_thumbnail(self, index):
-        if 0 <= index < len(self.thumbnail_widgets):
-            thumbnail_widget = self.thumbnail_widgets.pop(index)
-            #self.image_files.pop(index)
-            self.layout.removeWidget(thumbnail_widget)
-            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+    def removeThumbnail(self, thumbnail_index):
+        # Sort indices in reverse order to avoid index shifting issues
+        thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
+        #self.image_files.pop(thumbnail_index)
+        self.layout.removeWidget(thumbnail_widget)
+        thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+
+        # Clear the layout
+        for i in reversed(range(self.layout.count())):
+            self.layout.itemAt(i).widget().setParent(None)
+    
+        # Re-add remaining thumbnails to the layout
+        row, col = 0, 0
+        for i, widget in enumerate(self.thumbnail_widgets):
+            self.layout.addWidget(widget, row, col)
+            col += 1
+            if col == 3:
+                col = 0
+                row += 1
+    
+        
+    def getIndicesToDelete(self):
+        '''
+        gets indices to delete which are only the odd numbers of indices recieved. as even counts means that
+        it was selected and unselected
+        Args:
+            None
+        returns:
+            indices to delete(list)
+        '''
+        count = {}
+        indices_to_delete = []
+        for e in self.selected_indices:
+            count[e] = count.get(e, 0) + 1
             
-            return thumbnail_widget
+        for e in count:
+            if count[e] % 2 != 0:
+                indices_to_delete.append(e)
+        self.selected_indices = []
+        return indices_to_delete
     def removeThumbnails(self, thumbnails_indices_list):
         # Sort indices in reverse order to avoid index shifting issues
         thumbnails_indices_list.sort(reverse=True)
         for thumbnail_index in thumbnails_indices_list:
             thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
-            #os.system(f"gio trash '{self.image_files[thumbnail_index]}'")
+            os.system(f"gio trash '{self.image_files[thumbnail_index]}'")
             self.image_files.pop(thumbnail_index)
             self.layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  # Delete the widget to free up resources
@@ -1494,7 +1528,7 @@ class ImageGalleryApp(QMainWindow):
                 col = 0
                 row += 1
     
-        self.selected_indices = []
+        
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
@@ -1503,8 +1537,7 @@ class ImageGalleryApp(QMainWindow):
             print(self.selected_indices)
 
         if event.key() == Qt.Key_Delete:
-            print(self.selected_indices)
-            self.removeThumbnails(self.selected_indices)
+            self.removeThumbnails(self.getIndicesToDelete())
             
     
 def run_gui():
