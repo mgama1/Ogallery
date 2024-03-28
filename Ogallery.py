@@ -1,3 +1,4 @@
+import yaml
 
 import multiprocessing
 import os
@@ -28,9 +29,6 @@ from core import *
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
-classesNames=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog',
-         'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea',
-          'street', 'train', 'truck']
 
 from MobileNet import Model
 
@@ -47,18 +45,29 @@ class MainWidget(QWidget):
         self.setGeometry(300, 100, 750, 500)
 
         
-        self.model=Model()
+        #self.model=Model()
+        with open('classes_synonyms.yaml', 'r') as file:
+            classes_synonyms = yaml.safe_load(file)
         # Flatten keys and values of model.classes_synonyms
-        self.classes_plus = chain(self.model.classes_synonyms.keys(), self.model.classes_synonyms.values())
+        self.classes_plus = chain(classes_synonyms.keys(), classes_synonyms.values())
         # Split, strip, and filter empty strings.
         self.classes_plus = [item.strip().replace("q_",'') for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
         self.style=OStyle()
-        #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
-        #                            scale_factor=1.2))
-        self.setWindowIcon(QIcon('media/iconc.ico'))
-        pixmap = QPixmap('media/kirapink.png')
 
+        self.setWindowIcon(QIcon('media/iconc.ico'))
+        
+        config_file_path = 'config.yaml'
+        
+        if not os.path.exists(config_file_path):
+            with open(config_file_path, 'w') as file:
+                initial_data = {'style_color': '#8c40d4'}
+                yaml.dump(initial_data, file)
+        with open(config_file_path, 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        
+        pixmap = QPixmap(f'media/{self.config_data["style_color"]}.png')
+        print(f'media/{self.config_data["style_color"]}.png')
         # Create a QLabel to display the image
         background_label = QLabel(self)
         background_label.setPixmap(pixmap)
@@ -115,15 +124,18 @@ class MainWidget(QWidget):
         self.query_line.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
-        self.settings_button.setFixedSize(45,45)
+        self.settings_button.setFixedSize(40,40)
+        self.gallery_button.setFixedSize(40,40)
+        self.info_button.setFixedSize(40,40)
+
 
         button_style = f"QPushButton {{ background-color: transparent; \
                                         color: {self.style.color.foreground}; \
                                         icon-size: {self.style.size.standard_icon_size}; \
                                         border: none ;\
-                                        border-radius: 18px;padding: 5px;}} \
+                                        border-radius: 16px;padding: 0px;}} \
                                         QPushButton:hover {{  \
-                                        background-color: {self.style.color.hover_default}; }}"
+                                        background-color: #d0ced9; }}"
         
         
         qline_style = (
@@ -1120,11 +1132,13 @@ class InfoWidget(QWidget):
 class CircularButton(QPushButton):
     def __init__(self, color, parent=None):
         super().__init__(parent)
+        self.color=color
         self.setFixedSize(50, 50)
         self.setStyleSheet(f"background-color: {color}; border-radius: 25px;")
         self.clicked.connect(self.toggleBorder)
 
     def toggleBorder(self):
+        self.parent().setStyleColor(self.color)
         self.parent().clearBorders()
         self.setStyleSheet(self.styleSheet() + "border: 2px solid black;")
 
@@ -1140,14 +1154,19 @@ class SettingsWidget(QWidget):
         self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
 
+        
+        
+       
+        
+        
         layout = QVBoxLayout(self)
         dir_layout=QHBoxLayout()
         dir_buttons_layout=QVBoxLayout()
         colors_layout = QHBoxLayout()
         
         colors = [
-            "#a260d3",  
-            "#b35991",  
+            "#8c40d4",  
+            "#ce3485",  
             "#d06957",  
             "#c5b058",  
             "#5b62d1", 
@@ -1187,6 +1206,17 @@ class SettingsWidget(QWidget):
         layout.addStretch()
         self.setLayout(layout)
 
+    def setStyleColor(self,color):
+        config_file_path = 'config.yaml'
+        with open(config_file_path, 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
+        self.config_data['style_color'] = color
+        
+        with open(config_file_path, 'w') as file:
+            yaml.dump(self.config_data, file)
+
+        
     def clearBorders(self):
         for button in self.colors_buttons:
             button.setStyleSheet(button.styleSheet().replace("border: 2px solid black;", ""))

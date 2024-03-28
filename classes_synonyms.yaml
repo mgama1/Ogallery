@@ -1,0 +1,20 @@
+ID: 'q_identity card,q_id card '
+bicycle: q_bike
+boat: q_ship
+building: q_house , q_home , q_apartment
+bus: q_autobus
+car: 'q_automobile '
+cat: 'q_kitty ,q_kitten '
+document: 'q_docs , q_text '
+dog: 'q_puppy ,q_pupper ,q_doggo ,q_doggy '
+forest: 'q_tree '
+glacier: 'q_ice ,q_iceberg '
+helicopter: 'q_chopper '
+motorcycle: 'q_bike '
+mountain: 'q_nature '
+plane: q_airplane ,q_aeroplane , q_aircraft
+reciept: ' q_bill '
+sea: 'q_beach ,q_water '
+street: ''
+train: ''
+truck: ''
