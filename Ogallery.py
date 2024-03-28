@@ -44,7 +44,7 @@ class MainWidget(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('OGallery')
-        self.setGeometry(300, 100, 800, 600)
+        self.setGeometry(300, 100, 750, 500)
 
         
         self.model=Model()
@@ -56,9 +56,18 @@ class MainWidget(QWidget):
         self.style=OStyle()
         #self.setWindowIcon(qta.icon('fa5s.map-pin',color=self.style.color.dark_background,
         #                            scale_factor=1.2))
-        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowIcon(QIcon('media/iconc.ico'))
+        pixmap = QPixmap('media/kirapink.png')
+
+        # Create a QLabel to display the image
+        background_label = QLabel(self)
+        background_label.setPixmap(pixmap)
+        background_label.setScaledContents(True) 
+        background_label.setGeometry(0, 0, self.width(), self.height())
+        
         #buttons instantiation
         self.query_line = QLineEdit(self)
+        self.query_line.setMinimumWidth(500)
         self.search_button = QPushButtonHighlight()
         
         self.info_button=QPushButtonHighlight()
@@ -72,11 +81,7 @@ class MainWidget(QWidget):
         completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.query_line.setCompleter(completer)
         
-        #logo QLabel instantiation and settings
-        self.logo_label = QLabel(self)
-        pixmap = QPixmap('l2.jpg')
-        self.logo_label.setPixmap(pixmap)
-        self.logo_label.setAlignment(Qt.AlignCenter)
+        
         
         #layout structure 
         layout = QVBoxLayout(self)
@@ -89,9 +94,12 @@ class MainWidget(QWidget):
         header_layout.addWidget(self.info_button)
                 
         layout.addLayout(header_layout)
-        layout.addWidget(self.logo_label)
+        #layout.addWidget(self.logo_label)
+        horizontal_layout.addStretch(1)
         horizontal_layout.addWidget(self.search_button)
         horizontal_layout.addWidget(self.query_line)
+        horizontal_layout.addStretch(1)
+        layout.addStretch(2)
         layout.addLayout(horizontal_layout)
         layout.addStretch(1)
         
@@ -109,10 +117,10 @@ class MainWidget(QWidget):
         self.info_button.setFixedWidth(45)
         self.settings_button.setFixedSize(45,45)
 
-        button_style = f"QPushButton {{ background-color: {self.style.color.dark_background}; \
+        button_style = f"QPushButton {{ background-color: transparent; \
                                         color: {self.style.color.foreground}; \
                                         icon-size: {self.style.size.standard_icon_size}; \
-                                        border: 2px solid {self.style.color.dark_background}; \
+                                        border: none ;\
                                         border-radius: 18px;padding: 5px;}} \
                                         QPushButton:hover {{  \
                                         background-color: {self.style.color.hover_default}; }}"
@@ -146,7 +154,7 @@ class MainWidget(QWidget):
         
         #icons
         
-        self.search_button.setIconNormal(qta.icon('fa.search',color=self.style.color.foreground))
+        self.search_button.setIconNormal(qta.icon('fa.search',color='#212121',scale_factor=1.1))
         self.search_button.setIconHover(qta.icon('fa.search',color=self.style.color.purple,scale_factor=1.1))
         
         self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.style.color.foreground))
