@@ -5,7 +5,7 @@ from tensorflow import keras
 import os
 import glob
 import pandas as pd
-from core import *#EEE
+from core import *
 class Model:
     def __init__(self):
         self.core=Core()
