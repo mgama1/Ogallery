@@ -1112,7 +1112,23 @@ class InfoWidget(QWidget):
             button.setFixedHeight(50)
         for button in footer_buttons:
             button.setStyleSheet(button_style)
-            
+
+
+
+
+
+class CircularButton(QPushButton):
+    def __init__(self, color, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(50, 50)
+        self.setStyleSheet(f"background-color: {color}; border-radius: 25px;")
+        self.clicked.connect(self.toggleBorder)
+
+    def toggleBorder(self):
+        self.parent().clearBorders()
+        self.setStyleSheet(self.styleSheet() + "border: 2px solid black;")
+
+
 class SettingsWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -1124,25 +1140,57 @@ class SettingsWidget(QWidget):
         self.setGeometry(300, 100, 800, 600)
         self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
 
-        layout = QVBoxLayout()
-
+        layout = QVBoxLayout(self)
+        dir_layout=QHBoxLayout()
+        dir_buttons_layout=QVBoxLayout()
+        colors_layout = QHBoxLayout()
+        
+        colors = [
+            "#a260d3",  
+            "#b35991",  
+            "#d06957",  
+            "#c5b058",  
+            "#5b62d1", 
+            "#5d87cd",  
+            "#66aa78"   
+        ]
+        colors_layout.addStretch()
+        self.colors_buttons = []
+        for color in colors:
+            button = CircularButton(color, self)
+            colors_layout.addWidget(button)
+            self.colors_buttons.append(button)
+        colors_layout.addStretch()
+           
         self.model = QStringListModel()
         self.model.setStringList(self.getImagesPaths())
 
         self.listView = QListView()
         self.listView.setModel(self.model)
-        layout.addWidget(self.listView)
+        dir_layout.addWidget(self.listView)
 
         # Add a button to remove directories
         self.remove_dir_button = QPushButton('Remove Directory')
         self.remove_dir_button.clicked.connect(self.removeSelectedItems)
-        layout.addWidget(self.remove_dir_button)
+        dir_buttons_layout.addWidget(self.remove_dir_button)
 
         self.add_dir_button = QPushButton('Add Directory')
         self.add_dir_button.clicked.connect(self.addItem)
-        layout.addWidget(self.add_dir_button)
+        dir_buttons_layout.addWidget(self.add_dir_button)
+        dir_buttons_layout.addStretch()
+        dir_layout.addLayout(dir_buttons_layout)
+        layout.addLayout(dir_layout)
+        style_label = QLabel("style")
+        layout.addWidget(style_label)
+        layout.addSpacing(30)
+        layout.addLayout(colors_layout)
+        layout.addStretch()
         self.setLayout(layout)
 
+    def clearBorders(self):
+        for button in self.colors_buttons:
+            button.setStyleSheet(button.styleSheet().replace("border: 2px solid black;", ""))
+    
     def getImagesPaths(self):
         username = os.getenv('USER')
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
