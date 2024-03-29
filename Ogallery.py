@@ -161,17 +161,17 @@ class MainWidget(QWidget):
         #icons
         
         self.search_button.setIconNormal(qta.icon('fa.search',color='#212121',scale_factor=1.1))
-        self.search_button.setIconHover(qta.icon('fa.search',color=self.style.color.purple,scale_factor=1.1))
+        self.search_button.setIconHover(qta.icon('fa.search',color=self.config_data["style_color"],scale_factor=1.1))
         
         self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.style.color.foreground))
-        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.style.color.purple))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.config_data["style_color"]))
         
         
         self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.style.color.foreground))
-        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.style.color.purple))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.config_data["style_color"]))
         
         self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.style.color.foreground))
-        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.style.color.purple))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.config_data["style_color"]))
      
         self.show()
 
@@ -193,7 +193,11 @@ class MainWidget(QWidget):
         print(f"color sent {color}")
         pixmap = QPixmap(f'media/{color}.png')
         self.background_label.setPixmap(pixmap)
-        
+        self.search_button.setIconHover(qta.icon('fa.search',color=color,scale_factor=1.1))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=color))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=color))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=color))
+
     def openSettings(self):
         self.settings=SettingsWidget()
         self.settings.colorChanged.connect(self.updateBackground)
@@ -1154,7 +1158,7 @@ class CircularButton(QPushButton):
     def toggleBorder(self):
         self.parent().setStyleColor(self.color)
         self.parent().clearBorders()
-        self.setStyleSheet(self.styleSheet() + "border: 2px solid black;")
+        self.setStyleSheet(self.styleSheet() + "border: 2px solid white;")
 
 
 class SettingsWidget(QWidget):
@@ -1234,7 +1238,7 @@ class SettingsWidget(QWidget):
         self.colorChanged.emit(color)
     def clearBorders(self):
         for button in self.colors_buttons:
-            button.setStyleSheet(button.styleSheet().replace("border: 2px solid black;", ""))
+            button.setStyleSheet(button.styleSheet().replace("border: 2px solid white;", ""))
     
     def getImagesPaths(self):
         username = os.getenv('USER')
