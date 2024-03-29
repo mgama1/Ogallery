@@ -8,7 +8,9 @@
   }
 
   .hero_area {
-    background: linear-gradient(130deg, #231a6f, #0f054c);
+    background-image: url('../images/hero-bg.png');
+    background-size: auto; /* Cover the entire background */
+    background-position: center;
   }
 
   .hero_area .hero_bg_box {
