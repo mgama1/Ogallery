@@ -66,13 +66,7 @@ class MainWidget(QWidget):
         with open(config_file_path, 'r') as file:
             self.config_data = yaml.safe_load(file)
         
-        pixmap = QPixmap(f'media/{self.config_data["style_color"]}.png')
-        print(f'media/{self.config_data["style_color"]}.png')
-        # Create a QLabel to display the image
-        background_label = QLabel(self)
-        background_label.setPixmap(pixmap)
-        background_label.setScaledContents(True) 
-        background_label.setGeometry(0, 0, self.width(), self.height())
+        self.loadBackground()
         
         #buttons instantiation
         self.query_line = QLineEdit(self)
@@ -181,8 +175,28 @@ class MainWidget(QWidget):
      
         self.show()
 
+
+    def loadBackground(self):
+        
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        color=self.config_data["style_color"]
+        pixmap = QPixmap(f'media/{color}.png')
+        
+            
+        self.background_label = QLabel(self)
+        self.background_label.setPixmap(pixmap)
+        self.background_label.setScaledContents(True) 
+        self.background_label.setGeometry(0, 0, self.width(), self.height())
+
+    def updateBackground(self,color):
+        print(f"color sent {color}")
+        pixmap = QPixmap(f'media/{color}.png')
+        self.background_label.setPixmap(pixmap)
+        
     def openSettings(self):
         self.settings=SettingsWidget()
+        self.settings.colorChanged.connect(self.updateBackground)
         self.settings.show()
     
            
@@ -1144,6 +1158,7 @@ class CircularButton(QPushButton):
 
 
 class SettingsWidget(QWidget):
+    colorChanged=pyqtSignal(str)
     def __init__(self):
         super().__init__()
         self.style = OStyle()
@@ -1165,13 +1180,14 @@ class SettingsWidget(QWidget):
         colors_layout = QHBoxLayout()
         
         colors = [
+            "#ce3485",
             "#8c40d4",  
-            "#ce3485",  
-            "#d06957",  
-            "#c5b058",  
-            "#5b62d1", 
-            "#5d87cd",  
-            "#66aa78"   
+            "#2631c9",  
+            "#5588db",  
+            "#4bb7b5", 
+            "#60b67d",  
+            "#c86923" ,
+            "#c41d21"
         ]
         colors_layout.addStretch()
         self.colors_buttons = []
@@ -1215,8 +1231,7 @@ class SettingsWidget(QWidget):
         
         with open(config_file_path, 'w') as file:
             yaml.dump(self.config_data, file)
-
-        
+        self.colorChanged.emit(color)
     def clearBorders(self):
         for button in self.colors_buttons:
             button.setStyleSheet(button.styleSheet().replace("border: 2px solid black;", ""))
