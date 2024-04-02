@@ -568,10 +568,10 @@
 
   var SWIPE_THRESHOLD = 40;
   var Default = {
-    interval: 5000,
+    interval: 7000,
     keyboard: true,
     slide: false,
-    pause: 'hover',
+    pause: false,
     wrap: true,
     touch: true
   };
