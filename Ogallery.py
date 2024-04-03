@@ -1,4 +1,6 @@
 import yaml
+import webbrowser
+from qreader import QReader
 
 import multiprocessing
 import os
@@ -457,6 +459,7 @@ class ImageViewer(QWidget):
         self.flip_button=QPushButton()
         self.set_exposure_button = QPushButton()
         self.blur_background_button = QPushButton()
+        self.scan_qrc_button=QPushButton()
         self.undo_button=QPushButton()
         self.compare_button=QPushButton()
         self.revert_button = QPushButton('Revert', self)
@@ -470,6 +473,7 @@ class ImageViewer(QWidget):
         self.gray_button.setIcon(qta.icon('mdi.image-filter-black-white',color='white'))
         self.gaussianBlur_button.setIcon(qta.icon('mdi.blur',color='white'))
         self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
+        self.scan_qrc_button.setIcon(qta.icon('mdi6.qrcode-scan',color='white'))
         self.sharpen_button.setIcon(qta.icon('mdi.details',color='white'))
         self.set_exposure_button.setIcon(qta.icon('mdi.camera-iris',color='white'))
         self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
@@ -497,7 +501,7 @@ class ImageViewer(QWidget):
         
         self.editing_buttons=[self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
-                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
+                 self.blur_background_button, self.scan_qrc_button ,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
@@ -537,6 +541,7 @@ class ImageViewer(QWidget):
         self.back_button.clicked.connect(self.close)
 
         self.blur_background_button.clicked.connect(self.blurBackground)
+        self.scan_qrc_button.clicked.connect(self.scanQRC)
         self.undo_button.clicked.connect(self.undo)
         self.revert_button.clicked.connect(self.revert)
         self.leftBrowse.clicked.connect(self.previous_image)
@@ -710,8 +715,10 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_C:
             self.copyToClipboard()
          
+        if event.key()==Qt.Key_F1:
+            help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
+            webbrowser.open(help_page)
 
-        
     
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -921,6 +928,32 @@ class ImageViewer(QWidget):
         blurred_bg_image = (blurred_bg_image * 255).astype(np.uint8)
         self.edited_image=blurred_bg_image
         self.show_edited_image()
+
+
+    def scanQRC(self):
+        qreader = QReader()
+        image = cv2.cvtColor(cv2.imread(self.file_list[self.current_index]), cv2.COLOR_BGR2RGB)
+        decoded_text = qreader.detect_and_decode(image=image)
+        print(decoded_text)
+        if decoded_text and decoded_text[0]:
+            self.qrtext_label=QLabel()
+            # Set the text as a hyperlink
+            self.qrtext_label.setText(f'<a href="{decoded_text[0]}">{decoded_text[0]}</a>')
+            self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
+            
+            self.qrtext_label.adjustSize()
+            self.qrtext_label.setMaximumWidth(self.width()//2)
+            # Get the geometry of the parent widget
+            parent_rect = self.geometry()
+            
+            # Calculate the center position of the QLabel
+            center_x = int(parent_rect.left() + (parent_rect.width() - self.qrtext_label.width()) / 2)
+            center_y = int(parent_rect.top() + (parent_rect.height() - self.qrtext_label.height()) / 2)
+            
+            # Move the QLabel to the center of the parent widget
+            self.qrtext_label.move(center_x, center_y)
+            self.qrtext_label.show()
+         
         
     def convert_cv_image_to_qpixmap(self, cv_image):
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
