@@ -1,6 +1,7 @@
 import yaml
 import webbrowser
-from qreader import QReader
+#from qreader import QReader
+from pyzbar.pyzbar import decode as decodeqr
 
 import multiprocessing
 import os
@@ -200,6 +201,11 @@ class MainWidget(QWidget):
         self.settings_button.setIconHover(qta.icon('fa.cogs',color=color))
         self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=color))
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'background_label'):
+            self.background_label.setGeometry(0, 0, self.width(), self.height())
+            
     def openSettings(self):
         self.settings=SettingsWidget()
         self.settings.colorChanged.connect(self.updateBackground)
@@ -931,14 +937,12 @@ class ImageViewer(QWidget):
 
 
     def scanQRC(self):
-        qreader = QReader()
-        image = cv2.cvtColor(cv2.imread(self.file_list[self.current_index]), cv2.COLOR_BGR2RGB)
-        decoded_text = qreader.detect_and_decode(image=image)
+        decoded_text = decodeqr(Image.open(self.file_list[self.current_index]))[0].data.decode()
         print(decoded_text)
-        if decoded_text and decoded_text[0]:
+        if decoded_text:
             self.qrtext_label=QLabel()
             # Set the text as a hyperlink
-            self.qrtext_label.setText(f'<a href="{decoded_text[0]}">{decoded_text[0]}</a>')
+            self.qrtext_label.setText(f'<a href="{decoded_text}">{decoded_text}</a>')
             self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
             
             self.qrtext_label.adjustSize()
@@ -1155,7 +1159,7 @@ class InfoWidget(QWidget):
         footer_layout.addWidget(authors_button)
 
         website_button = QPushButton('Website', self)
-        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('http://mgama1.github.io')))
+        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://mgama1.github.io/Ogallery/')))
         footer_layout.addWidget(website_button)
         footer_buttons=[about_button,authors_button,website_button]
         layout.addLayout(footer_layout)
@@ -1224,7 +1228,8 @@ class SettingsWidget(QWidget):
             "#4bb7b5", 
             "#60b67d",  
             "#c86923" ,
-            "#c41d21"
+            "#c41d21",
+            "#212121",
         ]
         colors_layout.addStretch()
         self.colors_buttons = []
@@ -1233,7 +1238,11 @@ class SettingsWidget(QWidget):
             colors_layout.addWidget(button)
             self.colors_buttons.append(button)
         colors_layout.addStretch()
-           
+        
+        self.colors_buttons[-1].setStyleSheet("QPushButton {"
+                     "border-image: url(media/batman.png);"
+                     "border-radius: 25px;"
+                     "}")
         self.model = QStringListModel()
         self.model.setStringList(self.getImagesPaths())
 
@@ -1538,7 +1547,7 @@ class ImageGalleryApp(QMainWindow):
     def update_thumbnails(self):
         self.scroll_value = self.scroll.value()
         if self.scroll_value >= self.scrollbar_threshold or self.loaded_count<len(self.image_files):
-            for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
+            for i in range(min(len(self.thumbnail_widgets)-1, self.batch_size)):
                 self.thumbnail_widgets[self.loaded_count].load_thumbnail()
                 #print(self.loaded_count)
                 self.loaded_count +=   1
