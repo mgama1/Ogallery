@@ -39,7 +39,8 @@ from MobileNet import Model
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
-        
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
         self.init_ui()
 
 
@@ -117,7 +118,7 @@ class MainWidget(QWidget):
         
         
         #Elements style
-        self.setStyleSheet(f"background-color: {self.style.color.dark_background};color:white;")
+        self.setStyleSheet(f"background-color: {self.config_data['dark_background']};color:white;")
         self.query_line.setFixedHeight(33)
         self.search_button.setFixedSize(36, 36) 
         self.info_button.setFixedWidth(45)
@@ -127,25 +128,25 @@ class MainWidget(QWidget):
 
 
         button_style = f"QPushButton {{ background-color: transparent; \
-                                        color: {self.style.color.foreground}; \
+                                        color: {self.config_data['foreground']}; \
                                         icon-size: {self.style.size.standard_icon_size}; \
                                         border: none ;\
                                         border-radius: 16px;padding: 0px;}} \
                                         QPushButton:hover {{  \
-                                        background-color: #d0ced9; }}"
+                                        background-color: {self.config_data['foreground']}; }}"
         
         
         qline_style = (
             f"QLineEdit {{ \
-                background-color: {self.style.color.dark_background}; \
+                background-color: {self.config_data['dark_background']}; \
                 color: white; \
                 border-radius: 15px; \
                 padding: 5px; \
-                border: 2px solid {self.style.color.light_gray}; \
+                border: 2px solid {self.config_data['light_gray']}; \
                 font-size: 12pt; \
             }} \
             QLineEdit:focus {{ \
-                border-color: {self.style.color.dark_purple}; \
+                border-color: {self.config_data['hover_default']}; \
             }}"
         )
 
@@ -156,7 +157,7 @@ class MainWidget(QWidget):
             button.setStyleSheet(button_style)
             
         self.query_line.setStyleSheet(qline_style)
-        completer.popup().setStyleSheet(f"background-color: {self.style.color.light_gray}; \
+        completer.popup().setStyleSheet(f"background-color: {self.config_data['light_gray']}; \
                                         color: white; \
                                         font-size: 12pt;")
 
@@ -166,14 +167,14 @@ class MainWidget(QWidget):
         self.search_button.setIconNormal(qta.icon('fa.search',color='#212121',scale_factor=1.1))
         self.search_button.setIconHover(qta.icon('fa.search',color=self.config_data["style_color"],scale_factor=1.1))
         
-        self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.style.color.foreground))
+        self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.config_data['foreground']))
         self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.config_data["style_color"]))
         
         
-        self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.style.color.foreground))
+        self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.config_data['foreground']))
         self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.config_data["style_color"]))
         
-        self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.style.color.foreground))
+        self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.config_data['foreground']))
         self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.config_data["style_color"]))
      
         self.show()
@@ -181,8 +182,7 @@ class MainWidget(QWidget):
 
     def loadBackground(self):
         
-        with open('config.yaml', 'r') as file:
-            self.config_data = yaml.safe_load(file)
+        
         color=self.config_data["style_color"]
         pixmap = QPixmap(f'media/{color}.png')
         
@@ -388,6 +388,8 @@ class ImageViewer(QWidget):
     def __init__(self, result,current_index=0):
         super().__init__()
         self.style=OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
         self.file_list = []
         self.current_index = current_index
         self.primary_screen = QDesktopWidget().screenGeometry()
@@ -481,7 +483,7 @@ class ImageViewer(QWidget):
         self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
         self.scan_qrc_button.setIcon(qta.icon('mdi6.qrcode-scan',color='white'))
         self.sharpen_button.setIcon(qta.icon('mdi.details',color='white'))
-        self.set_exposure_button.setIcon(qta.icon('mdi.camera-iris',color='white'))
+        self.set_exposure_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
         self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
         self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
         
@@ -494,7 +496,7 @@ class ImageViewer(QWidget):
         self.blur_background_button.setToolTip('Portrait')
         self.flip_button.setToolTip('Right click to flip vertically')
         self.sharpen_button.setToolTip('Sharpen')
-        self.set_exposure_button.setToolTip('Exposure')
+        self.set_exposure_button.setToolTip('adjust')
         self.show_containing_folder_button.setToolTip('Show containing folder')
         
         self.exposure_slider = QSlider(Qt.Horizontal)
@@ -505,8 +507,8 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         
         
-        self.editing_buttons=[self.sharpen_button,self.gray_button,
-                self.gaussianBlur_button,self.rotate_button,self.flip_button,self.set_exposure_button ,
+        self.editing_buttons=[self.set_exposure_button ,self.sharpen_button,self.gray_button,
+                self.gaussianBlur_button,self.rotate_button,self.flip_button,
                  self.blur_background_button, self.scan_qrc_button ,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
@@ -542,7 +544,9 @@ class ImageViewer(QWidget):
         self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
         
-        self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
+        #self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
+        self.set_exposure_button.clicked.connect(self.adjust)
+
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.close)
 
@@ -565,7 +569,7 @@ class ImageViewer(QWidget):
         self.leftBrowse.leaveEvent = self.on_leave_event
       
         #Setting styles
-        self.setStyleSheet(f"background-color: {self.style.color.background};")
+        self.setStyleSheet(f"background-color: {self.config_data['background']};")
         self.leftBrowse.setFont(self.style.size.large_font)
         self.rightBrowse.setFont(self.style.size.large_font)
         border_color='#242424'
@@ -781,6 +785,16 @@ class ImageViewer(QWidget):
     def on_leave_event(self, event):
         self.set_transparency(0)
      
+
+    def adjust(self):
+        try:
+            self.adjust_instance = Adjust(self)
+            self.adjust_instance.show()
+        except Exception as e:
+            print(f"Error adjusting image: {e}")
+
+        
+        
     
     def copyToClipboard(self):
         image_path = self.file_list[self.current_index]
@@ -878,7 +892,98 @@ class ImageViewer(QWidget):
         self.edited_image=flipped_img
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
+
+    def change_contrast(self, contrast_factor):
+        contrast_factor /= 100
+        if hasattr(self, 'img_contrast'):
+            if len(self.edit_history)==1:
+                img=self.edit_history[-1]
+                
+            if len(self.edit_history)>1:
+                self.edit_history.pop()
+                self.img_contrast=self.edit_history[-1]
+                img=self.img_contrast
+            
+        elif hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        print(contrast_factor)   
+        # Convert image to floating point representation
+        img_float = img.astype(np.float32) / 255.0
         
+        # Apply contrast adjustment
+        self.img_contrast = (img_float - 0.5) * contrast_factor + 0.5
+        
+        # Clip values to range [0, 1]
+        self.img_contrast = np.clip(self.img_contrast, 0, 1)
+        
+        # Convert back to uint8
+        self.img_contrast = (self.img_contrast * 255).astype(np.uint8)
+        
+        self.edited_image=self.img_contrast
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+
+
+    def changeHue(self,shift_value):
+        if hasattr(self, 'shifted_image'):
+            if len(self.edit_history)==1:
+                img=self.edit_history[-1]
+                
+            if len(self.edit_history)>1:
+                self.edit_history.pop()
+                self.shifted_image=self.edit_history[-1]
+                img=self.shifted_image
+            
+        elif hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        
+
+
+        
+        # Convert the image to HSV
+        hsv_image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    
+        # Shift the hue channel by the specified value
+        hsv_image[:, :, 0] = (hsv_image[:, :, 0] + shift_value) % 180
+    
+        # Convert the image back to BGR
+        self.shifted_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+        self.edited_image=self.shifted_image
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+
+    
+    def change_brightness(self,brightness_offset):
+        # Change the brightness by adding a constant value
+        if hasattr(self, 'brightened_image'):
+            if len(self.edit_history)==1:
+                img=self.edit_history[-1]
+                
+            if len(self.edit_history)>1:
+                self.edit_history.pop()
+                self.brightened_image=self.edit_history[-1]
+                img=self.brightened_image
+            
+        elif hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.file_list[self.current_index]
+            img = cv2.imread(image_path)
+        
+        self.brightened_image = cv2.add(img, brightness_offset)
+        self.edited_image=self.brightened_image
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+        
+        
+
+    
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
         self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
@@ -1114,7 +1219,9 @@ class InfoWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.style=OStyle()
-        self.setStyleSheet(f"background-color: {self.style.color.background};color:white;"
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;"
                           )
         self.init_ui()
 
@@ -1181,7 +1288,76 @@ class InfoWidget(QWidget):
             button.setStyleSheet(button_style)
 
 
+class Adjust(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.image_file = self.parent().file_list[self.parent().current_index]
+        self.init_ui()
 
+    def init_ui(self):
+        self.setWindowFlags(Qt.Window)
+        self.setWindowTitle('adjust')
+        self.setGeometry(300, 100, 400, 400)
+        self.setStyleSheet(f"background-color: #212121;color:'white';")
+        self.contrast_label = QLabel('Contrast:', self)
+        self.contrast_slider = QSlider(Qt.Horizontal)
+        self.contrast_slider.setMinimum(30)
+        self.contrast_slider.setMaximum(200)
+        self.contrast_slider.setValue(100)
+        self.contrast_slider.valueChanged.connect(self.parent().change_contrast)
+        self.contrast_value_label = QLabel(str(self.contrast_slider.value()), self)
+        self.contrast_value_label.setText("1")
+        self.brightness_label = QLabel('Brightness:', self)
+        self.brightness_slider = QSlider(Qt.Horizontal)
+        self.brightness_slider.setMinimum(-100)
+        self.brightness_slider.setMaximum(100)
+        self.brightness_slider.setValue(0)
+        self.brightness_slider.valueChanged.connect(self.parent().change_brightness)
+        self.brightness_value_label = QLabel(str(self.brightness_slider.value()), self)
+
+        self.hue_label = QLabel('Hue:', self)
+        self.hue_slider = QSlider(Qt.Horizontal)
+        self.hue_slider.setMinimum(0)
+        self.hue_slider.setMaximum(180)
+        self.hue_slider.setValue(0)
+        self.hue_slider.valueChanged.connect(self.parent().changeHue)
+        self.hue_value_label = QLabel(str(self.hue_slider.value()), self)
+
+        layout = QVBoxLayout(self)
+
+        contrast_layout = QHBoxLayout()
+        contrast_layout.addWidget(self.contrast_label)
+        contrast_layout.addWidget(self.contrast_slider)
+        contrast_layout.addWidget(self.contrast_value_label)
+
+        brightness_layout = QHBoxLayout()
+        brightness_layout.addWidget(self.brightness_label)
+        brightness_layout.addWidget(self.brightness_slider)
+        brightness_layout.addWidget(self.brightness_value_label)
+
+        hue_layout = QHBoxLayout()
+        hue_layout.addWidget(self.hue_label)
+        hue_layout.addWidget(self.hue_slider)
+        hue_layout.addWidget(self.hue_value_label)
+
+        layout.addLayout(contrast_layout)
+        layout.addLayout(brightness_layout)
+        layout.addLayout(hue_layout)
+
+        self.setLayout(layout)
+
+        self.contrast_slider.valueChanged.connect(self.update_contrast_value_label)
+        self.brightness_slider.valueChanged.connect(self.update_brightness_value_label)
+        self.hue_slider.valueChanged.connect(self.update_hue_value_label)
+
+    def update_contrast_value_label(self, value):
+        self.contrast_value_label.setText(str(value/100.0))
+
+    def update_brightness_value_label(self, value):
+        self.brightness_value_label.setText(str(value))
+
+    def update_hue_value_label(self, value):
+        self.hue_value_label.setText(str(value))
 
 
 class CircularButton(QPushButton):
@@ -1349,6 +1525,8 @@ class Menu(QObject):
         super().__init__()
         self.opened_menu = None
         self.style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
         self.file_list = file_list
         self.current_index = current_index
         self.graphics_view = graphics_view
@@ -1371,11 +1549,11 @@ class Menu(QObject):
             self.opened_menu = menu
             menu.setStyleSheet(f"""
                 QMenu {{
-                    background-color: {self.style.color.background};
+                    background-color: {self.config_data['background']};
                     color: white;
                 }}
                 QMenu::item:selected {{
-                    background-color: {self.style.color.light_gray};
+                    background-color: {self.config_data['light_gray']};
                 }}
             """)
             menu.exec_(QCursor.pos())
@@ -1403,6 +1581,8 @@ class ImageThumbnailWidget(QWidget):
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
         self.style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
         self.image_path = image_path
         self.image_files = image_files
         self.right_clicked=False
@@ -1412,7 +1592,7 @@ class ImageThumbnailWidget(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         
-        self.setStyleSheet(f"background-color: {self.style.color.background};")
+        self.setStyleSheet(f"background-color: {self.config_data['background']};")
         
         
         self.label = QLabel()
@@ -1447,15 +1627,15 @@ class ImageThumbnailWidget(QWidget):
     
     def enterEvent(self, event):
         if not self.right_clicked:
-            self.setStyleSheet(f"background-color: {self.style.color.hover_default};")
+            self.setStyleSheet(f"background-color: {self.config_data['hover_default']};")
 
     def leaveEvent(self, event):
         if not self.right_clicked:
-            self.setStyleSheet(f"background-color: {self.style.color.background};")
+            self.setStyleSheet(f"background-color: {self.config_data['background']};")
     
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.setStyleSheet(f"background-color: {self.style.color.royal_blue};")
+            self.setStyleSheet(f"background-color: {self.config_data['royal_blue']};")
             self.viewer = ImageViewer(self.image_files, current_index=self.image_files.index(self.image_path))
             self.viewer.finishedSignal.connect(self.viewerClosed)
             self.viewer.savedSignal.connect(self.viewerSaved)
