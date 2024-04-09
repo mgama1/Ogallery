@@ -507,9 +507,9 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         
         
-        self.editing_buttons=[self.set_exposure_button ,self.sharpen_button,self.gray_button,
+        self.editing_buttons=[ self.scan_qrc_button ,self.set_exposure_button ,self.sharpen_button,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,
-                 self.blur_background_button, self.scan_qrc_button ,self.compare_button, self.revert_button,self.undo_button,self.save_button
+                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
@@ -895,95 +895,64 @@ class ImageViewer(QWidget):
 
     def change_contrast(self, contrast_factor):
         contrast_factor /= 100
-        if hasattr(self, 'img_contrast'):
-            if len(self.edit_history)==1:
-                img=self.edit_history[-1]
-                
-            if len(self.edit_history)>1:
-                self.edit_history.pop()
-                self.img_contrast=self.edit_history[-1]
-                img=self.img_contrast
             
-        elif hasattr(self, 'edited_image'):
-            img=self.edited_image
-        else :
-            image_path = self.file_list[self.current_index]
-            img = cv2.imread(image_path)
-        print(contrast_factor)   
         # Convert image to floating point representation
-        img_float = img.astype(np.float32) / 255.0
+        img_float = self.colors_transformation_image.astype(np.float32) / 255.0
         
         # Apply contrast adjustment
-        self.img_contrast = (img_float - 0.5) * contrast_factor + 0.5
+        self.colors_transformation_image = (img_float - 0.5) * contrast_factor + 0.5
         
         # Clip values to range [0, 1]
-        self.img_contrast = np.clip(self.img_contrast, 0, 1)
+        self.colors_transformation_image = np.clip(self.colors_transformation_image, 0, 1)
         
         # Convert back to uint8
-        self.img_contrast = (self.img_contrast * 255).astype(np.uint8)
+        self.colors_transformation_image = (self.colors_transformation_image * 255).astype(np.uint8)
         
-        self.edited_image=self.img_contrast
-        self.edit_history.append(self.edited_image)
-        self.show_edited_image()
-
-
-    def changeHue(self,shift_value):
-        if hasattr(self, 'shifted_image'):
-            if len(self.edit_history)==1:
-                img=self.edit_history[-1]
-                
-            if len(self.edit_history)>1:
-                self.edit_history.pop()
-                self.shifted_image=self.edit_history[-1]
-                img=self.shifted_image
-            
-        elif hasattr(self, 'edited_image'):
-            img=self.edited_image
-        else :
-            image_path = self.file_list[self.current_index]
-            img = cv2.imread(image_path)
         
-
-
-        
+    def changeSaturation(self,offset_value):
         # Convert the image to HSV
-        hsv_image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
+        # Create a mask for pixels with high saturation
+        saturation_mask = hsv_image[:, :, 1] > 10
+        # Shift the hue channel by the specified value
+        #hsv_image[:, :, 1] = np.clip(hsv_image[:, :, 1].astype(float) + offset_value, 0, 255).astype(np.uint8)
+        hsv_image[:, :, 1] = np.where(saturation_mask, np.clip(hsv_image[:, :, 1].astype(int) + offset_value, 0, 255), hsv_image[:, :, 1]).astype(np.uint8)
+
+        
+
+        self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    def changeHue(self,shift_value):        
+        # Convert the image to HSV
+        hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
     
         # Shift the hue channel by the specified value
-        hsv_image[:, :, 0] = (hsv_image[:, :, 0] + shift_value) % 180
+        hsv_image[:, :, 0] = ((hsv_image[:, :, 0].astype(float) + shift_value)% 180).astype(np.uint8) 
     
         # Convert the image back to BGR
-        self.shifted_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
-        self.edited_image=self.shifted_image
-        self.edit_history.append(self.edited_image)
-        self.show_edited_image()
+        self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     
-    def change_brightness(self,brightness_offset):
-        # Change the brightness by adding a constant value
-        if hasattr(self, 'brightened_image'):
-            if len(self.edit_history)==1:
-                img=self.edit_history[-1]
-                
-            if len(self.edit_history)>1:
-                self.edit_history.pop()
-                self.brightened_image=self.edit_history[-1]
-                img=self.brightened_image
-            
-        elif hasattr(self, 'edited_image'):
-            img=self.edited_image
-        else :
+    def change_brightness(self,brightness_offset):       
+        self.colors_transformation_image = cv2.add(self.colors_transformation_image, brightness_offset)
+        
+        
+        
+    def applyColorsTransformations(self,contrast_factor,brightness_offset,s_shift_value,shift_value):
+        if self.edit_history:
+            self.colors_transformation_image=self.edit_history[-1]
+        else:   
             image_path = self.file_list[self.current_index]
-            img = cv2.imread(image_path)
-        
-        self.brightened_image = cv2.add(img, brightness_offset)
-        self.edited_image=self.brightened_image
-        self.edit_history.append(self.edited_image)
+            self.colors_transformation_image = cv2.imread(image_path)
+                
+        self.change_contrast(contrast_factor)
+        self.change_brightness(brightness_offset)
+        self.changeSaturation(s_shift_value)
+        self.changeHue(shift_value)
+        self.edited_image=self.colors_transformation_image
+        #self.edit_history.append(self.edited_image)
         self.show_edited_image()
         
-        
-
-    
     def toggle_exposure_slider(self):
     # Toggle the visibility of the slider when the button is pressed
         self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
@@ -1291,7 +1260,11 @@ class InfoWidget(QWidget):
 class Adjust(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.image_file = self.parent().file_list[self.parent().current_index]
+        self.contrast_offset = 100
+        self.saturation_offset=0
+        self.hue_offset = 0
+        self.brightness_offset = 0
+        
         self.init_ui()
 
     def init_ui(self):
@@ -1304,15 +1277,16 @@ class Adjust(QWidget):
         self.contrast_slider.setMinimum(30)
         self.contrast_slider.setMaximum(200)
         self.contrast_slider.setValue(100)
-        self.contrast_slider.valueChanged.connect(self.parent().change_contrast)
+        self.contrast_slider.valueChanged.connect(self.update_contrast_offset)
         self.contrast_value_label = QLabel(str(self.contrast_slider.value()), self)
         self.contrast_value_label.setText("1")
+        
         self.brightness_label = QLabel('Brightness:', self)
         self.brightness_slider = QSlider(Qt.Horizontal)
         self.brightness_slider.setMinimum(-100)
         self.brightness_slider.setMaximum(100)
         self.brightness_slider.setValue(0)
-        self.brightness_slider.valueChanged.connect(self.parent().change_brightness)
+        self.brightness_slider.valueChanged.connect(self.update_brightness_offset)
         self.brightness_value_label = QLabel(str(self.brightness_slider.value()), self)
 
         self.hue_label = QLabel('Hue:', self)
@@ -1320,8 +1294,16 @@ class Adjust(QWidget):
         self.hue_slider.setMinimum(0)
         self.hue_slider.setMaximum(180)
         self.hue_slider.setValue(0)
-        self.hue_slider.valueChanged.connect(self.parent().changeHue)
+        self.hue_slider.valueChanged.connect(self.update_hue_offset)
         self.hue_value_label = QLabel(str(self.hue_slider.value()), self)
+
+        self.saturation_label = QLabel('saturation:', self)
+        self.saturation_slider = QSlider(Qt.Horizontal)
+        self.saturation_slider.setMinimum(-100)
+        self.saturation_slider.setMaximum(100)
+        self.saturation_slider.setValue(0)
+        self.saturation_slider.valueChanged.connect(self.update_saturation_offset)
+        self.saturation_value_label = QLabel(str(self.saturation_slider.value()), self)
 
         layout = QVBoxLayout(self)
 
@@ -1335,6 +1317,11 @@ class Adjust(QWidget):
         brightness_layout.addWidget(self.brightness_slider)
         brightness_layout.addWidget(self.brightness_value_label)
 
+        saturation_layout = QHBoxLayout()
+        saturation_layout.addWidget(self.saturation_label)
+        saturation_layout.addWidget(self.saturation_slider)
+        saturation_layout.addWidget(self.saturation_value_label)
+        
         hue_layout = QHBoxLayout()
         hue_layout.addWidget(self.hue_label)
         hue_layout.addWidget(self.hue_slider)
@@ -1342,20 +1329,48 @@ class Adjust(QWidget):
 
         layout.addLayout(contrast_layout)
         layout.addLayout(brightness_layout)
+        layout.addLayout(saturation_layout)
         layout.addLayout(hue_layout)
+        
 
         self.setLayout(layout)
 
         self.contrast_slider.valueChanged.connect(self.update_contrast_value_label)
         self.brightness_slider.valueChanged.connect(self.update_brightness_value_label)
+        self.saturation_slider.valueChanged.connect(self.update_saturation_value_label)
         self.hue_slider.valueChanged.connect(self.update_hue_value_label)
 
+        self.contrast_slider.valueChanged.connect(self.applyAdjustments)
+        self.brightness_slider.valueChanged.connect(self.applyAdjustments)
+        self.saturation_slider.valueChanged.connect(self.applyAdjustments)
+        self.hue_slider.valueChanged.connect(self.applyAdjustments)
+
+    def applyAdjustments(self):
+        self.parent().applyColorsTransformations(self.contrast_offset,self.brightness_offset,self.saturation_offset,self.hue_offset)
+        
+    def update_contrast_offset(self,contrast_val):
+        self.contrast_offset = contrast_val
+
+        
+    def update_brightness_offset(self,brightness_val):
+        self.brightness_offset = brightness_val
+
+    def update_saturation_offset(self,saturation_val):
+        self.saturation_offset = saturation_val
+        
+    def update_hue_offset(self,hue_val):
+        self.hue_offset = hue_val
+
+    
     def update_contrast_value_label(self, value):
         self.contrast_value_label.setText(str(value/100.0))
 
     def update_brightness_value_label(self, value):
         self.brightness_value_label.setText(str(value))
 
+
+    def update_saturation_value_label(self, value):
+        self.hue_value_label.setText(str(value))
     def update_hue_value_label(self, value):
         self.hue_value_label.setText(str(value))
 
