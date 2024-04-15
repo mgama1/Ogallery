@@ -57,7 +57,6 @@ class MainWidget(QWidget):
         # Split, strip, and filter empty strings.
         self.classes_plus = [item.strip().replace("q_",'') for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
-        self.style=OStyle()
 
         self.setWindowIcon(QIcon('media/iconc.ico'))
         
@@ -129,7 +128,7 @@ class MainWidget(QWidget):
 
         button_style = f"QPushButton {{ background-color: transparent; \
                                         color: {self.config_data['foreground']}; \
-                                        icon-size: {self.style.size.standard_icon_size}; \
+                                        icon-size: {self.config_data['standard_icon_size']}; \
                                         border: none ;\
                                         border-radius: 16px;padding: 0px;}} \
                                         QPushButton:hover {{  \
@@ -387,7 +386,7 @@ class ImageViewer(QWidget):
     deletedSignal=pyqtSignal(dict)
     def __init__(self, result,current_index=0):
         super().__init__()
-        self.style=OStyle()
+        self.NAVBUTTONWIDTH=60
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.file_list = []
@@ -441,8 +440,8 @@ class ImageViewer(QWidget):
         self.editing_buttons_layout = QHBoxLayout()
 
        
-        self.leftBrowse = QPushButton('〈', self)
-        self.rightBrowse = QPushButton('〉', self)
+        self.leftBrowse = QPushButton( self)
+        self.rightBrowse = QPushButton( self)
         self.back_button = QPushButton('↩', self)
         
 
@@ -453,9 +452,7 @@ class ImageViewer(QWidget):
         Hlayout.addWidget(self.leftBrowse)
         Hlayout.addWidget(self.image_view)
         Hlayout.addWidget(self.rightBrowse)
-
         header_layout.addWidget(self.back_button)
-        
 
         header_layout.addStretch(1)
         header_layout.addWidget(self.show_containing_folder_button)
@@ -486,6 +483,9 @@ class ImageViewer(QWidget):
         self.set_exposure_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
         self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
         self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
+        self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
+        self.rightBrowse.setIcon(qta.icon('fa.angle-right',color=self.config_data['background']))
+
         
        
         #tooltip
@@ -527,7 +527,7 @@ class ImageViewer(QWidget):
    
         layout.addLayout(header_layout)
         layout.addLayout(Hlayout)
-        layout.addWidget(self.exposure_slider)
+        #layout.addWidget(self.exposure_slider)
         layout.addLayout(self.editing_buttons_layout)
         self.setLayout(layout)
 
@@ -570,8 +570,6 @@ class ImageViewer(QWidget):
       
         #Setting styles
         self.setStyleSheet(f"background-color: {self.config_data['background']};")
-        self.leftBrowse.setFont(self.style.size.large_font)
-        self.rightBrowse.setFont(self.style.size.large_font)
         border_color='#242424'
         
         button_style = ("QPushButton {{"
@@ -585,7 +583,7 @@ class ImageViewer(QWidget):
                 "}} "
                 "QPushButton:hover {{"
                 "background-color: #00347d; "
-                "}}").format(border_color=border_color,icon_size=self.style.size.standard_icon_size)
+                "}}").format(border_color=border_color,icon_size=self.config_data['standard_icon_size'])
 
         
         
@@ -604,10 +602,10 @@ class ImageViewer(QWidget):
         self.back_button.setStyleSheet(button_style)
         self.show_containing_folder_button.setStyleSheet(button_style)
         
-        self.back_button.setFixedSize(60,40) 
-        self.show_containing_folder_button.setFixedSize(60,40)
-        self.leftBrowse.setFixedSize(60, self.height())
-        self.rightBrowse.setFixedSize(60, self.height())
+        self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
+        self.show_containing_folder_button.setFixedSize(self.NAVBUTTONWIDTH,40)
+        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, self.height())
+        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, self.height())
 
         browsing_buttons_style= "background-color: rgba(22, 22, 22, .5); \
                                                     color: white; \
@@ -728,7 +726,8 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_F1:
             help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
             webbrowser.open(help_page)
-
+        
+            
     
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -778,6 +777,12 @@ class ImageViewer(QWidget):
     def set_transparency(self, alpha):
         self.rightBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
         self.leftBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
+        if alpha==.5:
+            self.leftBrowse.setIcon(qta.icon('fa.angle-left',color='white'))
+            self.rightBrowse.setIcon(qta.icon('fa.angle-right',color='white'))
+        if alpha==0:
+            self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
+            self.rightBrowse.setIcon(qta.icon('fa.angle-right',color=self.config_data['background']))
 
     def on_enter_event(self, event):
         self.set_transparency(.5)
@@ -1011,26 +1016,30 @@ class ImageViewer(QWidget):
 
 
     def scanQRC(self):
-        decoded_text = decodeqr(Image.open(self.file_list[self.current_index]))[0].data.decode()
-        print(decoded_text)
+        decoded=decodeqr(Image.open(self.file_list[self.current_index]))[0]
+        rpos_x,rpos_y=(decoded.polygon[1])
+        
+        decoded_text = decoded.data.decode()
         if decoded_text:
-            self.qrtext_label=QLabel()
-            # Set the text as a hyperlink
-            self.qrtext_label.setText(f'<a href="{decoded_text}">{decoded_text}</a>')
-            self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
-            
-            self.qrtext_label.adjustSize()
-            self.qrtext_label.setMaximumWidth(self.width()//2)
-            # Get the geometry of the parent widget
+            self.qrcode_window = QRCodeWindow(decoded_text)
             parent_rect = self.geometry()
+            img_shape=cv2.imread(self.file_list[self.current_index]).shape
+         
+        
+            scale_factor = self.image_view.transform().m11()  
             
-            # Calculate the center position of the QLabel
-            center_x = int(parent_rect.left() + (parent_rect.width() - self.qrtext_label.width()) / 2)
-            center_y = int(parent_rect.top() + (parent_rect.height() - self.qrtext_label.height()) / 2)
+            # Calculate the displayed dimensions
+            displayed_width = img_shape[1] * scale_factor
+            displayed_height = img_shape[1] * scale_factor
+            pos_x=int(parent_rect.left()+(parent_rect.width()-displayed_width)//2+(rpos_x*scale_factor)-self.NAVBUTTONWIDTH*2)
+            pos_y=int(parent_rect.top()+(parent_rect.height()-displayed_height)//2+(rpos_y*scale_factor))
+            print(displayed_width,displayed_height)
+            self.qrcode_window.setGeometry(pos_x,pos_y ,50, 20)  # Adjust the size and position as needed
+            self.qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
             
-            # Move the QLabel to the center of the parent widget
-            self.qrtext_label.move(center_x, center_y)
-            self.qrtext_label.show()
+            self.qrcode_window.show()
+        
+    
          
         
     def convert_cv_image_to_qpixmap(self, cv_image):
@@ -1181,13 +1190,37 @@ class ImageViewer(QWidget):
         event.accept()
 
 
-        
-        
+
+class QRCodeWindow(QWidget):
+    def __init__(self, decoded_text):
+        super().__init__()
+        self.setGeometry(0,0,15,15)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        self.qrtext_label = QLabel(self)
+        # Set the text as a hyperlink
+        self.qrtext_label.setText(f'<a href="{decoded_text}">{decoded_text}</a>')
+        self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
+        self.qrtext_label.adjustSize()
+        #self.qrtext_label.setGeometry(0, 0, self.width() // 2, self.qrtext_label.height())
+
+        self.close_button = QPushButton("x", self)
+        #self.close_button.setGeometry(self.width()-5,0, 20, 20)
+        self.close_button.clicked.connect(self.close)
+        self.qrtext_label.setMaximumWidth(200)
+        self.close_button.setFixedSize(15,15)
+        layout=QVBoxLayout()
+        layout.addWidget(self.close_button)
+        layout.addWidget(self.qrtext_label)
+        self.setLayout(layout)
+
+
+
 
 class InfoWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.style=OStyle()
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;"
@@ -1250,7 +1283,7 @@ class InfoWidget(QWidget):
                 "}} "
                 "QPushButton:hover {{"
                 "background-color: #00347d; "
-                "}}").format(border_color=border_color,icon_size=self.style.size.standard_icon_size)
+                "}}").format(border_color=border_color,icon_size=self.config_data['standard_icon_size'])
         for button in footer_buttons:
             button.setFixedHeight(50)
         for button in footer_buttons:
@@ -1327,6 +1360,11 @@ class Adjust(QWidget):
         hue_layout.addWidget(self.hue_slider)
         hue_layout.addWidget(self.hue_value_label)
 
+        self.reset_button=QPushButton('reset')
+        self.reset_button.setFixedWidth(100)
+        self.reset_button.clicked.connect(self.reset)
+        layout.addWidget(self.reset_button,alignment=Qt.AlignRight)
+        
         layout.addLayout(contrast_layout)
         layout.addLayout(brightness_layout)
         layout.addLayout(saturation_layout)
@@ -1370,11 +1408,25 @@ class Adjust(QWidget):
 
 
     def update_saturation_value_label(self, value):
-        self.hue_value_label.setText(str(value))
+        self.saturation_value_label.setText(str(value))
     def update_hue_value_label(self, value):
         self.hue_value_label.setText(str(value))
 
+    def reset(self):
+        self.contrast_offset = 100
+        self.saturation_offset=0
+        self.hue_offset = 0
+        self.brightness_offset = 0
+        
+        self.contrast_slider.setValue(self.contrast_offset)
+        self.brightness_slider.setValue(self.brightness_offset)
+        self.hue_slider.setValue(self.hue_offset)
+        self.saturation_slider.setValue(self.saturation_offset)
+        
+        
+        
 
+        
 class CircularButton(QPushButton):
     def __init__(self, color, parent=None):
         super().__init__(parent)
@@ -1393,13 +1445,15 @@ class SettingsWidget(QWidget):
     colorChanged=pyqtSignal(str)
     def __init__(self):
         super().__init__()
-        self.style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
         self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle('Settings')
         self.setGeometry(300, 100, 800, 600)
-        self.setStyleSheet(f"background-color: {self.style.color.background};color:'white';")
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:'white';")
 
         
         
@@ -1539,7 +1593,6 @@ class Menu(QObject):
     def __init__(self, file_list, current_index, graphics_view):
         super().__init__()
         self.opened_menu = None
-        self.style = OStyle()
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.file_list = file_list
@@ -1595,7 +1648,9 @@ class ImageThumbnailWidget(QWidget):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
-        self.style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.image_path = image_path
@@ -1663,7 +1718,7 @@ class ImageThumbnailWidget(QWidget):
                 self.right_clicked= not self.right_clicked
             else:
                 self.right_clicked = True
-            colors=[self.style.color.background,'#3f5b63']
+            colors=[self.config_data['background'],'#3f5b63']
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
             #print(self.image_files.index(self.image_path))
             self.selectedSig.emit(self.image_files.index(self.image_path))
@@ -1683,20 +1738,22 @@ class ImageThumbnailWidget(QWidget):
 class ImageGalleryApp(QMainWindow):
     def __init__(self, image_files):
         super().__init__()
-        self.style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
         self.image_files = image_files
         self.thumbnail_widgets = []  # To store references to thumbnail widgets
         self.scroll_value =   0 # Initialize scroll_value
         self.initial_batch=12
         self.batch_size =   9  # Number of thumbnails to load per batch
         self.loaded_count =   0  
-        self.scrollbar_threshold =   300  # Scrollbar threshold for loading thumbnails
+        self.scrollbar_threshold =   20  # Scrollbar threshold for loading thumbnails
         self.selected_indices=[]
         self.init_ui()
     
     def init_ui(self):
         central_widget = QWidget()
-        self.setStyleSheet(f"background-color: {self.style.color.background};")
+        self.setStyleSheet(f"background-color: {self.config_data['background']};")
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget(scroll_area)
@@ -1742,9 +1799,8 @@ class ImageGalleryApp(QMainWindow):
     def update_thumbnails(self):
         self.scroll_value = self.scroll.value()
         if self.scroll_value >= self.scrollbar_threshold or self.loaded_count<len(self.image_files):
-            for i in range(min(len(self.thumbnail_widgets)-1, self.batch_size)):
+            for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
                 self.thumbnail_widgets[self.loaded_count].load_thumbnail()
-                #print(self.loaded_count)
                 self.loaded_count +=   1
             self.scrollbar_threshold += self.scrollbar_threshold
             
@@ -1881,7 +1937,8 @@ class ImageGalleryApp(QMainWindow):
         if event.key() == Qt.Key_Delete:
             self.removeThumbnails(self.getIndicesToDelete())
             
-    
+        
+            
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
