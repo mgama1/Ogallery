@@ -3,9 +3,9 @@ from PyQt5.QtCore import Qt,pyqtSignal
 from PyQt5.QtWidgets import *
 import datetime
 import os
+import yaml
 
 import cv2
-from styles import *
 
 class CustomAwesome():
     def __init(self):
@@ -30,7 +30,9 @@ class CustomAwesome():
 class SavingMessageBox(QMessageBox):
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+
         self.image_path=image_path
         self.edited_image=edited_image
         self.overwrite_button = QPushButton("Overwrite")
@@ -48,9 +50,9 @@ class SavingMessageBox(QMessageBox):
         
         self.setWindowTitle("Save Image")
         self.setText("Do you want to overwrite the existing image or save a copy?")
-        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.overwrite_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.red}; }}")
-        self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;")
+        self.overwrite_button.setStyleSheet(f"QPushButton:hover {{background-color:{self.config_data['red']}; }}")
+        self.copy_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['blue']}; }}")
 
     def handle_overwrite(self):
         self.choice = "overwrite"
@@ -72,22 +74,26 @@ class SavingMessageBox(QMessageBox):
 class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
-        style = OStyle()
-        self.OK_button = QPushButton("OK")
-        #self.OK_button.setFocusPolicy(Qt.NoFocus)
-        self.addButton(self.OK_button, QMessageBox.ActionRole)
-        self.setWindowTitle("Info")
-        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.blue}; }}")
-
-    
+        try:
+            with open('config.yaml', 'r') as file:
+                self.config_data = yaml.safe_load(file)
+            self.OK_button = QPushButton("OK")
+            #self.OK_button.setFocusPolicy(Qt.NoFocus)
+            self.addButton(self.OK_button, QMessageBox.ActionRole)
+            self.setWindowTitle("Info")
+            self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;")
+            self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['blue']}; }}")
+            print('wtf')
+        except Exception as e:
+            print(f"Error: {e}")
  
   
 class SaveDiscardMessageBox(QMessageBox):
     revert_signal=pyqtSignal()
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        style = OStyle()
+        with open('config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
         self.image_path=image_path
         self.edited_image=edited_image
         self.save_button = QPushButton("Save")
@@ -105,10 +111,10 @@ class SaveDiscardMessageBox(QMessageBox):
         
         self.setWindowTitle("Save Image")
         self.setText("Do you want to overwrite the existing image or save a copy?")
-        self.setStyleSheet(f"background-color: {style.color.background};color:white;")
-        self.save_button.setStyleSheet(f"QPushButton:hover {{background-color:{style.color.blue}; }}")
-        self.discard_button.setStyleSheet(f"QPushButton:hover {{background-color: {style.color.red}; }}")
-
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;")
+        self.save_button.setStyleSheet(f"QPushButton:hover {{background-color:{self.config_data['blue']}; }}")
+        self.discard_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['red']}; }}")
+        
     def handle_save(self):
         msg_box = SavingMessageBox(self.image_path,self.edited_image)
         msg_box.exec_()

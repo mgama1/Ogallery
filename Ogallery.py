@@ -26,8 +26,6 @@ from itertools import chain
 
 from Levenshtein import distance as lev_distance
 from Othumbnails import ThumbnailMaker
-from custom import *
-from styles import *
 from core import *
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
@@ -359,10 +357,8 @@ class MainWidget(QWidget):
             None
         """
         msg_box = InfoMessageBox()
-        pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
-        pixmap2 = QPixmap(qta.icon('fa.exclamation',color='#fde01a').pixmap(50,50))
-        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,1.5)
-        msg_box.setIconPixmap(combined_pixmap)
+        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        msg_box.setIconPixmap(pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
@@ -1145,10 +1141,8 @@ class ImageViewer(QWidget):
             None
         '''
         msg_box = InfoMessageBox()
-        pixmap1 = QPixmap(qta.icon('mdi.jellyfish',color='#faf7f7').pixmap(100,100))
-        pixmap2 = QPixmap(qta.icon('mdi.fullscreen-exit',color='#e2172b').pixmap(50,50))
-        combined_pixmap = CustomAwesome().concat_pixmaps(pixmap1, pixmap2,2)
-        msg_box.setIconPixmap(combined_pixmap)
+        pixmap = QPixmap('media/angry.png').scaledToWidth(150)
+        msg_box.setIconPixmap(pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
         msg_box.exec_()
@@ -1220,6 +1214,9 @@ class QRCodeWindow(QWidget):
 
 class InfoWidget(QWidget):
     def __init__(self):
+        '''
+        this info widget is only for app description and information not error messages and what not
+        '''
         super().__init__()
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
