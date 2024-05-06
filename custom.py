@@ -65,7 +65,6 @@ class InfoMessageBox(QMessageBox):
             self.setWindowTitle("Info")
             self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;")
             self.OK_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['blue']}; }}")
-            print('wtf')
         except Exception as e:
             print(f"Error: {e}")
  
