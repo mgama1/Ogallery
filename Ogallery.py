@@ -1,6 +1,5 @@
 import yaml
 import webbrowser
-#from qreader import QReader
 from pyzbar.pyzbar import decode as decodeqr
 
 import multiprocessing
@@ -26,6 +25,7 @@ from itertools import chain
 
 from Levenshtein import distance as lev_distance
 from Othumbnails import ThumbnailMaker
+from custom import *
 from core import *
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
@@ -210,13 +210,13 @@ class MainWidget(QWidget):
     
            
     def openResultsGallery(self):
-        self.selectImages()
-            
-        if self.result:
-            core=Core()
-            self.image_gallery=ImageGalleryApp(self.result)
-            self.image_gallery.show()
-            
+        if self.selectImages():
+                
+            if self.result:
+                core=Core()
+                self.image_gallery=ImageGalleryApp(self.result)
+                self.image_gallery.show()
+                
     def openGallery(self):
         core=Core()
         self.image_gallery=ImageGalleryApp(core.getImagesPaths())
@@ -294,11 +294,12 @@ class MainWidget(QWidget):
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText=='':
             self.showErrorMessage("No images found")
+            return 0
             
         db=pd.read_csv("db.csv")
         
         self.result=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
-
+        return 1
     
     
         
@@ -756,8 +757,9 @@ class ImageViewer(QWidget):
             msg_box = SaveDiscardMessageBox(self.file_list[self.current_index],self.edited_image)
             msg_box.revert_signal.connect(self.revert)
             msg_box.exec_()
-            
+        
         self.current_index = (self.current_index + 1) % len(self.file_list)
+        self.purge()
         self.show_image()
 
     def previous_image(self):
@@ -767,6 +769,7 @@ class ImageViewer(QWidget):
             msg_box.exec_()
             
         self.current_index = (self.current_index - 1) % len(self.file_list)
+        self.purge()
         self.show_image()
         
     
@@ -1009,33 +1012,54 @@ class ImageViewer(QWidget):
         blurred_bg_image = (blurred_bg_image * 255).astype(np.uint8)
         self.edited_image=blurred_bg_image
         self.show_edited_image()
-
-
-    def scanQRC(self):
-        decoded=decodeqr(Image.open(self.file_list[self.current_index]))[0]
-        rpos_x,rpos_y=(decoded.polygon[1])
-        
-        decoded_text = decoded.data.decode()
-        if decoded_text:
-            self.qrcode_window = QRCodeWindow(decoded_text)
-            parent_rect = self.geometry()
-            img_shape=cv2.imread(self.file_list[self.current_index]).shape
-         
-        
-            scale_factor = self.image_view.transform().m11()  
-            
-            # Calculate the displayed dimensions
-            displayed_width = img_shape[1] * scale_factor
-            displayed_height = img_shape[1] * scale_factor
-            pos_x=int(parent_rect.left()+(parent_rect.width()-displayed_width)//2+(rpos_x*scale_factor)-self.NAVBUTTONWIDTH*2)
-            pos_y=int(parent_rect.top()+(parent_rect.height()-displayed_height)//2+(rpos_y*scale_factor))
-            print(displayed_width,displayed_height)
-            self.qrcode_window.setGeometry(pos_x,pos_y ,50, 20)  # Adjust the size and position as needed
-            self.qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
-            
-            self.qrcode_window.show()
-        
     
+    def scanQRC(self):
+        decoded_list = decodeqr(Image.open(self.file_list[self.current_index]))
+        self.qrcode_windows = []  # Create a list to store all the QRCodeWindow instances
+        
+        parent_rect = self.geometry()
+        img_shape = cv2.imread(self.file_list[self.current_index]).shape
+        scale_factor = self.image_view.transform().m11()
+        
+        for box in decoded_list:
+            decoded = box[0]
+            print(decoded)
+            rpos_x, rpos_y = box.polygon[1]
+            
+            decoded_text = box.data.decode()
+            if decoded_text:
+                qrcode_window = QRCodeWindow(decoded_text)
+                self.qrcode_windows.append(qrcode_window)  # Add the window to the list to keep a reference
+                
+                # Calculate the displayed dimensions
+                displayed_width = img_shape[1] * scale_factor
+                displayed_height = img_shape[0] * scale_factor  # Fixed the height calculation to use img_shape[0]
+                
+                # Get the bounding box of the QR code
+                min_x = min(point.x for point in box.polygon)
+                max_x = max(point.x for point in box.polygon)
+                min_y = min(point.y for point in box.polygon)
+                max_y = max(point.y for point in box.polygon)
+                
+                # Calculate the center of the QR code
+                center_x = (min_x + max_x) / 2
+                center_y = (min_y + max_y) / 2
+                
+                pos_x = int(parent_rect.left() + (parent_rect.width() - displayed_width) // 2 + (center_x * scale_factor) - 25)  # Center the text horizontally
+                pos_y = int(parent_rect.top() + (parent_rect.height() - displayed_height) // 2 + (center_y * scale_factor) - 10)  # Center the text vertically
+                print(displayed_width, displayed_height)
+                
+                qrcode_window.setGeometry(pos_x, pos_y, 50, 20)  # Adjust the size as needed
+                qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
+                
+                qrcode_window.show()
+
+
+    def closeAllQRCodes(self):
+        for window in self.qrcode_windows:
+            window.close()
+        self.qrcode_windows = []  # Clear the list after closing all windows
+
          
         
     def convert_cv_image_to_qpixmap(self, cv_image):
@@ -1068,13 +1092,11 @@ class ImageViewer(QWidget):
     def revert(self):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
-            if hasattr(self,'exposureImg'):
-                    delattr(self,'exposureImg')
-        self.exposure_slider.setValue(100)
-        self.exposure_slider.setVisible(False)
         self.edit_history=[]
         self.show_image()
-    
+    def purge(self):
+        self.closeAllQRCodes()
+        
     def save_image(self):
         if hasattr(self, 'edited_image'):
             msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
@@ -1180,8 +1202,10 @@ class ImageViewer(QWidget):
     
     def closeEvent(self, event):
         # Override the closeEvent method to handle the window close event
+        self.purge()
         self.finishedSignal.emit()
         event.accept()
+        
 
 
 
@@ -1641,15 +1665,12 @@ class ImageThumbnailWidget(QWidget):
     viewerSavedSig=pyqtSignal(dict)
     viewerDeletedSig=pyqtSignal(dict)
     selectedSig=pyqtSignal(int)
-    def __init__(self, image_path, image_files):
+    def __init__(self, image_path, image_files,config_data):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
-        with open('config.yaml', 'r') as file:
-            self.config_data = yaml.safe_load(file)
-            
-        with open('config.yaml', 'r') as file:
-            self.config_data = yaml.safe_load(file)
+        
+        self.config_data=config_data
         self.image_path = image_path
         self.image_files = image_files
         self.right_clicked=False
@@ -1746,7 +1767,10 @@ class ImageGalleryApp(QMainWindow):
         self.loaded_count =   0  
         self.scrollbar_threshold =   20  # Scrollbar threshold for loading thumbnails
         self.selected_indices=[]
+        st=time.time()
         self.init_ui()
+        et=time.time()
+        print(f'loading time: {et-st}')
     
     def init_ui(self):
         central_widget = QWidget()
@@ -1760,7 +1784,7 @@ class ImageGalleryApp(QMainWindow):
         
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data)
             #thumbnail_widget.thumbnailClicked.connect(self.hide)
             thumbnail_widget.viewerClosedSig.connect(self.showGallery)
             thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
@@ -1830,7 +1854,7 @@ class ImageGalleryApp(QMainWindow):
             self.layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  
             #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files)
+            nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files,self.config_data)
             nthumbnail_widget.load_thumbnail()
             nthumbnail_widget.thumbnailClicked.connect(self.hide)
             nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
@@ -1838,7 +1862,7 @@ class ImageGalleryApp(QMainWindow):
             nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         if choice=='copy':
             #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files)
+            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files,self.config_data)
             nthumbnail_widget.load_thumbnail()
             self.image_files.insert(self.edited_index,file_name)
             nthumbnail_widget.thumbnailClicked.connect(self.hide)
@@ -1953,6 +1977,7 @@ if __name__ == '__main__':
     gui_process = multiprocessing.Process(target=run_gui)
     inference_process = multiprocessing.Process(target=run_inference_model)
 
+    
     gui_process.start()
     inference_process.start()
 
