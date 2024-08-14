@@ -1056,9 +1056,10 @@ class ImageViewer(QWidget):
 
 
     def closeAllQRCodes(self):
-        for window in self.qrcode_windows:
-            window.close()
-        self.qrcode_windows = []  # Clear the list after closing all windows
+        if hasattr(self,'qrcode_windows'):
+            for window in self.qrcode_windows:
+                window.close()
+            self.qrcode_windows = []  
 
          
         
@@ -1190,11 +1191,14 @@ class ImageViewer(QWidget):
                     command_run.append(dir_path)
                 
                 subprocess.run(command_run, check=True)
+                print(1)
                 return True
             except subprocess.CalledProcessError:
+                print(2)
                 continue
 
         # If none of the commands were successful
+        print(3)
         return False
 
 
@@ -1819,11 +1823,13 @@ class ImageGalleryApp(QMainWindow):
 
     def update_thumbnails(self):
         self.scroll_value = self.scroll.value()
-        if self.scroll_value >= self.scrollbar_threshold or self.loaded_count<len(self.image_files):
+        if self.scroll_value >= self.scrollbar_threshold:
             for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
-                self.thumbnail_widgets[self.loaded_count].load_thumbnail()
-                self.loaded_count +=   1
-            self.scrollbar_threshold += self.scrollbar_threshold
+                if self.loaded_count < len(self.image_files):  # Load only if there's more to load
+                    self.thumbnail_widgets[self.loaded_count].load_thumbnail()
+                    self.loaded_count += 1
+            self.scrollbar_threshold += 20  # Adjust the threshold by a fixed amount
+
             
     def showGallery(self):
         self.show()
