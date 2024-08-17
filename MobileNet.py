@@ -8,7 +8,7 @@ import pandas as pd
 from core import *
 class Model:
     def __init__(self):
-        self.core=Core()
+        self.images_model=ImagesModel()
         self.savedModel = keras.models.load_model("ogalleryv2.h5")
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
@@ -56,7 +56,7 @@ class Model:
     def predictAndSave(self):
         
         
-        batch_results = self.predict_batch(self.core.getImagesPaths())
+        batch_results = self.predict_batch(self.images_model.getImagesPaths())
         
         if batch_results==0:
             return 0

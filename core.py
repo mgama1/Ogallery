@@ -1,6 +1,6 @@
 import os
 import glob
-class Core():
+class ImagesModel():
     def __init__(self):
         self.file_types=['jpg','jpeg','png','gif']
     
@@ -19,3 +19,4 @@ class Core():
         image_files.sort(key=lambda x: os.path.getmtime(x),reverse=True)
         
         return image_files
+    

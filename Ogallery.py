@@ -213,13 +213,13 @@ class MainWidget(QWidget):
         if self.selectImages():
                 
             if self.result:
-                core=Core()
+                images_model=ImagesModel()
                 self.image_gallery=ImageGalleryApp(self.result)
                 self.image_gallery.show()
                 
     def openGallery(self):
-        core=Core()
-        self.image_gallery=ImageGalleryApp(core.getImagesPaths())
+        images_model=ImagesModel()
+        self.image_gallery=ImageGalleryApp(images_model.getImagesPaths())
         self.image_gallery.show()
     def showMainWidget(self):
         """
