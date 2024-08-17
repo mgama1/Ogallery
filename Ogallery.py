@@ -381,7 +381,7 @@ class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
     savedSignal=pyqtSignal(dict)
     deletedSignal=pyqtSignal(dict)
-    def __init__(self, result,current_index=0):
+    def __init__(self, image_files,current_index=0):
         super().__init__()
         self.NAVBUTTONWIDTH=60
         with open('config.yaml', 'r') as file:
@@ -391,7 +391,7 @@ class ImageViewer(QWidget):
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
-        self.result = result
+        self.image_files = image_files
         self.edit_history=[]
         self.fullscreen = False
         
@@ -621,7 +621,7 @@ class ImageViewer(QWidget):
       
 
     def load_images(self):
-        self.file_list = self.result
+        self.file_list = self.image_files
         
     def show_image(self):
         if self.file_list:
@@ -1128,6 +1128,7 @@ class ImageViewer(QWidget):
             self.show_image()
             
             time.sleep(.1)
+            #print(f"ImageViewer deletedsignal:{deleted}")
             self.deletedSignal.emit(deleted)
             
             #db=pd.read_csv("db.csv")
@@ -1754,6 +1755,7 @@ class ImageThumbnailWidget(QWidget):
         self.viewerSavedSig.emit(saved)
         
     def viewerDeleted(self,deleted):
+        print(f"i can see {deleted} in ImageThumbnailWidget ")
         self.viewerDeletedSig.emit(deleted)
         
         
@@ -1842,7 +1844,7 @@ class ImageGalleryApp(QMainWindow):
         self.savedData=saved
         
     def getDeletedData(self, deleted):
-        print(deleted)
+        print(f"recieved deleted signal: {deleted}")
         self.removeThumbnail(deleted["index"])
         
     
