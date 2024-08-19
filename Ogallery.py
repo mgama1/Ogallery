@@ -1831,13 +1831,7 @@ class ImageGalleryApp(QMainWindow):
                     self.loaded_count += 1
             self.scrollbar_threshold += 20  # Adjust the threshold by a fixed amount
 
-            
-    def showGallery(self):
-        self.show()
-        if hasattr(self,'savedData'):
-            self.updateThumbnail(self.savedData)
-            delattr(self,'savedData')
-            
+    
        
    
    
