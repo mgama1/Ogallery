@@ -1813,9 +1813,9 @@ class ImageGalleryApp(QMainWindow):
         for index, image_file in enumerate(self.image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data,self.main_widget)
             #thumbnail_widget.thumbnailClicked.connect(self.hide)
-            thumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
-            thumbnail_widget.viewerDeletedSig.connect(self.getDeletedData)
+            #thumbnail_widget.viewerClosedSig.connect(self.showGallery)
+            #thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            #thumbnail_widget.viewerDeletedSig.connect(self.getDeletedData)
             thumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
             self.layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
@@ -1885,18 +1885,18 @@ class ImageGalleryApp(QMainWindow):
             #reload the thumbnail widget from disk
             nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files,self.config_data)
             nthumbnail_widget.load_thumbnail()
-            nthumbnail_widget.thumbnailClicked.connect(self.hide)
-            nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            #nthumbnail_widget.thumbnailClicked.connect(self.hide)
+            #nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
+            #nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
             nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         if choice=='copy':
             #reload the thumbnail widget from disk
             nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files,self.config_data)
             nthumbnail_widget.load_thumbnail()
             self.image_files.insert(self.edited_index,file_name)
-            nthumbnail_widget.thumbnailClicked.connect(self.hide)
-            nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            #nthumbnail_widget.thumbnailClicked.connect(self.hide)
+            #nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
+            #nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
             nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         else:
             pass
