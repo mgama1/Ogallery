@@ -35,13 +35,17 @@ from MobileNet import Model
 
 
 class MainWidget(QWidget):
-    def __init__(self):
+    def __init__(self,init_ui=True):
         super().__init__()
+
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
+
+        
+
         self.init_ui()
 
-
+        
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 750, 500)
@@ -214,13 +218,26 @@ class MainWidget(QWidget):
                 
             if self.result:
                 images_model=ImagesModel()
-                self.image_gallery=ImageGalleryApp(self.result)
+                self.images=self.result
+                self.image_gallery=ImageGalleryApp(self)
                 self.image_gallery.show()
                 
     def openGallery(self):
         images_model=ImagesModel()
-        self.image_gallery=ImageGalleryApp(images_model.getImagesPaths())
+        self.images=images_model.getImagesPaths()
+        self.image_gallery=ImageGalleryApp(self)
         self.image_gallery.show()
+    
+    
+    def openViewer(self,image_path):
+        
+        
+        ImageViewer(self.images, current_index=self.images.index(image_path))
+
+    
+    
+    
+    
     def showMainWidget(self):
         """
         Show the main widget when the ImageViewer is closed
@@ -232,6 +249,8 @@ class MainWidget(QWidget):
         self.show()
         
     
+
+
     def map_arabic_to_english(self,input_string):
         '''
         Maps Arabic characters to english characters if any exists
@@ -1670,7 +1689,7 @@ class ImageThumbnailWidget(QWidget):
     viewerSavedSig=pyqtSignal(dict)
     viewerDeletedSig=pyqtSignal(dict)
     selectedSig=pyqtSignal(int)
-    def __init__(self, image_path, image_files,config_data):
+    def __init__(self, image_path, image_files,config_data,main_widget):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
@@ -1679,7 +1698,8 @@ class ImageThumbnailWidget(QWidget):
         self.image_path = image_path
         self.image_files = image_files
         self.right_clicked=False
-        
+        self.main_widget = main_widget  # Keep a reference to MainWidget
+
         self.init_ui()
         
     def init_ui(self):
@@ -1729,11 +1749,8 @@ class ImageThumbnailWidget(QWidget):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.setStyleSheet(f"background-color: {self.config_data['royal_blue']};")
-            self.viewer = ImageViewer(self.image_files, current_index=self.image_files.index(self.image_path))
-            self.viewer.finishedSignal.connect(self.viewerClosed)
-            self.viewer.savedSignal.connect(self.viewerSaved)
-            self.viewer.deletedSignal.connect(self.viewerDeleted)
-            self.thumbnailClicked.emit()
+            
+            self.main_widget.openViewer(self.image_path)
     
         if event.button() == Qt.RightButton:
             
@@ -1760,12 +1777,13 @@ class ImageThumbnailWidget(QWidget):
         
         
 class ImageGalleryApp(QMainWindow):
-    def __init__(self, image_files):
+    def __init__(self,main_widget):
         super().__init__()
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
-            
-        self.image_files = image_files
+
+        self.main_widget = main_widget  # Keep a reference to MainWidget 
+        self.image_files = self.main_widget.images
         self.thumbnail_widgets = []  # To store references to thumbnail widgets
         self.scroll_value =   0 # Initialize scroll_value
         self.initial_batch=12
@@ -1790,7 +1808,7 @@ class ImageGalleryApp(QMainWindow):
         
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data,self.main_widget)
             #thumbnail_widget.thumbnailClicked.connect(self.hide)
             thumbnail_widget.viewerClosedSig.connect(self.showGallery)
             thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
