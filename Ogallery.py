@@ -237,7 +237,8 @@ class MainWidget(QWidget):
     def imageViewerDeleted(self,index):
         self.image_gallery.removeThumbnail(index)
     
-    
+    def imageViewerSaved(self,saved_dic):
+        self.image_gallery.updateThumbnail(saved_dic)
     
     def showMainWidget(self):
         """
@@ -399,8 +400,6 @@ class MainWidget(QWidget):
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    savedSignal=pyqtSignal(dict)
-    deletedSignal=pyqtSignal(dict)
     def __init__(self,main_widget,image_path):
         super().__init__()
         self.main_widget = main_widget  # Keep a reference to MainWidget
@@ -1129,8 +1128,7 @@ class ImageViewer(QWidget):
             choice = msg_box.get_choice()
             file_name=msg_box.getFileName()
             saved={'index':self.current_index,'choice':choice,'file_name':file_name}
-            time.sleep(.1)
-            self.savedSignal.emit(saved)
+            self.main_widget.imageViewerSaved(saved)
             
         else:
             self.showErrorMessage("no changes were made!")
@@ -1145,13 +1143,10 @@ class ImageViewer(QWidget):
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
-            deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
+            #deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
             self.file_list.pop(self.current_index)
             self.show_image()
             
-            time.sleep(.1)
-            #print(f"ImageViewer deletedsignal:{deleted}")
-            self.deletedSignal.emit(deleted)
             self.main_widget.imageViewerDeleted(self.current_index)
             #db=pd.read_csv("db.csv")
             #if file_name in db["directory"].values:
@@ -1687,10 +1682,6 @@ class Menu(QObject):
 
 
 class ImageThumbnailWidget(QWidget):
-    thumbnailClicked = pyqtSignal()
-    viewerClosedSig = pyqtSignal()
-    viewerSavedSig=pyqtSignal(dict)
-    viewerDeletedSig=pyqtSignal(dict)
     selectedSig=pyqtSignal(int)
     def __init__(self, image_path, image_files,config_data,main_widget):
         super().__init__()
@@ -1763,20 +1754,11 @@ class ImageThumbnailWidget(QWidget):
                 self.right_clicked = True
             colors=[self.config_data['background'],'#3f5b63']
             self.setStyleSheet(f"background-color: {colors[self.right_clicked]};")
-            #print(self.image_files.index(self.image_path))
             self.selectedSig.emit(self.image_files.index(self.image_path))
     
 
     
-    def viewerClosed(self):
-        self.viewerClosedSig.emit()
-        
-    def viewerSaved(self,saved):
-        self.viewerSavedSig.emit(saved)
-        
-    def viewerDeleted(self,deleted):
-        print(f"i can see {deleted} in ImageThumbnailWidget ")
-        self.viewerDeletedSig.emit(deleted)
+    
         
         
 class ImageGalleryApp(QMainWindow):
@@ -1812,10 +1794,6 @@ class ImageGalleryApp(QMainWindow):
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
             thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data,self.main_widget)
-            #thumbnail_widget.thumbnailClicked.connect(self.hide)
-            #thumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            #thumbnail_widget.viewerSavedSig.connect(self.getSavedData)
-            #thumbnail_widget.viewerDeletedSig.connect(self.getDeletedData)
             thumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
             self.layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
@@ -1861,13 +1839,8 @@ class ImageGalleryApp(QMainWindow):
             delattr(self,'savedData')
             
        
-    def getSavedData(self, saved):
-        self.savedData=saved
-        
-    def getDeletedData(self, deleted):
-        print(f"recieved deleted signal: {deleted}")
-        self.removeThumbnail(deleted["index"])
-        
+   
+   
     
 
         
@@ -1883,20 +1856,16 @@ class ImageGalleryApp(QMainWindow):
             self.layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  
             #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files,self.config_data)
+            nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files,self.config_data,self.main_widget)
             nthumbnail_widget.load_thumbnail()
-            #nthumbnail_widget.thumbnailClicked.connect(self.hide)
-            #nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            #nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            
             nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         if choice=='copy':
             #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files,self.config_data)
+            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files,self.config_data,self.main_widget)
             nthumbnail_widget.load_thumbnail()
             self.image_files.insert(self.edited_index,file_name)
-            #nthumbnail_widget.thumbnailClicked.connect(self.hide)
-            #nthumbnail_widget.viewerClosedSig.connect(self.showGallery)
-            #nthumbnail_widget.viewerSavedSig.connect(self.getSavedData)
+            
             nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
         else:
             pass
