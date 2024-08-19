@@ -232,9 +232,10 @@ class MainWidget(QWidget):
     def openViewer(self,image_path):
         
         
-        ImageViewer(self.images, current_index=self.images.index(image_path))
+        ImageViewer(self,image_path)
 
-    
+    def imageViewerDeleted(self,index):
+        self.image_gallery.removeThumbnail(index)
     
     
     
@@ -400,17 +401,19 @@ class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
     savedSignal=pyqtSignal(dict)
     deletedSignal=pyqtSignal(dict)
-    def __init__(self, image_files,current_index=0):
+    def __init__(self,main_widget,image_path):
         super().__init__()
+        self.main_widget = main_widget  # Keep a reference to MainWidget
         self.NAVBUTTONWIDTH=60
         with open('config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.file_list = []
-        self.current_index = current_index
+        self.current_index = main_widget.images.index(image_path)
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
         self.screen_height = self.primary_screen.height()
-        self.image_files = image_files
+        self.image_files = self.main_widget.images
+
         self.edit_history=[]
         self.fullscreen = False
         
@@ -1149,7 +1152,7 @@ class ImageViewer(QWidget):
             time.sleep(.1)
             #print(f"ImageViewer deletedsignal:{deleted}")
             self.deletedSignal.emit(deleted)
-            
+            self.main_widget.imageViewerDeleted(self.current_index)
             #db=pd.read_csv("db.csv")
             #if file_name in db["directory"].values:
             #    db=db[db["directory"]!=file_name]
