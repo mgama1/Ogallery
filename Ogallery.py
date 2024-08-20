@@ -475,7 +475,6 @@ class ImageViewer(QWidget):
         header_layout.addStretch(1)
         header_layout.addWidget(self.show_containing_folder_button)
         
-        self.sharpen_button = QPushButton()
         self.gray_button = QPushButton()
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
@@ -497,7 +496,6 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.setIcon(qta.icon('mdi.blur',color='white'))
         self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
         self.scan_qrc_button.setIcon(qta.icon('mdi6.qrcode-scan',color='white'))
-        self.sharpen_button.setIcon(qta.icon('mdi.details',color='white'))
         self.set_exposure_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
         self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
         self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
@@ -513,7 +511,6 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.setToolTip('Blur')
         self.blur_background_button.setToolTip('Portrait')
         self.flip_button.setToolTip('Right click to flip vertically')
-        self.sharpen_button.setToolTip('Sharpen')
         self.set_exposure_button.setToolTip('adjust')
         self.show_containing_folder_button.setToolTip('Show containing folder')
         
@@ -525,7 +522,7 @@ class ImageViewer(QWidget):
         self.exposure_slider.hide()
         
         
-        self.editing_buttons=[ self.scan_qrc_button ,self.set_exposure_button ,self.sharpen_button,self.gray_button,
+        self.editing_buttons=[ self.scan_qrc_button ,self.set_exposure_button ,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
@@ -551,7 +548,6 @@ class ImageViewer(QWidget):
 
         # Connect button signals to their respective functions
         
-        self.sharpen_button.clicked.connect(self.sharpen_image)
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
@@ -827,22 +823,7 @@ class ImageViewer(QWidget):
         clipboard.setPixmap(QPixmap(image_path))
         
         
-        
-        
-        
-        
-    def sharpen_image(self):
-            if hasattr(self, 'edited_image'):
-                img=self.edited_image
-            else :
-                image_path = self.file_list[self.current_index]
-                img = cv2.imread(image_path)
-            
-            gaussian_blurred=cv2.GaussianBlur(img,(5,5),1)
-            sharpened=cv2.addWeighted(img,1.5,gaussian_blurred,-.5,0)
-            self.edited_image=sharpened
-            self.edit_history.append(self.edited_image)
-            self.show_edited_image()
+    
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
