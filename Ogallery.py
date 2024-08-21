@@ -1864,14 +1864,8 @@ class ImageGalleryApp(QMainWindow):
                     indices_to_delete.append(e)
             self.selected_indices = []
             return indices_to_delete
-        
-    def removeThumbnail(self, thumbnail_index):
-        # Sort indices in reverse order to avoid index shifting issues
-        thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
-        #self.image_files.pop(thumbnail_index)
-        self.layout.removeWidget(thumbnail_widget)
-        thumbnail_widget.deleteLater()  # Delete the widget to free up resources
 
+    def refreshLayout(self):
         # Clear the layout
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
@@ -1884,6 +1878,13 @@ class ImageGalleryApp(QMainWindow):
             if col == 3:
                 col = 0
                 row += 1
+
+    def removeThumbnail(self, thumbnail_index):
+        thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
+        self.layout.removeWidget(thumbnail_widget)
+        thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+
+        self.refreshLayout()
     
 
     def removeThumbnails(self, thumbnails_indices_list):
@@ -1896,19 +1897,7 @@ class ImageGalleryApp(QMainWindow):
             self.layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  # Delete the widget to free up resources
     
-        # Clear the layout
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
-    
-        # Re-add remaining thumbnails to the layout
-        row, col = 0, 0
-        for i, widget in enumerate(self.thumbnail_widgets):
-            self.layout.addWidget(widget, row, col)
-            col += 1
-            if col == 3:
-                col = 0
-                row += 1
-
+        self.refreshLayout()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
