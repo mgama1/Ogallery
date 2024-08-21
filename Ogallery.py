@@ -1025,7 +1025,6 @@ class ImageViewer(QWidget):
         
         for box in decoded_list:
             decoded = box[0]
-            print(decoded)
             rpos_x, rpos_y = box.polygon[1]
             
             decoded_text = box.data.decode()
@@ -1049,7 +1048,6 @@ class ImageViewer(QWidget):
                 
                 pos_x = int(parent_rect.left() + (parent_rect.width() - displayed_width) // 2 + (center_x * scale_factor) - 25)  # Center the text horizontally
                 pos_y = int(parent_rect.top() + (parent_rect.height() - displayed_height) // 2 + (center_y * scale_factor) - 10)  # Center the text vertically
-                print(displayed_width, displayed_height)
                 
                 qrcode_window.setGeometry(pos_x, pos_y, 50, 20)  # Adjust the size as needed
                 qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
@@ -1190,14 +1188,11 @@ class ImageViewer(QWidget):
                     command_run.append(dir_path)
                 
                 subprocess.run(command_run, check=True)
-                print(1)
                 return True
             except subprocess.CalledProcessError:
-                print(2)
                 continue
 
         # If none of the commands were successful
-        print(3)
         return False
 
 
@@ -1790,7 +1785,7 @@ class ImageGalleryApp(QMainWindow):
         self.setCentralWidget(scroll_area)
         
         self.scroll = scroll_area.verticalScrollBar()
-        self.scroll.valueChanged.connect(self.update_thumbnails)
+        self.scroll.valueChanged.connect(self.loadNextBatch)
         
 
         self.setGeometry(300, 100, 800, 650)
@@ -1803,7 +1798,7 @@ class ImageGalleryApp(QMainWindow):
             self.thumbnail_widgets[self.loaded_count].load_thumbnail()
             self.loaded_count += 1
 
-    def update_thumbnails(self):
+    def loadNextBatch(self):
         self.scroll_value = self.scroll.value()
         if self.scroll_value >= self.scrollbar_threshold:
             for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
@@ -1812,13 +1807,7 @@ class ImageGalleryApp(QMainWindow):
                     self.loaded_count += 1
             self.scrollbar_threshold += 20  # Adjust the threshold by a fixed amount
 
-    
-       
-   
-   
-    
-
-        
+            
     def updateThumbnail(self, saved):
         self.edited_index=saved["index"]
         choice=saved["choice"]
@@ -1856,7 +1845,26 @@ class ImageGalleryApp(QMainWindow):
                 row += 1
 
 
-
+    def getIndicesToDelete(self):
+            '''
+            gets indices to delete which are only the odd numbers of indices recieved. as even counts means that
+            it was selected and unselected
+            Args:
+                None
+            returns:
+                indices to delete(list)
+            '''
+            count = {}
+            indices_to_delete = []
+            for e in self.selected_indices:
+                count[e] = count.get(e, 0) + 1
+                
+            for e in count:
+                if count[e] % 2 != 0:
+                    indices_to_delete.append(e)
+            self.selected_indices = []
+            return indices_to_delete
+        
     def removeThumbnail(self, thumbnail_index):
         # Sort indices in reverse order to avoid index shifting issues
         thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
@@ -1877,26 +1885,7 @@ class ImageGalleryApp(QMainWindow):
                 col = 0
                 row += 1
     
-        
-    def getIndicesToDelete(self):
-        '''
-        gets indices to delete which are only the odd numbers of indices recieved. as even counts means that
-        it was selected and unselected
-        Args:
-            None
-        returns:
-            indices to delete(list)
-        '''
-        count = {}
-        indices_to_delete = []
-        for e in self.selected_indices:
-            count[e] = count.get(e, 0) + 1
-            
-        for e in count:
-            if count[e] % 2 != 0:
-                indices_to_delete.append(e)
-        self.selected_indices = []
-        return indices_to_delete
+
     def removeThumbnails(self, thumbnails_indices_list):
         # Sort indices in reverse order to avoid index shifting issues
         thumbnails_indices_list.sort(reverse=True)
@@ -1919,14 +1908,11 @@ class ImageGalleryApp(QMainWindow):
             if col == 3:
                 col = 0
                 row += 1
-    
-        
+
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
             self.close()        
-        if event.key() == Qt.Key_M:
-            print(self.selected_indices)
 
         if event.key() == Qt.Key_Delete:
             self.removeThumbnails(self.getIndicesToDelete())
