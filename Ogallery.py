@@ -1357,6 +1357,11 @@ class Adjust(QWidget):
         self.saturation_slider.valueChanged.connect(self.update_saturation_offset)
         self.saturation_value_label = QLabel(str(self.saturation_slider.value()), self)
 
+
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.applyAdjustments)
+        
         layout = QVBoxLayout(self)
 
         contrast_layout = QHBoxLayout()
@@ -1397,10 +1402,12 @@ class Adjust(QWidget):
         self.saturation_slider.valueChanged.connect(self.update_saturation_value_label)
         self.hue_slider.valueChanged.connect(self.update_hue_value_label)
 
-        self.contrast_slider.valueChanged.connect(self.applyAdjustments)
-        self.brightness_slider.valueChanged.connect(self.applyAdjustments)
-        self.saturation_slider.valueChanged.connect(self.applyAdjustments)
-        self.hue_slider.valueChanged.connect(self.applyAdjustments)
+        #slow is smooth and smooth is fast. when applying every little change instantly it takes a lot of unneccessary resources
+        #which slows down the widget
+        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(100))
+        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(100))
+        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(100))
+        self.hue_slider.valueChanged.connect(lambda:self.timer.start(100))
 
     def applyAdjustments(self):
         self.parent().applyColorsTransformations(self.contrast_offset,self.brightness_offset,self.saturation_offset,self.hue_offset)
