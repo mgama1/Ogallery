@@ -1449,8 +1449,10 @@ class Adjust(QWidget):
         self.hue_slider.setValue(self.hue_offset)
         self.saturation_slider.setValue(self.saturation_offset)
         
-        
-        
+    
+    def keyPressEvent(self, event):
+            if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+                self.close()
 
         
 class CircularButton(QPushButton):
