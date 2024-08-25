@@ -1,0 +1,12 @@
+numpy==1.23.5
+pandas==2.1.4
+opencv-python==4.9.0.80
+Pillow==10.2.0
+rembg==2.0.56
+PyQt5==5.15.10
+qtawesome==1.2.2
+pyzbar==0.1.9
+Levenshtein==0.25.0
+tensorflow==2.12.0
+scikit-image==0.22.0
+PyYAML==6.0.1
