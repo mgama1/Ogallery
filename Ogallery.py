@@ -225,10 +225,12 @@ class MainWidget(QWidget):
     def openGallery(self):
         images_model=ImagesModel()
         self.images=images_model.getImagesPaths()
-        self.image_gallery=ImageGalleryApp(self)
-        self.image_gallery.show()
+        if self.images:
+            self.image_gallery=ImageGalleryApp(self)
+            self.image_gallery.show()
     
-    
+        else:
+            self.showErrorMessage("please setup the images directories")
     def openViewer(self,image_path):
         
         
