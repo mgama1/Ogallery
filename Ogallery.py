@@ -318,8 +318,12 @@ class MainWidget(QWidget):
             return 0
             
         db=pd.read_csv("db.csv")
-        
-        self.result=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+        self.result=[]
+        self.filtered=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+        for filePath in self.filtered:
+            if os.path.exists(filePath):
+                self.result.append(filePath)
+            #else:delete from db.csv
         return 1
     
     
