@@ -311,19 +311,27 @@ class MainWidget(QWidget):
 
     def selectImages(self):
         self.queryText=self.query_line.text()
+        if self.queryText=='':
+                    self.showErrorMessage("Forgetting something?")
+                    return 0
         self.queryText=self.map_arabic_to_english(self.queryText)
         self.queryText=self.suggestClasses(self.queryText)
         if self.queryText=='':
-            self.showErrorMessage("No images found")
+            self.showErrorMessage("no matches found!")
             return 0
             
         db=pd.read_csv("db.csv")
         self.result=[]
         self.filtered=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+        #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
+        #instead of continously checking and updating. we only check and update upon search
         for filePath in self.filtered:
             if os.path.exists(filePath):
                 self.result.append(filePath)
             #else:delete from db.csv
+        if len(self.result)<1:
+            self.showErrorMessage("no matches found!")
+            return 0
         return 1
     
     
