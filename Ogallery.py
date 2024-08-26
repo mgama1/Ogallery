@@ -1518,7 +1518,7 @@ class SettingsWidget(QWidget):
             "#60b67d",  
             "#c86923" ,
             "#c41d21",
-            "#212121",
+            "#c1c100",
         ]
         colors_layout.addStretch()
         self.colors_buttons = []
