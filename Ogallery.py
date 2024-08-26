@@ -500,7 +500,9 @@ class ImageViewer(QWidget):
         
         self.save_button = QPushButton()
         
-        #setting icons       
+        #setting icons
+        
+
         self.save_button.setIcon(qta.icon('fa5.save', color='white'))
         self.undo_button.setIcon(qta.icon('mdi.undo-variant', color='white'))
         self.rotate_button.setIcon(qta.icon('mdi.crop-rotate', color='white'))
@@ -1781,38 +1783,71 @@ class ImageGalleryApp(QMainWindow):
     def init_ui(self):
         central_widget = QWidget()
         self.setStyleSheet(f"background-color: {self.config_data['background']};")
+
+        # Create the main vertical layout
+        main_layout = QVBoxLayout()
+
+        # Create a scroll area for the grid layout
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_content = QWidget(scroll_area)
+        scroll_content = QWidget()
         scroll_area.setWidget(scroll_content)
-        self.layout = QGridLayout()
-        scroll_content.setLayout(self.layout)
-        
+
+        # Create the grid layout and add it to the scroll content
+        self.grid_layout = QGridLayout()
+        scroll_content.setLayout(self.grid_layout)
+
+        # Add thumbnails to the grid layout
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files,self.config_data,self.main_widget)
-            thumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
-            self.layout.addWidget(thumbnail_widget, row, col)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self.config_data, self.main_widget)
+            thumbnail_widget.selectedSig.connect(lambda selected_index: self.selected_indices.append(selected_index))
+            self.grid_layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 
-            
             
             col += 1
             if col == 3:
                 col = 0
                 row += 1
 
-        central_widget.setLayout(self.layout)
-        scroll_area.setWidget(central_widget)
-        self.setCentralWidget(scroll_area)
+        # Add the scroll area to the main layout
+        main_layout.addWidget(scroll_area)
+
+        # Create a horizontal layout for the button to center it
+        button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(0, 0, 0, 0)  # Set margins around the layout to zero
+        #button_layout.addStretch()  # Add stretchable space before the button
+        self.backToTopButton = QPushButton(self)
+        self.backToTopButton.setVisible(0)
+        self.visiblity_timer = QTimer()
+        self.visiblity_timer.setSingleShot(True)  
+        self.visiblity_timer.timeout.connect(lambda:self.backToTopButton.setVisible(False))
+        #ph.caret-up-fill
+        #
+        self.backToTopButton.setIcon(qta.icon('msc.chevron-up', color='white',scale_factor=2))
+        self.backToTopButton.setStyleSheet("margin: 0px; padding: 0px;border: none;")  # Remove margin and padding
+        #self.button.setFixedSize(20, 20)  # Set the button size to 50x50
+        button_layout.addWidget(self.backToTopButton)
+        #button_layout.addStretch()  # Add stretchable space after the button
+
+        # Create a widget to hold the button layout and add it to the main layout
+        button_widget = QWidget()
+        button_widget.setLayout(button_layout)
+        main_layout.addWidget(button_widget)  # Add the button at the bottom of the layout
+
+        central_widget.setLayout(main_layout)
+        self.setCentralWidget(central_widget)
         
+        # Connect the scrollbar value change event to load more thumbnails
         self.scroll = scroll_area.verticalScrollBar()
         self.scroll.valueChanged.connect(self.loadNextBatch)
-        
+        #go back to Top
+        self.backToTopButton.clicked.connect(lambda:self.scroll.setValue(0))
 
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
-        self.load_initial_batch()#
+        self.load_initial_batch()
         
     def load_initial_batch(self):
         for i in range(min(self.initial_batch,len(self.thumbnail_widgets))):
@@ -1820,6 +1855,9 @@ class ImageGalleryApp(QMainWindow):
             self.loaded_count += 1
 
     def loadNextBatch(self):
+        self.backToTopButton.setVisible(True)  # Show the button when scrolling
+        self.visiblity_timer.start(2000)  # Start a timer for x seconds to hide the button
+        
         self.scroll_value = self.scroll.value()
         if self.scroll_value >= self.scrollbar_threshold:
             for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
@@ -1927,7 +1965,8 @@ class ImageGalleryApp(QMainWindow):
         if event.key() == Qt.Key_Delete:
             self.removeThumbnails(self.getIndicesToDelete())
             
-        
+        if event.key() == Qt.Key_T:
+            self.scroll.setValue(0)
             
 def run_gui():
     app = QApplication([])    
