@@ -35,7 +35,7 @@ from MobileNet import Model
 
 
 class MainWidget(QWidget):
-    def __init__(self,init_ui=True):
+    def __init__(self):
         super().__init__()
 
         with open('config.yaml', 'r') as file:
