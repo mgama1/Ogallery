@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt,QTimer
 import yaml
 import time
+import os
 from imageThumbnail import ImageThumbnailWidget
 
 class ImageGalleryApp(QMainWindow):
