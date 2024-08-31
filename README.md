@@ -1,33 +1,24 @@
 # Ogallery
+![image](https://github.com/user-attachments/assets/50b261f9-c025-4c53-80aa-e6197499c0ef)
 
-## Quick demo
-![quickdemo](https://github.com/mgama1/Ogallery/assets/40968723/45aeccd1-16df-4ca1-8a0a-4b3801eeaf13)
+## Website
+https://mgama1.github.io/Ogallery/
 ### Viewer features:
  - fullscreen mode
  - show containing folder
  - copy to clipboard
  - move to trash
+ - QR-Code scan
    
 ### Editing features:
- - sharpen
  - grayscale
  - rotation
  - flipping
  - blur
  - portrait(blur background)
- - exposure
+ - Compare
+ - Adjust (Contrast, Brightness, Saturation, Hue)
 
-### Dependencies
-
-```bash
-
-
-pip install --upgrade pip
-pip3 install opencv-python
-pip install rembg
-pip install tensorflow==2.12.0
-pip install levenshtein
-```
 
 ## Meet jiffy
 ![jellyfish](https://github.com/mgama1/Ogallery/assets/40968723/28a3d604-f660-40a9-a918-221cfaa445d6)
