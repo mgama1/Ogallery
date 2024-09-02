@@ -13,7 +13,6 @@ from urllib.parse import urlparse
 from PIL.PngImagePlugin import PngInfo
 from PIL import Image
 import rembg
-from MobileNet import Model
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor,QDesktopServices
@@ -27,16 +26,16 @@ from core import *
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 from PyQt5.QtCore import pyqtSlot
-from imageGallery import ImageGalleryApp
-from imageThumbnail import ImageThumbnailWidget
-from MobileNet import Model
+from gallery.imageGallery import ImageGalleryApp
+from gallery.imageThumbnail import ImageThumbnailWidget
+from models.MobileNet import Model
 
 
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
 
         
@@ -50,7 +49,7 @@ class MainWidget(QWidget):
 
         
         #self.model=Model()
-        with open('classes_synonyms.yaml', 'r') as file:
+        with open('./config/classes_synonyms.yaml', 'r') as file:
             classes_synonyms = yaml.safe_load(file)
         # Flatten keys and values of model.classes_synonyms
         self.classes_plus = chain(classes_synonyms.keys(), classes_synonyms.values())
@@ -60,8 +59,7 @@ class MainWidget(QWidget):
 
         self.setWindowIcon(QIcon('media/iconc.ico'))
         
-        config_file_path = 'config.yaml'
-        
+        config_file_path = 'config/config.yaml'
         if not os.path.exists(config_file_path):
             with open(config_file_path, 'w') as file:
                 initial_data = {'style_color': '#8c40d4'}
@@ -416,7 +414,7 @@ class ImageViewer(QWidget):
         super().__init__()
         self.main_widget = main_widget  # Keep a reference to MainWidget
         self.NAVBUTTONWIDTH=60
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.file_list = []
         self.current_index = main_widget.images.index(image_path)
@@ -1254,7 +1252,7 @@ class InfoWidget(QWidget):
         this info widget is only for app description and information not error messages and what not
         '''
         super().__init__()
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;"
                           )
@@ -1487,7 +1485,7 @@ class SettingsWidget(QWidget):
     colorChanged=pyqtSignal(str)
     def __init__(self):
         super().__init__()
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
             
         self.init_ui()
@@ -1556,7 +1554,7 @@ class SettingsWidget(QWidget):
         self.setLayout(layout)
 
     def setStyleColor(self,color):
-        config_file_path = 'config.yaml'
+        config_file_path = 'config/config.yaml'
         with open(config_file_path, 'r') as file:
             self.config_data = yaml.safe_load(file)
             
@@ -1635,7 +1633,7 @@ class Menu(QObject):
     def __init__(self, file_list, current_index, graphics_view):
         super().__init__()
         self.opened_menu = None
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.file_list = file_list
         self.current_index = current_index

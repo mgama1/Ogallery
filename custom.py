@@ -12,7 +12,7 @@ import cv2
 class SavingMessageBox(QMessageBox):
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
 
         self.image_path=image_path
@@ -44,7 +44,8 @@ class SavingMessageBox(QMessageBox):
     def handle_copy(self):
         self.choice = "copy"
         mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-        self.file_name=f"{os.path.splitext(self.image_path)[0]}_{mod_time}.jpg"
+        path = os.path.splitext(self.image_path)
+        self.file_name=f"{path[0]}_{mod_time}{path[-1]}"
         cv2.imwrite(self.file_name,self.edited_image)
         
     def get_choice(self):
@@ -57,7 +58,7 @@ class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
         try:
-            with open('config.yaml', 'r') as file:
+            with open('config/config.yaml', 'r') as file:
                 self.config_data = yaml.safe_load(file)
             self.OK_button = QPushButton("OK")
             #self.OK_button.setFocusPolicy(Qt.NoFocus)
@@ -73,7 +74,7 @@ class SaveDiscardMessageBox(QMessageBox):
     revert_signal=pyqtSignal()
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.image_path=image_path
         self.edited_image=edited_image

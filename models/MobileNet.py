@@ -9,7 +9,8 @@ from core import *
 class Model:
     def __init__(self):
         self.images_model=ImagesModel()
-        self.savedModel = keras.models.load_model("ogalleryv2.h5")
+        model_path = os.path.join('models', 'ogalleryv2.h5')
+        self.savedModel = keras.models.load_model(model_path)
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
         #spaces before and after words are intentional to avoid retreiving unintentional substring 

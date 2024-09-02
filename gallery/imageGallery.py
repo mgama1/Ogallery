@@ -5,12 +5,12 @@ from PyQt5.QtCore import Qt,QTimer
 import yaml
 import time
 import os
-from imageThumbnail import ImageThumbnailWidget
+from .imageThumbnail import ImageThumbnailWidget
 
 class ImageGalleryApp(QMainWindow):
     def __init__(self,main_widget):
         super().__init__()
-        with open('config.yaml', 'r') as file:
+        with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
 
         self.main_widget = main_widget  # Keep a reference to MainWidget 

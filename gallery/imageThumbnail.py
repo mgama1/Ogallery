@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt,pyqtSignal
 from PIL import Image
 import os
 
-from Othumbnails import ThumbnailMaker
+from .Othumbnails import ThumbnailMaker
 
 class ImageThumbnailWidget(QWidget):
     selectedSig=pyqtSignal(int)
