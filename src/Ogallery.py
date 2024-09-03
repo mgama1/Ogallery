@@ -437,12 +437,7 @@ class ImageViewer(QWidget):
         self.setFocusPolicies()
         self.connectSignals()
         self.setStyles()
-        
-        
-        self.rightBrowse.enterEvent = self.on_enter_event
-        self.rightBrowse.leaveEvent = self.on_leave_event
-        self.leftBrowse.enterEvent = self.on_enter_event
-        self.leftBrowse.leaveEvent = self.on_leave_event
+        self.setupHoverEvents()
         
         self.set_transparency(0)
         self.show_image()
@@ -629,6 +624,13 @@ class ImageViewer(QWidget):
         self.rightBrowse.setStyleSheet(browsing_buttons_style)
 
         self.image_view.setStyleSheet("border: none;")
+    
+
+    def setupHoverEvents(self):
+        self.rightBrowse.enterEvent = self.on_enter_event
+        self.rightBrowse.leaveEvent = self.on_leave_event
+        self.leftBrowse.enterEvent = self.on_enter_event
+        self.leftBrowse.leaveEvent = self.on_leave_event
         
     def show_image(self):
         if self.image_files:
