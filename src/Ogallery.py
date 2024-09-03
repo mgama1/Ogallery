@@ -432,10 +432,6 @@ class ImageViewer(QWidget):
         self.setupMenu()
         self.setupButtons()
         self.setupLayout()
-        self.setIcons()        
-        self.setTooltips()
-        self.setFocusPolicies()
-        self.connectSignals()
         self.setStyles()
         self.setupHoverEvents()
         
@@ -466,31 +462,49 @@ class ImageViewer(QWidget):
         self.menu.show_folder.connect(self.show_containing_folder)
         self.image_view.installEventFilter(self.menu)
 
-    def setupButtons(self):
-        self.leftBrowse = QPushButton( self)
-        self.rightBrowse = QPushButton( self)
-        self.back_button = QPushButton('↩', self)
-        
+    def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
+        button = QPushButton(parent)
+        if icon_name is not None:
+            button.setIcon(qta.icon(icon_name, color='white'))
+        else:
+            button.setText(text)
+        button.setToolTip(tooltip_text)
+        button.clicked.connect(callback)
+        button.setFixedHeight(40)
+        button.setFocusPolicy(Qt.NoFocus)
+        return button
 
-        self.show_containing_folder_button=QPushButton()
-        self.gray_button = QPushButton()
-        self.gaussianBlur_button = QPushButton()
-        self.rotate_button = QPushButton()
-        self.flip_button=QPushButton()
-        self.adjust_button = QPushButton()
-        self.blur_background_button = QPushButton()
-        self.scan_qrc_button=QPushButton()
-        self.undo_button=QPushButton()
-        self.compare_button=QPushButton()
-        self.revert_button = QPushButton('Revert', self)
+    def setupButtons(self):
+        # Passing 'self' as the parent ensures these buttons are tied to the main window
+        self.leftBrowse = self.create_button('fa.angle-left', '', self.previous_image, parent=self)
+        self.rightBrowse = self.create_button('fa.angle-right', '', self.next_image, parent=self)
+        self.back_button = self.create_button(None, '', self.close, parent=self,text='↩')
         
-        self.save_button = QPushButton()
+        self.show_containing_folder_button = self.create_button('mdi.folder-search-outline', 'Show containing folder', self.show_containing_folder, parent=self)
+        self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
+        self.gaussianBlur_button = self.create_button('mdi.blur', 'Blur', self.gaussianBlur, parent=self)
+        self.rotate_button = self.create_button('mdi.crop-rotate', 'Rotate?', self.rotateCCW)
+        self.flip_button = self.create_button('mdi.reflect-horizontal', 'Right click to flip vertically', self.flipH, parent=self)
+        self.adjust_button = self.create_button('ei.adjust-alt', 'Adjust', self.adjust, parent=self)
+        self.blur_background_button = self.create_button('fa.user', 'Portrait', self.blurBackground, parent=self)
+        self.scan_qrc_button = self.create_button('mdi6.qrcode-scan', '', self.scanQRC, parent=self)
+        self.undo_button = self.create_button('mdi.undo-variant', 'Undo', self.undo, parent=self)
+        self.compare_button = self.create_button('mdi.select-compare', '', self.show_image, parent=self)
+        self.revert_button = self.create_button(None, 'Revert', self.revert, parent=self,text='revert')
+        self.save_button = self.create_button('fa5.save', '', self.save_image, parent=self)
+
+        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.flip_button.customContextMenuRequested.connect(self.flipV)
+        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
         self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         self.navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
+
+
 
 
     def setupLayout(self):
@@ -519,64 +533,6 @@ class ImageViewer(QWidget):
 
 
 
-    def setIcons(self):
-        
-        self.show_containing_folder_button.setIcon(qta.icon('mdi.folder-search-outline', color='white'))
-        self.save_button.setIcon(qta.icon('fa5.save', color='white'))
-        self.undo_button.setIcon(qta.icon('mdi.undo-variant', color='white'))
-        self.rotate_button.setIcon(qta.icon('mdi.crop-rotate', color='white'))
-        self.gray_button.setIcon(qta.icon('mdi.image-filter-black-white',color='white'))
-        self.gaussianBlur_button.setIcon(qta.icon('mdi.blur',color='white'))
-        self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
-        self.scan_qrc_button.setIcon(qta.icon('mdi6.qrcode-scan',color='white'))
-        self.adjust_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
-        self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
-        self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
-        self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
-        self.rightBrowse.setIcon(qta.icon('fa.angle-right',color=self.config_data['background']))
-
-
-    def setTooltips(self):
-        self.rotate_button.setToolTip('Rotate')
-        self.undo_button.setToolTip('Undo')
-        self.gray_button.setToolTip('Gray scale')
-        self.gaussianBlur_button.setToolTip('Blur')
-        self.blur_background_button.setToolTip('Portrait')
-        self.flip_button.setToolTip('Right click to flip vertically')
-        self.adjust_button.setToolTip('adjust')
-        self.show_containing_folder_button.setToolTip('Show containing folder')
-
-    def setFocusPolicies(self):
-
-        for button in self.editing_buttons+self.navigation_buttons:
-            button.setFocusPolicy(Qt.NoFocus)
-        
-        self.image_view.setFocusPolicy(Qt.NoFocus)
-
-    def connectSignals(self):
-
-        self.gray_button.clicked.connect(self.BGR2GRAY)
-        self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
-        self.rotate_button.clicked.connect(self.rotateCCW)
-        self.flip_button.clicked.connect(self.flipH)
-        self.adjust_button.clicked.connect(self.adjust)
-        self.save_button.clicked.connect(self.save_image)
-        self.back_button.clicked.connect(self.close)
-        self.blur_background_button.clicked.connect(self.blurBackground)
-        self.scan_qrc_button.clicked.connect(self.scanQRC)
-        self.undo_button.clicked.connect(self.undo)
-        self.revert_button.clicked.connect(self.revert)
-        self.leftBrowse.clicked.connect(self.previous_image)
-        self.rightBrowse.clicked.connect(self.next_image)
-        self.show_containing_folder_button.clicked.connect(self.show_containing_folder)
-        self.compare_button.pressed.connect(self.show_image)
-        self.compare_button.released.connect(self.show_edited_image)
-        
-        
-        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.flip_button.customContextMenuRequested.connect(self.flipV)
-        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
     def setStyles(self):
         self.setStyleSheet(f"background-color: {self.config_data['background']};")
