@@ -416,11 +416,7 @@ class ImageViewer(QWidget):
         self.NAVBUTTONWIDTH=60
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
-        self.image_files = []
         self.current_index = main_widget.images.index(image_path)
-        self.primary_screen = QDesktopWidget().screenGeometry()
-        self.screen_width = self.primary_screen.width()
-        self.screen_height = self.primary_screen.height()
         self.image_files = self.main_widget.images
 
         self.edit_history=[]
@@ -549,11 +545,8 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
         self.flip_button.clicked.connect(self.flipH)
-        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.flip_button.customContextMenuRequested.connect(self.flipV)
-        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
+        
         
         self.adjust_button.clicked.connect(self.adjust)
 
@@ -571,6 +564,11 @@ class ImageViewer(QWidget):
         self.compare_button.released.connect(self.show_edited_image)
         
         
+        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.flip_button.customContextMenuRequested.connect(self.flipV)
+        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
+
         ###############################
         
         self.rightBrowse.enterEvent = self.on_enter_event
@@ -724,7 +722,7 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_S :
             self.save_image()
             
-        if event.key()==Qt.Key_F:
+        if (event.key()==Qt.Key_F) or (event.key()==Qt.Key_F11):
             self.toggleFullScreen()
         
         if event.key()==Qt.Key_C:
