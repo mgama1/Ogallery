@@ -421,14 +421,16 @@ class ImageViewer(QWidget):
 
         self.edit_history=[]
         self.fullscreen = False
-        
+        #self.setMouseTracking(True)
+
         self.init_ui()
         
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(300, 100, 800, 550)
-        
+
+        #########image view
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
         self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -436,44 +438,27 @@ class ImageViewer(QWidget):
         
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
-        
+        QTimer.singleShot(0, self.handle_timeout)
+        self.image_view.wheelEvent = self.zoom_image
+        #############
+
+        ##### menu##########
         self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
         self.image_view.installEventFilter(self.menu)
-        
-        # this is to fix weird behaviour similar to stackoverflow Q #68182395
-        QTimer.singleShot(0, self.handle_timeout)
-        self.image_view.wheelEvent = self.zoom_image
+        ####################
 
         
-        self.setMouseTracking(True)
+        #### create buttons
 
-        # Main layout using QVBoxLayout
-        layout = QVBoxLayout(self)
-        Hlayout=QHBoxLayout()
-        header_layout=QHBoxLayout()
-        self.editing_buttons_layout = QHBoxLayout()
-
-       
         self.leftBrowse = QPushButton( self)
         self.rightBrowse = QPushButton( self)
         self.back_button = QPushButton('↩', self)
         
 
-        SCF_icon = qta.icon("mdi.folder-search-outline",color="white")  # Use the correct icon name here
-        
-        self.show_containing_folder_button=QPushButton(SCF_icon,'')
-        self.show_containing_folder_button.setIconSize(SCF_icon.actualSize(QSize(20,  20)))  # Set the size of the icon
-        Hlayout.addWidget(self.leftBrowse)
-        Hlayout.addWidget(self.image_view)
-        Hlayout.addWidget(self.rightBrowse)
-        header_layout.addWidget(self.back_button)
-
-        header_layout.addStretch(1)
-        header_layout.addWidget(self.show_containing_folder_button)
-        
+        self.show_containing_folder_button=QPushButton()
         self.gray_button = QPushButton()
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
@@ -486,10 +471,48 @@ class ImageViewer(QWidget):
         self.revert_button = QPushButton('Revert', self)
         
         self.save_button = QPushButton()
-        
-        #setting icons
-        
 
+        self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
+                self.gaussianBlur_button,self.rotate_button,self.flip_button,
+                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
+                ]
+        self.navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
+
+        
+        #############################################
+
+        
+        
+        # ##################### layout ##############
+        layout = QVBoxLayout(self)
+        Hlayout=QHBoxLayout()
+        header_layout=QHBoxLayout()
+        self.editing_buttons_layout = QHBoxLayout()
+        Hlayout.addWidget(self.leftBrowse)
+        Hlayout.addWidget(self.image_view)
+        Hlayout.addWidget(self.rightBrowse)
+        header_layout.addWidget(self.back_button)
+
+        header_layout.addStretch(1)
+        header_layout.addWidget(self.show_containing_folder_button)
+
+
+        for  button in self.editing_buttons:
+            button.setFixedHeight(40)
+
+            self.editing_buttons_layout.addWidget(button)
+   
+        layout.addLayout(header_layout)
+        layout.addLayout(Hlayout)
+        layout.addLayout(self.editing_buttons_layout)
+        self.setLayout(layout)
+        
+        #######################
+
+        
+        #################setting icons######################
+
+        self.show_containing_folder_button.setIcon(qta.icon('mdi.folder-search-outline', color='white'))
         self.save_button.setIcon(qta.icon('fa5.save', color='white'))
         self.undo_button.setIcon(qta.icon('mdi.undo-variant', color='white'))
         self.rotate_button.setIcon(qta.icon('mdi.crop-rotate', color='white'))
@@ -505,7 +528,7 @@ class ImageViewer(QWidget):
 
         
        
-        #tooltip
+        ########################tooltip####################################
         self.rotate_button.setToolTip('Rotate')
         self.undo_button.setToolTip('Undo')
         self.gray_button.setToolTip('Gray scale')
@@ -515,44 +538,28 @@ class ImageViewer(QWidget):
         self.adjust_button.setToolTip('adjust')
         self.show_containing_folder_button.setToolTip('Show containing folder')
         
+        ##################################################
         
-        self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
-                self.gaussianBlur_button,self.rotate_button,self.flip_button,
-                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
-                ]
-        navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
         
-        #setting focus policy for all buttons
-        for button in self.editing_buttons+navigation_buttons:
+        #########setting focus policy #############################
+        
+        for button in self.editing_buttons+self.navigation_buttons:
             button.setFocusPolicy(Qt.NoFocus)
-
         
         self.image_view.setFocusPolicy(Qt.NoFocus)
-        #adding editing buttons to th editing buttons layout2+++++++
-        for  button in self.editing_buttons:
-            button.setFixedHeight(40)
+        #################################################
+        
+        
 
-            self.editing_buttons_layout.addWidget(button)
-   
-        layout.addLayout(header_layout)
-        layout.addLayout(Hlayout)
-        layout.addLayout(self.editing_buttons_layout)
-        self.setLayout(layout)
-
-        # Connect button signals to their respective functions
+        # ####### signals connections##############
         
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
         self.flip_button.clicked.connect(self.flipH)
-
-        
-        
         self.adjust_button.clicked.connect(self.adjust)
-
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.close)
-
         self.blur_background_button.clicked.connect(self.blurBackground)
         self.scan_qrc_button.clicked.connect(self.scanQRC)
         self.undo_button.clicked.connect(self.undo)
@@ -569,14 +576,12 @@ class ImageViewer(QWidget):
         self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
         self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
-        ###############################
+        ####################################
         
-        self.rightBrowse.enterEvent = self.on_enter_event
-        self.rightBrowse.leaveEvent = self.on_leave_event
-        self.leftBrowse.enterEvent = self.on_enter_event
-        self.leftBrowse.leaveEvent = self.on_leave_event
-      
-        #Setting styles
+        
+
+        
+        ##################Setting styles#############################
         self.setStyleSheet(f"background-color: {self.config_data['background']};")
         border_color='#242424'
         
@@ -600,15 +605,15 @@ class ImageViewer(QWidget):
         
         
         
-        button_style=(
+        header_button_style=(
             "QPushButton {background-color: rgba(22, 22, 22, .5); \
             border: none; \
             color: white; \
             font-size: 16pt;} \
             QPushButton:hover {background-color: #2e2e2e;} "
         )
-        self.back_button.setStyleSheet(button_style)
-        self.show_containing_folder_button.setStyleSheet(button_style)
+        self.back_button.setStyleSheet(header_button_style)
+        self.show_containing_folder_button.setStyleSheet(header_button_style)
         
         self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
         self.show_containing_folder_button.setFixedSize(self.NAVBUTTONWIDTH,40)
@@ -624,6 +629,10 @@ class ImageViewer(QWidget):
         self.image_view.setStyleSheet("border: none;")
         
         
+        self.rightBrowse.enterEvent = self.on_enter_event
+        self.rightBrowse.leaveEvent = self.on_leave_event
+        self.leftBrowse.enterEvent = self.on_enter_event
+        self.leftBrowse.leaveEvent = self.on_leave_event
         
         self.set_transparency(0)
         self.show_image()
