@@ -416,7 +416,7 @@ class ImageViewer(QWidget):
         self.NAVBUTTONWIDTH=60
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
-        self.file_list = []
+        self.image_files = []
         self.current_index = main_widget.images.index(image_path)
         self.primary_screen = QDesktopWidget().screenGeometry()
         self.screen_width = self.primary_screen.width()
@@ -427,12 +427,7 @@ class ImageViewer(QWidget):
         self.fullscreen = False
         
         self.init_ui()
-        #self.menu = Menu(self.file_list,self.current_index)
         
-        
-        
-        
-        #self.installEventFilter(self.menu)
 
     def init_ui(self):
         self.setWindowTitle('Image Viewer')
@@ -446,7 +441,7 @@ class ImageViewer(QWidget):
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
         
-        self.menu = Menu(self.file_list, self.current_index, self.image_view)
+        self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
@@ -457,9 +452,7 @@ class ImageViewer(QWidget):
         self.image_view.wheelEvent = self.zoom_image
 
         
-        self.file_list = []
         self.setMouseTracking(True)
-        self.load_images()
 
         # Main layout using QVBoxLayout
         layout = QVBoxLayout(self)
@@ -635,17 +628,14 @@ class ImageViewer(QWidget):
         
         
         self.set_transparency(0)
-        self.load_images()
         self.show_image()
         self.show()
       
 
-    def load_images(self):
-        self.file_list = self.image_files
         
     def show_image(self):
-        if self.file_list:
-            image_path = self.file_list[self.current_index]
+        if self.image_files:
+            image_path = self.image_files[self.current_index]
             pixmap = QPixmap(image_path)
 
             # Clear the scene before adding a new item
@@ -691,8 +681,8 @@ class ImageViewer(QWidget):
 
         
     def handle_timeout(self):
-        if self.file_list:
-            image_path = self.file_list[self.current_index]
+        if self.image_files:
+            image_path = self.image_files[self.current_index]
             pixmap = QPixmap(image_path)
             pixmap_item = QGraphicsPixmapItem(pixmap)
 
@@ -774,21 +764,21 @@ class ImageViewer(QWidget):
         
     def next_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SaveDiscardMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
             msg_box.revert_signal.connect(self.revert)
             msg_box.exec_()
         
-        self.current_index = (self.current_index + 1) % len(self.file_list)
+        self.current_index = (self.current_index + 1) % len(self.image_files)
         self.purge()
         self.show_image()
 
     def previous_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SaveDiscardMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
             msg_box.revert_signal.connect(self.revert)
             msg_box.exec_()
             
-        self.current_index = (self.current_index - 1) % len(self.file_list)
+        self.current_index = (self.current_index - 1) % len(self.image_files)
         self.purge()
         self.show_image()
         
@@ -821,7 +811,7 @@ class ImageViewer(QWidget):
         
     
     def copyToClipboard(self):
-        image_path = self.file_list[self.current_index]
+        image_path = self.image_files[self.current_index]
         clipboard = QApplication.clipboard()
         clipboard.setPixmap(QPixmap(image_path))
         
@@ -831,7 +821,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
@@ -845,7 +835,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
@@ -858,7 +848,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
@@ -870,7 +860,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
@@ -882,7 +872,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         flipped_img=cv2.flip(img, 1)
@@ -894,7 +884,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         flipped_img=cv2.flip(img, 0)
@@ -951,7 +941,7 @@ class ImageViewer(QWidget):
         if self.edit_history:
             self.colors_transformation_image=self.edit_history[-1]
         else:   
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             self.colors_transformation_image = cv2.imread(image_path)
                 
         self.change_contrast(contrast_factor)
@@ -968,7 +958,7 @@ class ImageViewer(QWidget):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
-            image_path = self.file_list[self.current_index]
+            image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         mask = rembg.remove(img,only_mask=True)
         mask_3c=cv2.merge([mask,mask,mask])
@@ -984,11 +974,11 @@ class ImageViewer(QWidget):
         self.show_edited_image()
     
     def scanQRC(self):
-        decoded_list = decodeqr(Image.open(self.file_list[self.current_index]))
+        decoded_list = decodeqr(Image.open(self.image_files[self.current_index]))
         self.qrcode_windows = []  # Create a list to store all the QRCodeWindow instances
         
         parent_rect = self.geometry()
-        img_shape = cv2.imread(self.file_list[self.current_index]).shape
+        img_shape = cv2.imread(self.image_files[self.current_index]).shape
         scale_factor = self.image_view.transform().m11()
         
         for box in decoded_list:
@@ -1067,7 +1057,7 @@ class ImageViewer(QWidget):
         
     def save_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SavingMessageBox(self.file_list[self.current_index],self.edited_image)
+            msg_box = SavingMessageBox(self.image_files[self.current_index],self.edited_image)
             msg_box.exec_()
             delattr(self,'edited_image')
             self.edit_history=[]
@@ -1080,17 +1070,17 @@ class ImageViewer(QWidget):
             self.showErrorMessage("no changes were made!")
     
     def delete_image(self):
-        file_name=self.file_list[self.current_index]
+        file_name=self.image_files[self.current_index]
         if os.path.exists(file_name):
             
             try:
-                os.system(f"gio trash '{self.file_list[self.current_index]}'")
+                os.system(f"gio trash '{self.image_files[self.current_index]}'")
 
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
-            #deleted={'index':self.current_index,'file_name':self.file_list[self.current_index]}
-            self.file_list.pop(self.current_index)
+            #deleted={'index':self.current_index,'file_name':self.image_files[self.current_index]}
+            self.image_files.pop(self.current_index)
             self.show_image()
             
             self.main_widget.imageViewerDeleted(self.current_index)
@@ -1137,7 +1127,7 @@ class ImageViewer(QWidget):
     
 
     def show_containing_folder(self):
-        image_path=(self.file_list[self.current_index])
+        image_path=(self.image_files[self.current_index])
         dir_path=image_path[0:image_path.rfind('/')]
 
         commands = [
@@ -1579,19 +1569,17 @@ class SettingsWidget(QWidget):
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
             self.close()
         
-    
+
 class Menu(QObject):
     copy_signal = pyqtSignal()
     delete_signal = pyqtSignal()
     show_folder = pyqtSignal()
 
-    def __init__(self, file_list, current_index, graphics_view):
+    def __init__(self, graphics_view):
         super().__init__()
         self.opened_menu = None
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
-        self.file_list = file_list
-        self.current_index = current_index
         self.graphics_view = graphics_view
 
     def eventFilter(self, obj, event):
@@ -1643,7 +1631,7 @@ def run_gui():
     main_widget = MainWidget()
     app.exec_()
 
-    
+
 def run_inference_model():
     model=Model()
     model.predictAndSave()
