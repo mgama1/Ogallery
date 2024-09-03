@@ -489,7 +489,7 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button = QPushButton()
         self.rotate_button = QPushButton()
         self.flip_button=QPushButton()
-        self.set_exposure_button = QPushButton()
+        self.adjust_button = QPushButton()
         self.blur_background_button = QPushButton()
         self.scan_qrc_button=QPushButton()
         self.undo_button=QPushButton()
@@ -508,7 +508,7 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.setIcon(qta.icon('mdi.blur',color='white'))
         self.blur_background_button.setIcon(qta.icon('fa.user',color='white'))
         self.scan_qrc_button.setIcon(qta.icon('mdi6.qrcode-scan',color='white'))
-        self.set_exposure_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
+        self.adjust_button.setIcon(qta.icon('ei.adjust-alt',color='white'))
         self.flip_button.setIcon(qta.icon('mdi.reflect-horizontal',color='white'))
         self.compare_button.setIcon(qta.icon('mdi.select-compare',color='white'))
         self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
@@ -523,18 +523,11 @@ class ImageViewer(QWidget):
         self.gaussianBlur_button.setToolTip('Blur')
         self.blur_background_button.setToolTip('Portrait')
         self.flip_button.setToolTip('Right click to flip vertically')
-        self.set_exposure_button.setToolTip('adjust')
+        self.adjust_button.setToolTip('adjust')
         self.show_containing_folder_button.setToolTip('Show containing folder')
         
-        self.exposure_slider = QSlider(Qt.Horizontal)
-        self.exposure_slider.setMinimum(2)
-        self.exposure_slider.setMaximum(200)
-        self.exposure_slider.setValue(100)  
-        self.exposure_slider.valueChanged.connect(self.update_exposure)
-        self.exposure_slider.hide()
         
-        
-        self.editing_buttons=[ self.scan_qrc_button ,self.set_exposure_button ,self.gray_button,
+        self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
@@ -554,7 +547,6 @@ class ImageViewer(QWidget):
    
         layout.addLayout(header_layout)
         layout.addLayout(Hlayout)
-        #layout.addWidget(self.exposure_slider)
         layout.addLayout(self.editing_buttons_layout)
         self.setLayout(layout)
 
@@ -570,8 +562,7 @@ class ImageViewer(QWidget):
         self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
         
-        #self.set_exposure_button.clicked.connect(self.toggle_exposure_slider)
-        self.set_exposure_button.clicked.connect(self.adjust)
+        self.adjust_button.clicked.connect(self.adjust)
 
         self.save_button.clicked.connect(self.save_image)
         self.back_button.clicked.connect(self.close)
@@ -971,43 +962,8 @@ class ImageViewer(QWidget):
         #self.edit_history.append(self.edited_image)
         self.show_edited_image()
         
-    def toggle_exposure_slider(self):
-    # Toggle the visibility of the slider when the button is pressed
-        self.exposure_slider.setVisible(not self.exposure_slider.isVisible())
-        colors=['#1f1f1f','#00347d']
-        border_color='#242424'
-        exposure_button_style=f"QPushButton {{ background-color: {colors[self.exposure_slider.isVisible()]}; color: white;border-top: 2px solid {border_color};border-bottom: 2px solid {border_color};border-right: 2px solid {border_color}; border-left: 2px solid {border_color};}}"
-        self.set_exposure_button.setStyleSheet(exposure_button_style)
-       
+           
     
-    def update_exposure(self, gamma1e2):
-
-        
-        
-        if hasattr(self, 'exposureImg'):
-            if len(self.edit_history)==1:
-                img=self.edit_history[-1]
-                
-            if len(self.edit_history)>1:
-                self.edit_history.pop()
-                self.exposureImg=self.edit_history[-1]
-                img=self.exposureImg
-            
-        elif hasattr(self, 'edited_image'):
-            img=self.edited_image
-        else :
-            image_path = self.file_list[self.current_index]
-            img = cv2.imread(image_path)
-        gamma=gamma1e2/100
-        invGamma = 1.0 / gamma
-        table = np.array([((i / 255.0) ** invGamma) * 255
-            for i in np.arange(0, 256)]).astype("uint8")
-        self.exposureImg= cv2.LUT(img, table)
-        
-        self.edited_image=self.exposureImg
-        self.edit_history.append(self.edited_image)
-        self.show_edited_image()
-        
     def blurBackground(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -1097,8 +1053,7 @@ class ImageViewer(QWidget):
             if hasattr(self, 'edited_image'):
                 self.edit_history=[]
                 delattr(self,'edited_image')
-                if hasattr(self,'exposureImg'):
-                    delattr(self,'exposureImg')
+                
                 self.show_image()
             
             
@@ -1416,10 +1371,10 @@ class Adjust(QWidget):
 
         #slow is smooth and smooth is fast. when applying every little change instantly it takes a lot of unneccessary resources
         #which slows down the widget
-        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(100))
-        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(100))
-        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(100))
-        self.hue_slider.valueChanged.connect(lambda:self.timer.start(100))
+        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.hue_slider.valueChanged.connect(lambda:self.timer.start(0))
 
     def applyAdjustments(self):
         self.parent().applyColorsTransformations(self.contrast_offset,self.brightness_offset,self.saturation_offset,self.hue_offset)
