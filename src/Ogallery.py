@@ -427,10 +427,33 @@ class ImageViewer(QWidget):
         
 
     def init_ui(self):
+        self.setupWindow()
+        self.setupGraphicsView()
+        self.setupMenu()
+        self.setupButtons()
+        self.setupLayout()
+        self.setIcons()        
+        self.setTooltips()
+        self.setFocusPolicies()
+        self.connectSignals()
+        self.setStyles()
+        
+        
+        self.rightBrowse.enterEvent = self.on_enter_event
+        self.rightBrowse.leaveEvent = self.on_leave_event
+        self.leftBrowse.enterEvent = self.on_enter_event
+        self.leftBrowse.leaveEvent = self.on_leave_event
+        
+        self.set_transparency(0)
+        self.show_image()
+        self.show()
+      
+    def setupWindow(self):
         self.setWindowTitle('Image Viewer')
         self.setGeometry(300, 100, 800, 550)
 
-        #########image view
+        
+    def setupGraphicsView(self):
         self.image_view = QGraphicsView(self)
         self.image_view.setAlignment(Qt.AlignCenter)
         self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -440,19 +463,15 @@ class ImageViewer(QWidget):
         self.image_view.setScene(self.scene)
         QTimer.singleShot(0, self.handle_timeout)
         self.image_view.wheelEvent = self.zoom_image
-        #############
-
-        ##### menu##########
+    
+    def setupMenu(self):
         self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
         self.image_view.installEventFilter(self.menu)
-        ####################
 
-        
-        #### create buttons
-
+    def setupButtons(self):
         self.leftBrowse = QPushButton( self)
         self.rightBrowse = QPushButton( self)
         self.back_button = QPushButton('↩', self)
@@ -478,12 +497,8 @@ class ImageViewer(QWidget):
                 ]
         self.navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
 
-        
-        #############################################
 
-        
-        
-        # ##################### layout ##############
+    def setupLayout(self):
         layout = QVBoxLayout(self)
         Hlayout=QHBoxLayout()
         header_layout=QHBoxLayout()
@@ -506,12 +521,11 @@ class ImageViewer(QWidget):
         layout.addLayout(Hlayout)
         layout.addLayout(self.editing_buttons_layout)
         self.setLayout(layout)
-        
-        #######################
 
-        
-        #################setting icons######################
 
+
+    def setIcons(self):
+        
         self.show_containing_folder_button.setIcon(qta.icon('mdi.folder-search-outline', color='white'))
         self.save_button.setIcon(qta.icon('fa5.save', color='white'))
         self.undo_button.setIcon(qta.icon('mdi.undo-variant', color='white'))
@@ -526,9 +540,8 @@ class ImageViewer(QWidget):
         self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
         self.rightBrowse.setIcon(qta.icon('fa.angle-right',color=self.config_data['background']))
 
-        
-       
-        ########################tooltip####################################
+
+    def setTooltips(self):
         self.rotate_button.setToolTip('Rotate')
         self.undo_button.setToolTip('Undo')
         self.gray_button.setToolTip('Gray scale')
@@ -537,22 +550,16 @@ class ImageViewer(QWidget):
         self.flip_button.setToolTip('Right click to flip vertically')
         self.adjust_button.setToolTip('adjust')
         self.show_containing_folder_button.setToolTip('Show containing folder')
-        
-        ##################################################
-        
-        
-        #########setting focus policy #############################
-        
+
+    def setFocusPolicies(self):
+
         for button in self.editing_buttons+self.navigation_buttons:
             button.setFocusPolicy(Qt.NoFocus)
         
         self.image_view.setFocusPolicy(Qt.NoFocus)
-        #################################################
-        
-        
 
-        # ####### signals connections##############
-        
+    def connectSignals(self):
+
         self.gray_button.clicked.connect(self.BGR2GRAY)
         self.gaussianBlur_button.clicked.connect(self.gaussianBlur)
         self.rotate_button.clicked.connect(self.rotateCCW)
@@ -576,12 +583,7 @@ class ImageViewer(QWidget):
         self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
         self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
-        ####################################
-        
-        
-
-        
-        ##################Setting styles#############################
+    def setStyles(self):
         self.setStyleSheet(f"background-color: {self.config_data['background']};")
         border_color='#242424'
         
@@ -627,18 +629,6 @@ class ImageViewer(QWidget):
         self.rightBrowse.setStyleSheet(browsing_buttons_style)
 
         self.image_view.setStyleSheet("border: none;")
-        
-        
-        self.rightBrowse.enterEvent = self.on_enter_event
-        self.rightBrowse.leaveEvent = self.on_leave_event
-        self.leftBrowse.enterEvent = self.on_enter_event
-        self.leftBrowse.leaveEvent = self.on_leave_event
-        
-        self.set_transparency(0)
-        self.show_image()
-        self.show()
-      
-
         
     def show_image(self):
         if self.image_files:
