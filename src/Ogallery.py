@@ -23,7 +23,7 @@ from itertools import chain
 
 
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
-os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
+#os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
 
 from gallery.imageGallery import ImageGalleryApp
 from gallery.imageThumbnail import ImageThumbnailWidget
@@ -44,13 +44,13 @@ class MainWidget(QWidget):
 
         
         self.init_ui()
-        self.importInBackground()
-
-    def importInBackground(self):
-        thread = threading.Thread(target=self.importLibs)
+        self.import_data_in_background()
+    def import_data_in_background(self):
+        # Run the import in a separate thread
+        thread = threading.Thread(target=self.import_libraries)
         thread.start()
 
-    def importLibs(self):
+    def import_libraries(self):
         global np, pd, cv2,lev_distance
         import numpy as np
         import pandas as pd
@@ -474,7 +474,7 @@ class ImageViewer(QWidget):
         self.image_view.setScene(self.scene)
         QTimer.singleShot(0, self.handle_timeout)
         self.image_view.wheelEvent = self.zoom_image
-    
+        self.image_view.setFocusPolicy(Qt.NoFocus)
     def setupMenu(self):
         self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
@@ -489,7 +489,8 @@ class ImageViewer(QWidget):
         else:
             button.setText(text)
         button.setToolTip(tooltip_text)
-        button.clicked.connect(callback)
+        if callback:
+            button.clicked.connect(callback)
         button.setFixedHeight(40)
         button.setFocusPolicy(Qt.NoFocus)
         return button
@@ -509,7 +510,9 @@ class ImageViewer(QWidget):
         self.blur_background_button = self.create_button('fa.user', 'Portrait', self.blurBackground, parent=self)
         self.scan_qrc_button = self.create_button('mdi6.qrcode-scan', '', self.scanQRC, parent=self)
         self.undo_button = self.create_button('mdi.undo-variant', 'Undo', self.undo, parent=self)
-        self.compare_button = self.create_button('mdi.select-compare', '', self.show_image, parent=self)
+        self.compare_button = self.create_button('mdi.select-compare', '', None, parent=self)
+        self.compare_button.pressed.connect(self.show_image)
+        self.compare_button.released.connect(self.show_edited_image)
         self.revert_button = self.create_button(None, 'Revert', self.revert, parent=self,text='revert')
         self.save_button = self.create_button('fa5.save', '', self.save_image, parent=self)
 
@@ -686,7 +689,8 @@ class ImageViewer(QWidget):
         #Navigating images in the directory
         if event.key() == Qt.Key_Right:
             self.next_image()
-        elif event.key() == Qt.Key_Left:
+            print("rrrrrr")
+        if event.key() == Qt.Key_Left:
             self.previous_image()
     
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
@@ -998,11 +1002,22 @@ class ImageViewer(QWidget):
          
         
     def convert_cv_image_to_qpixmap(self, cv_image):
+        # Check if the image has an alpha channel (4 channels)
+        if cv_image.shape[2] == 4:
+            # Convert from BGRA (OpenCV's default with alpha) to RGBA
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGRA2RGBA)
+            height, width, channel = cv_image.shape
+            bytes_per_line = 4 * width
+            q_image = QImage(cv_image.data, width, height, bytes_per_line, QImage.Format_RGBA8888)
+        else:
+            # Convert from BGR to RGB (no alpha channel)
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
             height, width, channel = cv_image.shape
             bytes_per_line = 3 * width
             q_image = QImage(cv_image.data, width, height, bytes_per_line, QImage.Format_RGB888)
-            return QPixmap.fromImage(q_image)
+        
+        return QPixmap.fromImage(q_image)
+
 
 
         
@@ -1620,4 +1635,3 @@ if __name__ == '__main__':
 
     gui_process.join()
     inference_process.join()
-    
