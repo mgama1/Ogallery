@@ -1,13 +1,16 @@
+import time
+st=time.time()
 from PIL import Image
 import numpy as np
 from skimage import transform
-from tensorflow import keras
 import os
-import glob
 import pandas as pd
 from core import *
+print(time.time()-st)
 class Model:
     def __init__(self):
+        from tensorflow import keras
+
         self.images_model=ImagesModel()
         model_path = os.path.join('models', 'ogalleryv2.h5')
         self.savedModel = keras.models.load_model(model_path)

@@ -12,7 +12,6 @@ import cv2
 from urllib.parse import urlparse
 from PIL.PngImagePlugin import PngInfo
 from PIL import Image
-import rembg
 import qtawesome as qta
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor,QDesktopServices
@@ -412,7 +411,7 @@ class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
     def __init__(self,main_widget,image_path):
         super().__init__()
-        self.main_widget = main_widget  # Keep a reference to MainWidget
+        self.main_widget = main_widget  
         self.NAVBUTTONWIDTH=60
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
@@ -464,7 +463,7 @@ class ImageViewer(QWidget):
 
     def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
         button = QPushButton(parent)
-        if icon_name is not None:
+        if icon_name:
             button.setIcon(qta.icon(icon_name, color='white'))
         else:
             button.setText(text)
@@ -910,6 +909,8 @@ class ImageViewer(QWidget):
            
     
     def blurBackground(self):
+        import rembg
+
         if hasattr(self, 'edited_image'):
             img=self.edited_image
         else :
