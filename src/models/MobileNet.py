@@ -1,12 +1,9 @@
-import time
-st=time.time()
 from PIL import Image
 import numpy as np
 from skimage import transform
 import os
 import pandas as pd
 from core import *
-print(time.time()-st)
 class Model:
     def __init__(self):
         from tensorflow import keras

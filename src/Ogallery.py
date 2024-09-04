@@ -1,33 +1,38 @@
-import yaml
-import webbrowser
-from pyzbar.pyzbar import decode as decodeqr
+import time
+s=time.time()
 
+import threading
+import yaml
+from pyzbar.pyzbar import decode as decodeqr
 import multiprocessing
 import os
-import subprocess
-import glob
-import numpy as np
-import pandas as pd
-import cv2
-from urllib.parse import urlparse
-from PIL.PngImagePlugin import PngInfo
-from PIL import Image
-import qtawesome as qta
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap,QColor,QFont,QImage,QIcon,QCursor,QDesktopServices
-from PyQt5.QtCore import Qt,pyqtSignal,QPoint,QSize,QTimer,QStringListModel,QObject,QEvent,QUrl    
 
+import subprocess
+
+from PIL import Image
+
+import qtawesome as qta
+
+from PyQt5.QtWidgets import *
+
+from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices
+from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl    
+from PyQt5.QtCore import pyqtSlot
 from itertools import chain
 
-from Levenshtein import distance as lev_distance
-from custom import *
-from core import *
+
+
 #os.environ['QT_QPA_PLATFORM'] = 'wayland'
 os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
-from PyQt5.QtCore import pyqtSlot
+
 from gallery.imageGallery import ImageGalleryApp
 from gallery.imageThumbnail import ImageThumbnailWidget
-from models.MobileNet import Model
+from custom import *
+from core import *
+
+
+print(time.time()-s)
+
 
 
 class MainWidget(QWidget):
@@ -38,10 +43,26 @@ class MainWidget(QWidget):
             self.config_data = yaml.safe_load(file)
 
         
-
         self.init_ui()
+        self.importInBackground()
 
+    def importInBackground(self):
+        thread = threading.Thread(target=self.importLibs)
+        thread.start()
+
+    def importLibs(self):
+        global np, pd, cv2,lev_distance
+        import numpy as np
+        import pandas as pd
+        import cv2
+        from Levenshtein import distance as lev_distance
         
+
+
+    
+
+        # Any additional setup for pandas or numpy can be done here
+    
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 750, 500)
@@ -686,8 +707,7 @@ class ImageViewer(QWidget):
          
         if event.key()==Qt.Key_F1:
             help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
-            webbrowser.open(help_page)
-        
+            QDesktopServices.openUrl(QUrl(help_page))
             
     
     def mouseDoubleClickEvent(self, event):
@@ -1040,12 +1060,7 @@ class ImageViewer(QWidget):
             self.show_image()
             
             self.main_widget.imageViewerDeleted(self.current_index)
-            #db=pd.read_csv("db.csv")
-            #if file_name in db["directory"].values:
-            #    db=db[db["directory"]!=file_name]
-             #   db.to_csv("db.csv")
-            
-            
+           
     def show_success_message(self):
         '''
         Display a QMessageBox ("Saved successfully!") with information icon
@@ -1589,6 +1604,7 @@ def run_gui():
 
 
 def run_inference_model():
+    from models.MobileNet import Model
     model=Model()
     model.predictAndSave()
     
