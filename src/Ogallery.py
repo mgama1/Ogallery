@@ -461,7 +461,7 @@ class ImageViewer(QWidget):
       
     def setupWindow(self):
         self.setWindowTitle('Image Viewer')
-        self.setGeometry(300, 100, 800, 550)
+        self.setGeometry(300, 100, 800, 650)
 
         
     def setupGraphicsView(self):
@@ -525,35 +525,49 @@ class ImageViewer(QWidget):
                 self.gaussianBlur_button,self.rotate_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
-        self.navigation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
+        self.navigsetupLayoutation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
 
 
 
 
     def setupLayout(self):
         layout = QVBoxLayout(self)
-        Hlayout=QHBoxLayout()
-        header_layout=QHBoxLayout()
+        self.Hlayout = QHBoxLayout()
+        header_layout = QHBoxLayout()
         self.editing_buttons_layout = QHBoxLayout()
-        Hlayout.addWidget(self.leftBrowse)
-        Hlayout.addWidget(self.image_view)
-        Hlayout.addWidget(self.rightBrowse)
-        header_layout.addWidget(self.back_button)
 
+        self.Hlayout.addWidget(self.image_view)
+        
+        header_layout.addWidget(self.back_button)
         header_layout.addStretch(1)
         header_layout.addWidget(self.show_containing_folder_button)
 
-
-        for  button in self.editing_buttons:
+        for button in self.editing_buttons:
             button.setFixedHeight(40)
-
             self.editing_buttons_layout.addWidget(button)
-   
+
         layout.addLayout(header_layout)
-        layout.addLayout(Hlayout)
+        layout.addLayout(self.Hlayout)
+
         layout.addLayout(self.editing_buttons_layout)
+        
+        # Set absolute positions for leftBrowse and rightBrowse
+        self.leftBrowse.setParent(self)
+        self.leftBrowse.setGeometry(10, self.height() // 2 - self.leftBrowse.height() // 2, self.leftBrowse.width(), self.leftBrowse.height())
+
+        self.rightBrowse.setParent(self)
+        self.rightBrowse.setGeometry(self.width() - self.rightBrowse.width() - 10, self.height() // 2 - self.rightBrowse.height() // 2, self.rightBrowse.width(), self.rightBrowse.height())
+
         self.setLayout(layout)
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        # Reposition leftBrowse and rightBrowse on window resize
+        self.leftBrowse.move(10, self.height() // 2 - self.leftBrowse.height() // 2)
+        self.rightBrowse.move(self.width() - self.rightBrowse.width() - 10, self.height() // 2 - self.rightBrowse.height() // 2)
+        
 
 
 
@@ -593,8 +607,8 @@ class ImageViewer(QWidget):
         
         self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
         self.show_containing_folder_button.setFixedSize(self.NAVBUTTONWIDTH,40)
-        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, self.height())
-        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, self.height())
+        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
 
         browsing_buttons_style= "background-color: rgba(22, 22, 22, .5); \
                                                     color: white; \
@@ -689,7 +703,6 @@ class ImageViewer(QWidget):
         #Navigating images in the directory
         if event.key() == Qt.Key_Right:
             self.next_image()
-            print("rrrrrr")
         if event.key() == Qt.Key_Left:
             self.previous_image()
     

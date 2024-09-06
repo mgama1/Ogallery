@@ -1,216 +1,1651 @@
-       
-import qtawesome as qta
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt,QTimer
-import yaml
 import time
-import os
-from .imageThumbnail import ImageThumbnailWidget
+s=time.time()
 
-class ImageGalleryApp(QMainWindow):
-    def __init__(self,main_widget):
+import threading
+import yaml
+from pyzbar.pyzbar import decode as decodeqr
+import multiprocessing
+import os
+
+import subprocess
+
+from PIL import Image
+
+import qtawesome as qta
+
+from PyQt5.QtWidgets import *
+
+from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices
+from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl    
+from PyQt5.QtCore import pyqtSlot
+from itertools import chain
+
+
+
+#os.environ['QT_QPA_PLATFORM'] = 'wayland'
+#os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = '/path/to/your/qt/plugins'
+
+from gallery.imageGallery import ImageGalleryApp
+from gallery.imageThumbnail import ImageThumbnailWidget
+from custom import *
+from core import *
+
+
+print(time.time()-s)
+
+
+
+class MainWidget(QWidget):
+    def __init__(self):
         super().__init__()
+
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
 
-        self.main_widget = main_widget  # Keep a reference to MainWidget 
-        self.image_files = self.main_widget.images
-        self.thumbnail_widgets = []  # To store references to thumbnail widgets
-        self.scroll_value =   0 # Initialize scroll_value
-        self.initial_batch=12
-        self.batch_size =   9  # Number of thumbnails to load per batch
-        self.loaded_count =   0  
-        self.scrollbar_threshold =   20  # Scrollbar threshold for loading thumbnails
-        self.selected_indices=[]
-        st=time.time()
+        
         self.init_ui()
-        et=time.time()
-        print(f'loading time: {et-st}')
+        self.import_data_in_background()
+    def import_data_in_background(self):
+        # Run the import in a separate thread
+        thread = threading.Thread(target=self.import_libraries)
+        thread.start()
+
+    def import_libraries(self):
+        global np, pd, cv2,lev_distance
+        import numpy as np
+        import pandas as pd
+        import cv2
+        from Levenshtein import distance as lev_distance
+        
+
+
+    
+
+        # Any additional setup for pandas or numpy can be done here
     
     def init_ui(self):
-        central_widget = QWidget()
-        self.setStyleSheet(f"background-color: {self.config_data['background']};")
-
-        # Create the main vertical layout
-        main_layout = QVBoxLayout()
-
-        # Create a scroll area for the grid layout
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_content = QWidget()
-        scroll_area.setWidget(scroll_content)
-
-        # Create the grid layout and add it to the scroll content
-        self.grid_layout = QGridLayout()
-        scroll_content.setLayout(self.grid_layout)
-
-        # Add thumbnails to the grid layout
-        row, col = 0, 0
-        for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self.config_data, self.main_widget)
-            thumbnail_widget.selectedSig.connect(lambda selected_index: self.selected_indices.append(selected_index))
-            self.grid_layout.addWidget(thumbnail_widget, row, col)
-            self.thumbnail_widgets.append(thumbnail_widget) 
-            
-            col += 1
-            if col == 3:
-                col = 0
-                row += 1
-
-        # Add the scroll area to the main layout
-        main_layout.addWidget(scroll_area)
-
-        # Create a horizontal layout for the button to center it
-        button_layout = QHBoxLayout()
-        button_layout.setContentsMargins(0, 0, 0, 0)  # Set margins around the layout to zero
-        #button_layout.addStretch()  # Add stretchable space before the button
-        self.backToTopButton = QPushButton(self)
-        self.backToTopButton.setVisible(0)
-        self.visiblity_timer = QTimer()
-        self.visiblity_timer.setSingleShot(True)  
-        self.visiblity_timer.timeout.connect(lambda:self.backToTopButton.setVisible(False))
-        #ph.caret-up-fill
-        #
-        self.backToTopButton.setIcon(qta.icon('msc.chevron-up', color='white',scale_factor=2))
-        self.backToTopButton.setStyleSheet("margin: 0px; padding: 0px;border: none;")  # Remove margin and padding
-        #self.button.setFixedSize(20, 20)  # Set the button size to 50x50
-        button_layout.addWidget(self.backToTopButton)
-        #button_layout.addStretch()  # Add stretchable space after the button
-
-        # Create a widget to hold the button layout and add it to the main layout
-        button_widget = QWidget()
-        button_widget.setLayout(button_layout)
-        main_layout.addWidget(button_widget)  # Add the button at the bottom of the layout
-
-        central_widget.setLayout(main_layout)
-        self.setCentralWidget(central_widget)
-        
-        # Connect the scrollbar value change event to load more thumbnails
-        self.scroll = scroll_area.verticalScrollBar()
-        self.scroll.valueChanged.connect(self.loadNextBatch)
-        #go back to Top
-        self.backToTopButton.clicked.connect(lambda:self.scroll.setValue(0))
-
-        self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
-        self.show()
-        self.load_initial_batch()
-        
-    def load_initial_batch(self):
-        for i in range(min(self.initial_batch,len(self.thumbnail_widgets))):
-            self.thumbnail_widgets[self.loaded_count].load_thumbnail()
-            self.loaded_count += 1
+        self.setGeometry(300, 100, 750, 500)
 
-    def loadNextBatch(self):
-        self.backToTopButton.setVisible(True)  # Show the button when scrolling
-        self.visiblity_timer.start(2000)  # Start a timer for x seconds to hide the button
         
-        self.scroll_value = self.scroll.value()
-        if self.scroll_value >= self.scrollbar_threshold:
-            for i in range(min(len(self.thumbnail_widgets), self.batch_size)):
-                if self.loaded_count < len(self.image_files):  # Load only if there's more to load
-                    self.thumbnail_widgets[self.loaded_count].load_thumbnail()
-                    self.loaded_count += 1
-            self.scrollbar_threshold += 20  # Adjust the threshold by a fixed amount
-
-            
-    def updateThumbnail(self, saved):
-        self.edited_index=saved["index"]
-        choice=saved["choice"]
-        file_name=saved["file_name"]
+        #self.model=Model()
+        with open('./config/classes_synonyms.yaml', 'r') as file:
+            classes_synonyms = yaml.safe_load(file)
+        # Flatten keys and values of model.classes_synonyms
+        self.classes_plus = chain(classes_synonyms.keys(), classes_synonyms.values())
+        # Split, strip, and filter empty strings.
+        self.classes_plus = [item.strip().replace("q_",'') for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
-        if self.edited_index >= len(self.thumbnail_widgets):
-            return
-        if choice=='overwrite':
-            thumbnail_widget = self.thumbnail_widgets.pop(self.edited_index)
-            self.grid_layout.removeWidget(thumbnail_widget)
-            thumbnail_widget.deleteLater()  
-            #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(self.image_files[self.edited_index], self.image_files,self.config_data,self.main_widget)
-            nthumbnail_widget.load_thumbnail()
-            
-            nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
-        if choice=='copy':
-            #reload the thumbnail widget from disk
-            nthumbnail_widget = ImageThumbnailWidget(file_name, self.image_files,self.config_data,self.main_widget)
-            nthumbnail_widget.load_thumbnail()
-            self.image_files.insert(self.edited_index,file_name)
-            
-            nthumbnail_widget.selectedSig.connect(lambda selected_index:self.selected_indices.append(selected_index))
-        else:
-            pass
+
+        self.setWindowIcon(QIcon('media/iconc.ico'))
         
-        self.thumbnail_widgets.insert(self.edited_index, nthumbnail_widget)
-        self.loaded_count =   0  
-        row, col = 0, 0
-        for i, widget in enumerate(self.thumbnail_widgets):
-            self.grid_layout.addWidget(widget, row, col)
-            col += 1
-            if col == 3:
-                col = 0
-                row += 1
-
-
-    def getIndicesToDelete(self):
-            '''
-            gets indices to delete which are only the odd numbers of indices recieved. as even counts means that
-            it was selected and unselected
-            Args:
-                None
-            returns:
-                indices to delete(list)
-            '''
-            count = {}
-            indices_to_delete = []
-            for e in self.selected_indices:
-                count[e] = count.get(e, 0) + 1
+        config_file_path = 'config/config.yaml'
+        if not os.path.exists(config_file_path):
+            with open(config_file_path, 'w') as file:
+                initial_data = {'style_color': '#8c40d4'}
+                yaml.dump(initial_data, file)
+        with open(config_file_path, 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        
+        self.loadBackground()
+        
+        #buttons instantiation
+        self.query_line = QLineEdit(self)
+        self.query_line.setMinimumWidth(500)
+        self.search_button = QPushButtonHighlight()
+        
+        self.info_button=QPushButtonHighlight()
+        self.settings_button=QPushButtonHighlight()
+        self.gallery_button=QPushButtonHighlight()
+       
+        #Autocomplete using QCompleter
+        
+              
+        completer = QCompleter(self.classes_plus, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.query_line.setCompleter(completer)
+        
+        
+        
+        #layout structure 
+        layout = QVBoxLayout(self)
+        horizontal_layout = QHBoxLayout()
+        header_layout=QHBoxLayout()
+        
+        header_layout.addWidget(self.settings_button)
+        header_layout.addWidget(self.gallery_button)
+        header_layout.addStretch(1)
+        header_layout.addWidget(self.info_button)
                 
-            for e in count:
-                if count[e] % 2 != 0:
-                    indices_to_delete.append(e)
-            self.selected_indices = []
-            return indices_to_delete
+        layout.addLayout(header_layout)
+        #layout.addWidget(self.logo_label)
+        horizontal_layout.addStretch(1)
+        horizontal_layout.addWidget(self.search_button)
+        horizontal_layout.addWidget(self.query_line)
+        horizontal_layout.addStretch(1)
+        layout.addStretch(2)
+        layout.addLayout(horizontal_layout)
+        layout.addStretch(1)
+        
+        #connect button signals to their respective functions
+        self.search_button.clicked.connect(self.openResultsGallery)
+        self.info_button.clicked.connect(self.showAppInfo)
+        self.gallery_button.clicked.connect(self.openGallery)
+        self.settings_button.clicked.connect(self.openSettings)
+        
+        
+        #Elements style
+        self.setStyleSheet(f"background-color: {self.config_data['dark_background']};color:white;")
+        self.query_line.setFixedHeight(33)
+        self.search_button.setFixedSize(36, 36) 
+        self.info_button.setFixedWidth(45)
+        self.settings_button.setFixedSize(40,40)
+        self.gallery_button.setFixedSize(40,40)
+        self.info_button.setFixedSize(40,40)
 
-    def refreshLayout(self):
-        # Clear the layout
-        for i in reversed(range(self.grid_layout.count())):
-            self.grid_layout.itemAt(i).widget().setParent(None)
+
+        button_style = f"QPushButton {{ background-color: transparent; \
+                                        color: {self.config_data['foreground']}; \
+                                        icon-size: {self.config_data['standard_icon_size']}; \
+                                        border: none ;\
+                                        border-radius: 16px;padding: 0px;}} \
+                                        QPushButton:hover {{  \
+                                        background-color: {self.config_data['foreground']}; }}"
+        
+        
+        qline_style = (
+            f"QLineEdit {{ \
+                background-color: {self.config_data['dark_background']}; \
+                color: white; \
+                border-radius: 15px; \
+                padding: 5px; \
+                border: 2px solid {self.config_data['light_gray']}; \
+                font-size: 12pt; \
+            }} \
+            QLineEdit:focus {{ \
+                border-color: {self.config_data['hover_default']}; \
+            }}"
+        )
+
+        
+       
+        buttons=[self.search_button,self.info_button,self.settings_button,self.gallery_button]
+        for button in buttons:
+            button.setStyleSheet(button_style)
+            
+        self.query_line.setStyleSheet(qline_style)
+        completer.popup().setStyleSheet(f"background-color: {self.config_data['light_gray']}; \
+                                        color: white; \
+                                        font-size: 12pt;")
+
+        
+        #icons
+        
+        self.search_button.setIconNormal(qta.icon('fa.search',color='#212121',scale_factor=1.1))
+        self.search_button.setIconHover(qta.icon('fa.search',color=self.config_data["style_color"],scale_factor=1.1))
+        
+        self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.config_data['foreground']))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.config_data["style_color"]))
+        
+        
+        self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.config_data['foreground']))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.config_data["style_color"]))
+        
+        self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.config_data['foreground']))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.config_data["style_color"]))
+     
+        self.show()
+
+
+    def loadBackground(self):
+        
+        
+        color=self.config_data["style_color"]
+        pixmap = QPixmap(f'media/{color}.png')
+        
+            
+        self.background_label = QLabel(self)
+        self.background_label.setPixmap(pixmap)
+        self.background_label.setScaledContents(True) 
+        self.background_label.setGeometry(0, 0, self.width(), self.height())
+
+    def updateBackground(self,color):
+        print(f"color sent {color}")
+        pixmap = QPixmap(f'media/{color}.png')
+        self.background_label.setPixmap(pixmap)
+        self.search_button.setIconHover(qta.icon('fa.search',color=color,scale_factor=1.1))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=color))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=color))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=color))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'background_label'):
+            self.background_label.setGeometry(0, 0, self.width(), self.height())
+            
+    def openSettings(self):
+        self.settings=SettingsWidget()
+        self.settings.colorChanged.connect(self.updateBackground)
+        self.settings.show()
     
-        # Re-add remaining thumbnails to the layout
-        row, col = 0, 0
-        for i, widget in enumerate(self.thumbnail_widgets):
-            self.grid_layout.addWidget(widget, row, col)
-            col += 1
-            if col == 3:
-                col = 0
-                row += 1
+           
+    def openResultsGallery(self):
+        if self.selectImages():
+                
+            if self.result:
+                images_model=ImagesModel()
+                self.images=self.result
+                self.image_gallery=ImageGalleryApp(self)
+                self.image_gallery.show()
+                
+    def openGallery(self):
+        images_model=ImagesModel()
+        self.images=images_model.getImagesPaths()
+        if self.images:
+            self.image_gallery=ImageGalleryApp(self)
+            self.image_gallery.show()
+    
+        else:
+            self.showErrorMessage("please setup the images directories")
+    def openViewer(self,image_path):
+        
+        
+        ImageViewer(self,image_path)
 
-    def removeThumbnail(self, thumbnail_index):
-        thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
-        self.grid_layout.removeWidget(thumbnail_widget)
-        thumbnail_widget.deleteLater()  # Delete the widget to free up resources
-
-        self.refreshLayout()
+    def imageViewerDeleted(self,index):
+        self.image_gallery.removeThumbnail(index)
+    
+    def imageViewerSaved(self,saved_dic):
+        self.image_gallery.updateThumbnail(saved_dic)
+    
+    def showMainWidget(self):
+        """
+        Show the main widget when the ImageViewer is closed
+        Args:
+            None
+        Returns:
+            None
+        """
+        self.show()
+        
     
 
-    def removeThumbnails(self, thumbnails_indices_list):
-        # Sort indices in reverse order to avoid index shifting issues
-        thumbnails_indices_list.sort(reverse=True)
-        for thumbnail_index in thumbnails_indices_list:
-            thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
-            os.system(f"gio trash '{self.image_files[thumbnail_index]}'")
-            self.image_files.pop(thumbnail_index)
-            self.grid_layout.removeWidget(thumbnail_widget)
-            thumbnail_widget.deleteLater()  # Delete the widget to free up resources
+
+    def map_arabic_to_english(self,input_string):
+        '''
+        Maps Arabic characters to english characters if any exists
+        Args:
+            input_string (str)
+        Returns:
+            output_string (str)
+
+        '''
+        arabic_to_english = {
+        'ض': 'q',
+        'ص': 'w',
+        'ث': 'e',
+        'ق': 'r',
+        'ف': 't',
+        'غ': 'y',
+        'ع': 'u',
+        'ه': 'i',
+        'خ': 'o',
+        'ح': 'p',
+        'ج': '[',
+        'د': ']',
+        'ش': 'a',
+        'س': 's',
+        'ي': 'd',
+        'ب': 'f',
+        'ل': 'g',
+        'ا': 'h',
+        'ت': 'j',
+        'ن': 'k',
+        'م': 'l',
+        'ك': ';',
+        'ط': "'",
+        'ئ': 'z',
+        'ء': 'x',
+        'ؤ': 'c',
+        'ر': 'v',
+        'ﻻ': 'b',
+        'ى': 'n',
+        'ة': 'm',
+        'و': ',',
+        'ز': '.',
+        'ظ': '/',
+        ' ': ' ' ,
+
+        }
+
+
+        output_string = ''
+        for char in input_string:
+            if char in arabic_to_english:
+                output_string += arabic_to_english[char]
+            else:
+                output_string += char
+        return output_string
+
+    def selectImages(self):
+        self.queryText=self.query_line.text()
+        if self.queryText=='':
+                    self.showErrorMessage("Forgetting something?")
+                    return 0
+        self.queryText=self.map_arabic_to_english(self.queryText)
+        self.queryText=self.suggestClasses(self.queryText)
+        if self.queryText=='':
+            self.showErrorMessage("no matches found!")
+            return 0
+            
+        db=pd.read_csv("db.csv")
+        self.result=[]
+        self.filtered=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+        #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
+        #instead of continously checking and updating. we only check and update upon search
+        for filePath in self.filtered:
+            if os.path.exists(filePath):
+                self.result.append(filePath)
+            #else:delete from db.csv
+        if len(self.result)<1:
+            self.showErrorMessage("no matches found!")
+            return 0
+        return 1
     
-        self.refreshLayout()
+    
+        
+        
+    def suggestClasses(self,query):
+        '''
+        find the levenshtein distance between existing classes and 
+        the search query and returns the classes with distance <= 2
+        Args:
+            query (str)
+        Returns: 
+            suggested class (str) or None
+        '''
+        classes=[class_.lower().replace("q_",'') for class_ in self.classes_plus] 
+        query=query.lower()
+        
+        #check for exact match
+        if query in classes:
+            return query
+        
+        
+        #check for lev distance of 1 with avg words length
+        for classi in classes:
+            if lev_distance(query,classi)==1:
+                return classi
+        
+        #check for lev distance of 2 with long words i.e >=8
+        for classi in list(filter(lambda x: len(x) >= 8, classes)):
+            if lev_distance(query,classi)==2:
+                return classi
+        
+        #No matches returned.
+        return ''
+    
+    
+    def keyPressEvent(self, event):
+        """
+        Event handler for key press events, overriding the base class method.
+
+        Args:
+            event (QKeyEvent): The key event object containing information about the key press.
+
+        Returns:
+            None
+        """
+        
+        if (event.key() == Qt.Key_Return) or (event.key() == Qt.Key_Enter):
+            self.openResultsGallery()
+            
+    def showErrorMessage(self,msg):
+        """
+        Displays a QMessageBox warning
+        Args:
+            msg (str)
+        Returns:
+            None
+        """
+        msg_box = InfoMessageBox()
+        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        msg_box.setIconPixmap(pixmap)
+        msg_box.setText(msg)
+        msg_box.setWindowTitle('Warning')
+        msg_box.exec_()
+        
+    def showAppInfo(self):
+        """
+        Displays a 
+        
+        Args:
+            None
+        Returns:
+            None
+        """
+        self.info=InfoWidget()
+        self.info.show()
+
+
+class ImageViewer(QWidget):
+    finishedSignal = pyqtSignal()
+    def __init__(self,main_widget,image_path):
+        super().__init__()
+        self.main_widget = main_widget  
+        self.NAVBUTTONWIDTH=60
+        with open('config/config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        self.current_index = main_widget.images.index(image_path)
+        self.image_files = self.main_widget.images
+
+        self.edit_history=[]
+        self.fullscreen = False
+        #self.setMouseTracking(True)
+
+        self.init_ui()
+        
+
+    def init_ui(self):
+        self.setupWindow()
+        self.setupGraphicsView()
+        self.setupMenu()
+        self.setupButtons()
+        self.setupLayout()
+        self.setStyles()
+        self.setupHoverEvents()
+        
+        self.set_transparency(0)
+        self.show_image()
+        self.show()
+      
+    def setupWindow(self):
+        self.setWindowTitle('Image Viewer')
+        self.setGeometry(300, 100, 800, 650)
+
+        
+    def setupGraphicsView(self):
+        self.image_view = QGraphicsView(self)
+        self.image_view.setAlignment(Qt.AlignCenter)
+        self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.image_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        self.scene = QGraphicsScene()
+        self.image_view.setScene(self.scene)
+        QTimer.singleShot(0, self.handle_timeout)
+        self.image_view.wheelEvent = self.zoom_image
+        self.image_view.setFocusPolicy(Qt.NoFocus)
+    def setupMenu(self):
+        self.menu = Menu(self.image_view)
+        self.menu.copy_signal.connect(self.copyToClipboard)
+        self.menu.delete_signal.connect(self.delete_image)
+        self.menu.show_folder.connect(self.show_containing_folder)
+        self.image_view.installEventFilter(self.menu)
+
+    def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
+        button = QPushButton(parent)
+        if icon_name:
+            button.setIcon(qta.icon(icon_name, color='white'))
+        else:
+            button.setText(text)
+        button.setToolTip(tooltip_text)
+        if callback:
+            button.clicked.connect(callback)
+        button.setFixedHeight(40)
+        button.setFocusPolicy(Qt.NoFocus)
+        return button
+
+    def setupButtons(self):
+        # Passing 'self' as the parent ensures these buttons are tied to the main window
+        self.leftBrowse = self.create_button('fa.angle-left', '', self.previous_image, parent=self)
+        self.rightBrowse = self.create_button('fa.angle-right', '', self.next_image, parent=self)
+        self.back_button = self.create_button(None, '', self.close, parent=self,text='↩')
+        
+        self.show_containing_folder_button = self.create_button('mdi.folder-search-outline', 'Show containing folder', self.show_containing_folder, parent=self)
+        self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
+        self.gaussianBlur_button = self.create_button('mdi.blur', 'Blur', self.gaussianBlur, parent=self)
+        self.rotate_button = self.create_button('mdi.crop-rotate', 'Rotate?', self.rotateCCW)
+        self.flip_button = self.create_button('mdi.reflect-horizontal', 'Right click to flip vertically', self.flipH, parent=self)
+        self.adjust_button = self.create_button('ei.adjust-alt', 'Adjust', self.adjust, parent=self)
+        self.blur_background_button = self.create_button('fa.user', 'Portrait', self.blurBackground, parent=self)
+        self.scan_qrc_button = self.create_button('mdi6.qrcode-scan', '', self.scanQRC, parent=self)
+        self.undo_button = self.create_button('mdi.undo-variant', 'Undo', self.undo, parent=self)
+        self.compare_button = self.create_button('mdi.select-compare', '', None, parent=self)
+        self.compare_button.pressed.connect(self.show_image)
+        self.compare_button.released.connect(self.show_edited_image)
+        self.revert_button = self.create_button(None, 'Revert', self.revert, parent=self,text='revert')
+        self.save_button = self.create_button('fa5.save', '', self.save_image, parent=self)
+
+        self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.flip_button.customContextMenuRequested.connect(self.flipV)
+        self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
+
+        self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
+                self.gaussianBlur_button,self.rotate_button,self.flip_button,
+                 self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
+                ]
+        self.navigsetupLayoutation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
+
+
+
+
+    def setupLayout(self):
+        layout = QVBoxLayout(self)
+        self.Hlayout = QHBoxLayout()
+        header_layout = QHBoxLayout()
+        self.editing_buttons_layout = QHBoxLayout()
+
+        self.Hlayout.addWidget(self.image_view)
+        
+        header_layout.addWidget(self.back_button)
+        header_layout.addStretch(1)
+        header_layout.addWidget(self.show_containing_folder_button)
+
+        for button in self.editing_buttons:
+            button.setFixedHeight(40)
+            self.editing_buttons_layout.addWidget(button)
+
+        layout.addLayout(header_layout)
+        layout.addLayout(self.Hlayout)
+
+        layout.addLayout(self.editing_buttons_layout)
+        
+        # Set absolute positions for leftBrowse and rightBrowse
+        self.leftBrowse.setParent(self)
+        self.leftBrowse.setGeometry(10, self.height() // 2 - self.leftBrowse.height() // 2, self.leftBrowse.width(), self.leftBrowse.height())
+
+        self.rightBrowse.setParent(self)
+        self.rightBrowse.setGeometry(self.width() - self.rightBrowse.width() - 10, self.height() // 2 - self.rightBrowse.height() // 2, self.rightBrowse.width(), self.rightBrowse.height())
+
+        self.setLayout(layout)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        # Reposition leftBrowse and rightBrowse on window resize
+        self.leftBrowse.move(10, self.height() // 2 - self.leftBrowse.height() // 2)
+        self.rightBrowse.move(self.width() - self.rightBrowse.width() - 10, self.height() // 2 - self.rightBrowse.height() // 2)
+        
+
+
+
+    def setStyles(self):
+        self.setStyleSheet(f"background-color: {self.config_data['background']};")
+        border_color='#242424'
+        
+        button_style = ("QPushButton {{"
+                "background-color: #1f1f1f; "
+                "color: white; "
+                "icon-size:{icon_size};"
+                "border-top: 2px solid {border_color}; "
+                "border-bottom: 2px solid {border_color}; "
+                "border-right: 2px solid {border_color}; "
+                "border-left: 2px solid {border_color}; "
+                "}} "
+                "QPushButton:hover {{"
+                "background-color: #00347d; "
+                "}}").format(border_color=border_color,icon_size=self.config_data['standard_icon_size'])
+
+        
+        
+        for button in self.editing_buttons:
+            button.setStyleSheet(button_style)
+        
+        
+        
+        header_button_style=(
+            "QPushButton {background-color: rgba(22, 22, 22, .5); \
+            border: none; \
+            color: white; \
+            font-size: 16pt;} \
+            QPushButton:hover {background-color: #2e2e2e;} "
+        )
+        self.back_button.setStyleSheet(header_button_style)
+        self.show_containing_folder_button.setStyleSheet(header_button_style)
+        
+        self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
+        self.show_containing_folder_button.setFixedSize(self.NAVBUTTONWIDTH,40)
+        self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+        self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
+
+        browsing_buttons_style= "background-color: rgba(22, 22, 22, .5); \
+                                                    color: white; \
+                                                    border: none;"
+        self.leftBrowse.setStyleSheet(browsing_buttons_style)
+        self.rightBrowse.setStyleSheet(browsing_buttons_style)
+
+        self.image_view.setStyleSheet("border: none;")
+    
+
+    def setupHoverEvents(self):
+        self.rightBrowse.enterEvent = self.on_enter_event
+        self.rightBrowse.leaveEvent = self.on_leave_event
+        self.leftBrowse.enterEvent = self.on_enter_event
+        self.leftBrowse.leaveEvent = self.on_leave_event
+        
+    def show_image(self):
+        if self.image_files:
+            image_path = self.image_files[self.current_index]
+            pixmap = QPixmap(image_path)
+
+            # Clear the scene before adding a new item
+            self.scene.clear()
+
+            # Add a QGraphicsPixmapItem to the scene
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(pixmap_item)
+
+        
+            
+            # Set the scene rect to match the pixmap size
+            self.scene.setSceneRect(pixmap_item.boundingRect())
+
+            # Fit the image to the view
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+
+
+            self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
+            
+
+
+    def show_edited_image(self):
+        try:
+            self.scene.clear()
+            pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
+
+
+
+
+            # Add a QGraphicsPixmapItem to the scene
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(pixmap_item)
+
+            # Set the scene rect to match the pixmap size
+            self.scene.setSceneRect(pixmap_item.boundingRect())
+
+            # Fit the image to the view
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+        except:
+            self.show_image()
+        
+
+        
+    def handle_timeout(self):
+        if self.image_files:
+            image_path = self.image_files[self.current_index]
+            pixmap = QPixmap(image_path)
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+
+            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+        
+    def zoom_image(self, event):
+        # Get the current transformation matrix of the view
+        transform = self.image_view.transform()
+
+        # Set the transformation anchor to the center of the view
+        self.image_view.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+
+        # Get the zoom factor
+        delta = event.angleDelta().y() / 120  # Get the scroll steps (typically 120 per step)
+        zoom_factor = 1.1 if delta > 0 else 0.9  # Define the zoom factor
+
+        # Scale the view using zoom_factor
+        transform.scale(zoom_factor, zoom_factor)
+
+        # Apply the new transformation to the view
+        self.image_view.setTransform(transform)
+
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Escape:
-            self.close()        
-
-        if event.key() == Qt.Key_Delete:
-            self.removeThumbnails(self.getIndicesToDelete())
+        
+        #Navigating images in the directory
+        if event.key() == Qt.Key_Right:
+            self.next_image()
+            print("rrrrrr")
+        if event.key() == Qt.Key_Left:
+            self.previous_image()
+    
+        if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+            self.close()
+        
+        if event.key()==Qt.Key_Delete:
+            self.delete_image()
             
-        if event.key() == Qt.Key_T:
-            self.scroll.setValue(0)
+        #saving edited images         
+        if event.key()==Qt.Key_S :
+            self.save_image()
+            
+        if (event.key()==Qt.Key_F) or (event.key()==Qt.Key_F11):
+            self.toggleFullScreen()
+        
+        if event.key()==Qt.Key_C:
+            self.copyToClipboard()
+         
+        if event.key()==Qt.Key_F1:
+            help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
+            QDesktopServices.openUrl(QUrl(help_page))
+            
+    
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.toggleFullScreen()
+            
+    def toggleFullScreen(self):
+        self.toggleButtonsVisibility(self.editing_buttons)
+        if not self.fullscreen:
+            self.showFullScreen()
+            if self.edit_history:
+                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+            else:
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+
+            self.fullscreen = True
+        else:
+            self.showNormal()
+            if self.edit_history:
+                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+            else:
+                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+            self.fullscreen = False
+    
+    def toggleButtonsVisibility(self,buttons_list):
+        for button in buttons_list:
+            button.setVisible(self.fullscreen)
+        
+    def next_image(self):
+        if hasattr(self, 'edited_image'):
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+        
+        self.current_index = (self.current_index + 1) % len(self.image_files)
+        self.purge()
+        self.show_image()
+
+    def previous_image(self):
+        if hasattr(self, 'edited_image'):
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+            
+        self.current_index = (self.current_index - 1) % len(self.image_files)
+        self.purge()
+        self.show_image()
+        
+    
+    def set_transparency(self, alpha):
+        self.rightBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
+        self.leftBrowse.setStyleSheet(f"background-color: rgba(22,22,22,{alpha});border: none;color: rgba(255,255,255,{alpha});")
+        if alpha==.5:
+            self.leftBrowse.setIcon(qta.icon('fa.angle-left',color='white'))
+            self.rightBrowse.setIcon(qta.icon('fa.angle-right',color='white'))
+        if alpha==0:
+            self.leftBrowse.setIcon(qta.icon('fa.angle-left',color=self.config_data['background']))
+            self.rightBrowse.setIcon(qta.icon('fa.angle-right',color=self.config_data['background']))
+
+    def on_enter_event(self, event):
+        self.set_transparency(.5)
+
+    def on_leave_event(self, event):
+        self.set_transparency(0)
+     
+
+    def adjust(self):
+        try:
+            self.adjust_instance = Adjust(self)
+            self.adjust_instance.show()
+        except Exception as e:
+            print(f"Error adjusting image: {e}")
+
+        
+        
+    
+    def copyToClipboard(self):
+        image_path = self.image_files[self.current_index]
+        clipboard = QApplication.clipboard()
+        clipboard.setPixmap(QPixmap(image_path))
+        
+        
+    
+    def  BGR2GRAY(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
+        gray_3C=cv2.merge([gray,gray,gray])
+        self.edited_image=gray_3C
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+        
+        
+    def gaussianBlur(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
+        self.edited_image=Blurred_img
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+        
+        
+    def rotateCCW(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        self.edited_image=rotatedImg
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+
+    def rotateCW(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        rotatedImg=cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        self.edited_image=rotatedImg
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+    
+    def flipH(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        flipped_img=cv2.flip(img, 1)
+        self.edited_image=flipped_img
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+
+    def flipV(self):
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        
+        flipped_img=cv2.flip(img, 0)
+        self.edited_image=flipped_img
+        self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+
+    def change_contrast(self, contrast_factor):
+        contrast_factor /= 100
+            
+        # Convert image to floating point representation
+        img_float = self.colors_transformation_image.astype(np.float32) / 255.0
+        
+        # Apply contrast adjustment
+        self.colors_transformation_image = (img_float - 0.5) * contrast_factor + 0.5
+        
+        # Clip values to range [0, 1]
+        self.colors_transformation_image = np.clip(self.colors_transformation_image, 0, 1)
+        
+        # Convert back to uint8
+        self.colors_transformation_image = (self.colors_transformation_image * 255).astype(np.uint8)
+        
+        
+    def changeSaturation(self,offset_value):
+        # Convert the image to HSV
+        hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
+        # Create a mask for pixels with high saturation
+        saturation_mask = hsv_image[:, :, 1] > 10
+        # Shift the hue channel by the specified value
+        #hsv_image[:, :, 1] = np.clip(hsv_image[:, :, 1].astype(float) + offset_value, 0, 255).astype(np.uint8)
+        hsv_image[:, :, 1] = np.where(saturation_mask, np.clip(hsv_image[:, :, 1].astype(int) + offset_value, 0, 255), hsv_image[:, :, 1]).astype(np.uint8)
+
+        
+
+        self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    def changeHue(self,shift_value):        
+        # Convert the image to HSV
+        hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
+    
+        # Shift the hue channel by the specified value
+        hsv_image[:, :, 0] = ((hsv_image[:, :, 0].astype(float) + shift_value)% 180).astype(np.uint8) 
+    
+        # Convert the image back to BGR
+        self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    
+    def change_brightness(self,brightness_offset):       
+        self.colors_transformation_image = cv2.add(self.colors_transformation_image, brightness_offset)
+        
+        
+        
+    def applyColorsTransformations(self,contrast_factor,brightness_offset,s_shift_value,shift_value):
+        if self.edit_history:
+            self.colors_transformation_image=self.edit_history[-1]
+        else:   
+            image_path = self.image_files[self.current_index]
+            self.colors_transformation_image = cv2.imread(image_path)
+                
+        self.change_contrast(contrast_factor)
+        self.change_brightness(brightness_offset)
+        self.changeSaturation(s_shift_value)
+        self.changeHue(shift_value)
+        self.edited_image=self.colors_transformation_image
+        #self.edit_history.append(self.edited_image)
+        self.show_edited_image()
+        
+           
+    
+    def blurBackground(self):
+        import rembg
+
+        if hasattr(self, 'edited_image'):
+            img=self.edited_image
+        else :
+            image_path = self.image_files[self.current_index]
+            img = cv2.imread(image_path)
+        mask = rembg.remove(img,only_mask=True)
+        mask_3c=cv2.merge([mask,mask,mask])
+        foreground = np.copy(img).astype(float)
+        background = cv2.blur(img,(9,9)).astype(float)
+        alpha = mask_3c
+        alpha = alpha.astype(float)/255
+        foreground = cv2.multiply(alpha, foreground)
+        background = cv2.multiply(1.0 - alpha, background)
+        blurred_bg_image = cv2.add(foreground, background)/255
+        blurred_bg_image = (blurred_bg_image * 255).astype(np.uint8)
+        self.edited_image=blurred_bg_image
+        self.show_edited_image()
+    
+    def scanQRC(self):
+        decoded_list = decodeqr(Image.open(self.image_files[self.current_index]))
+        self.qrcode_windows = []  # Create a list to store all the QRCodeWindow instances
+        
+        parent_rect = self.geometry()
+        img_shape = cv2.imread(self.image_files[self.current_index]).shape
+        scale_factor = self.image_view.transform().m11()
+        
+        for box in decoded_list:
+            decoded = box[0]
+            rpos_x, rpos_y = box.polygon[1]
+            
+            decoded_text = box.data.decode()
+            if decoded_text:
+                qrcode_window = QRCodeWindow(decoded_text)
+                self.qrcode_windows.append(qrcode_window)  # Add the window to the list to keep a reference
+                
+                # Calculate the displayed dimensions
+                displayed_width = img_shape[1] * scale_factor
+                displayed_height = img_shape[0] * scale_factor  # Fixed the height calculation to use img_shape[0]
+                
+                # Get the bounding box of the QR code
+                min_x = min(point.x for point in box.polygon)
+                max_x = max(point.x for point in box.polygon)
+                min_y = min(point.y for point in box.polygon)
+                max_y = max(point.y for point in box.polygon)
+                
+                # Calculate the center of the QR code
+                center_x = (min_x + max_x) / 2
+                center_y = (min_y + max_y) / 2
+                
+                pos_x = int(parent_rect.left() + (parent_rect.width() - displayed_width) // 2 + (center_x * scale_factor) - 25)  # Center the text horizontally
+                pos_y = int(parent_rect.top() + (parent_rect.height() - displayed_height) // 2 + (center_y * scale_factor) - 10)  # Center the text vertically
+                
+                qrcode_window.setGeometry(pos_x, pos_y, 50, 20)  # Adjust the size as needed
+                qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
+                
+                qrcode_window.show()
+
+
+    def closeAllQRCodes(self):
+        if hasattr(self,'qrcode_windows'):
+            for window in self.qrcode_windows:
+                window.close()
+            self.qrcode_windows = []  
+
+         
+        
+    def convert_cv_image_to_qpixmap(self, cv_image):
+        # Check if the image has an alpha channel (4 channels)
+        if cv_image.shape[2] == 4:
+            # Convert from BGRA (OpenCV's default with alpha) to RGBA
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGRA2RGBA)
+            height, width, channel = cv_image.shape
+            bytes_per_line = 4 * width
+            q_image = QImage(cv_image.data, width, height, bytes_per_line, QImage.Format_RGBA8888)
+        else:
+            # Convert from BGR to RGB (no alpha channel)
+            cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+            height, width, channel = cv_image.shape
+            bytes_per_line = 3 * width
+            q_image = QImage(cv_image.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        
+        return QPixmap.fromImage(q_image)
+
+
+
+        
+        
+    def undo(self):
+        if len(self.edit_history)>1:
+            
+            self.edit_history.pop()  
+            self.edited_image=self.edit_history[-1]
+            self.show_edited_image()
+            
+
+        else:
+            if hasattr(self, 'edited_image'):
+                self.edit_history=[]
+                delattr(self,'edited_image')
+                
+                self.show_image()
+            
+            
+    def revert(self):
+        if hasattr(self, 'edited_image'):
+            delattr(self,'edited_image')
+        self.edit_history=[]
+        self.show_image()
+    def purge(self):
+        self.closeAllQRCodes()
+        
+    def save_image(self):
+        if hasattr(self, 'edited_image'):
+            msg_box = SavingMessageBox(self.image_files[self.current_index],self.edited_image)
+            msg_box.exec_()
+            delattr(self,'edited_image')
+            self.edit_history=[]
+            choice = msg_box.get_choice()
+            file_name=msg_box.getFileName()
+            saved={'index':self.current_index,'choice':choice,'file_name':file_name}
+            self.main_widget.imageViewerSaved(saved)
+            
+        else:
+            self.showErrorMessage("no changes were made!")
+    
+    def delete_image(self):
+        file_name=self.image_files[self.current_index]
+        if os.path.exists(file_name):
+            
+            try:
+                os.system(f"gio trash '{self.image_files[self.current_index]}'")
+
+            except OSError as e:
+                print(f"Error moving file to trash: {e.filename} - {e.strerror}")
+            
+            #deleted={'index':self.current_index,'file_name':self.image_files[self.current_index]}
+            self.image_files.pop(self.current_index)
+            self.show_image()
+            
+            self.main_widget.imageViewerDeleted(self.current_index)
+           
+    def show_success_message(self):
+        '''
+        Display a QMessageBox ("Saved successfully!") with information icon
+
+        Args:
+            None
+
+        Returns:
+            None
+        '''
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setText("Saved successfully!")
+        msg_box.setWindowTitle("Success")
+        msg_box.exec_()
+        
+    
+    def showErrorMessage(self,msg):
+        '''
+        Display a QMessageBox with a warning icon.
+
+        Args:
+            msg (str): The message to be displayed in the QMessageBox.
+
+        Returns:
+            None
+        '''
+        msg_box = InfoMessageBox()
+        pixmap = QPixmap('media/angry.png').scaledToWidth(150)
+        msg_box.setIconPixmap(pixmap)
+        msg_box.setText(msg)
+        msg_box.setWindowTitle('Warning')
+        msg_box.exec_()
+    
+    
+
+    def show_containing_folder(self):
+        image_path=(self.image_files[self.current_index])
+        dir_path=image_path[0:image_path.rfind('/')]
+
+        commands = [
+            f"nautilus --select",  # Default for GNOME desktop environment            f"nemo {dir_path}",          # Default for Cinnamon desktop environment
+            f"xdg-open",      # Default for most desktop environments
+            f"thunar"         # Default for XFCE desktop environment
+        ]
+        
+        for command in commands:
+            try:
+                command_run=command.split()
+                if command=='nautilus --select':
+                    command_run.append(image_path)
+                else:
+                    command_run.append(dir_path)
+                
+                subprocess.run(command_run, check=True)
+                return True
+            except subprocess.CalledProcessError:
+                continue
+
+        # If none of the commands were successful
+        return False
+
+
+
+    
+    def closeEvent(self, event):
+        # Override the closeEvent method to handle the window close event
+        self.purge()
+        self.finishedSignal.emit()
+        event.accept()
+        
+
+
+
+class QRCodeWindow(QWidget):
+    def __init__(self, decoded_text):
+        super().__init__()
+        self.setGeometry(0,0,15,15)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        self.qrtext_label = QLabel(self)
+        # Set the text as a hyperlink
+        self.qrtext_label.setText(f'<a href="{decoded_text}">{decoded_text}</a>')
+        self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
+        self.qrtext_label.adjustSize()
+        #self.qrtext_label.setGeometry(0, 0, self.width() // 2, self.qrtext_label.height())
+
+        self.close_button = QPushButton("x", self)
+        #self.close_button.setGeometry(self.width()-5,0, 20, 20)
+        self.close_button.clicked.connect(self.close)
+        self.qrtext_label.setMaximumWidth(200)
+        self.close_button.setFixedSize(15,15)
+        layout=QVBoxLayout()
+        layout.addWidget(self.close_button)
+        layout.addWidget(self.qrtext_label)
+        self.setLayout(layout)
+
+
+
+
+class InfoWidget(QWidget):
+    def __init__(self):
+        '''
+        this info widget is only for app description and information not error messages and what not
+        '''
+        super().__init__()
+        with open('config/config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;"
+                          )
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle('Info')
+        self.setGeometry(500, 200, 400, 300)
+
+        layout = QVBoxLayout()
+
+        # Horizontal Layout for Image and Text
+        horizontal_layout = QHBoxLayout()
+
+        # Image Label
+        image_label = QLabel(self)
+        pixmap = QPixmap('media/info.png').scaledToWidth(150)
+        image_label.setPixmap(pixmap)
+        image_label.setMaximumWidth(150)
+        horizontal_layout.addWidget(image_label)
+
+        # Text Label
+        info="""OGallery is an open‑source gallery app with advanced search capabilities, image viewing, and editing functionalities that aims to revolutinze user experience with images on Desktop """
+
+        text_label = QLabel(self)
+        text_label.setText(info)
+        text_label.setMaximumWidth(300)
+        text_label.setWordWrap(True)
+        horizontal_layout.addWidget(text_label)
+
+        layout.addLayout(horizontal_layout)
+
+        # Footer Buttons
+        footer_layout = QHBoxLayout()
+
+        about_button = QPushButton('About', self)
+        
+        about_button.clicked.connect(lambda: text_label.setText(info))
+        footer_layout.addWidget(about_button)
+
+        authors_button = QPushButton('Authors', self)
+        authors="""-Mahmoud Gamal"""
+        authors_button.clicked.connect(lambda: text_label.setText(authors))
+        footer_layout.addWidget(authors_button)
+
+        website_button = QPushButton('Website', self)
+        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://mgama1.github.io/Ogallery/')))
+        footer_layout.addWidget(website_button)
+        footer_buttons=[about_button,authors_button,website_button]
+        layout.addLayout(footer_layout)
+
+        self.setLayout(layout)
+        border_color='#242424'
+        button_style = ("QPushButton {{"
+                "background-color: #1f1f1f; "
+                "color: white; "
+                "icon-size:{icon_size};"
+                "border:none"
+                "}} "
+                "QPushButton:hover {{"
+                "background-color: #00347d; "
+                "}}").format(border_color=border_color,icon_size=self.config_data['standard_icon_size'])
+        for button in footer_buttons:
+            button.setFixedHeight(50)
+        for button in footer_buttons:
+            button.setStyleSheet(button_style)
+
+
+class Adjust(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.contrast_offset = 100
+        self.saturation_offset=0
+        self.hue_offset = 0
+        self.brightness_offset = 0
+        
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowFlags(Qt.Window)
+        self.setWindowTitle('adjust')
+        self.setGeometry(300, 100, 400, 400)
+        self.setStyleSheet(f"background-color: #212121;color:'white';")
+        self.contrast_label = QLabel('Contrast:', self)
+        self.contrast_slider = QSlider(Qt.Horizontal)
+        self.contrast_slider.setMinimum(30)
+        self.contrast_slider.setMaximum(200)
+        self.contrast_slider.setValue(100)
+        self.contrast_slider.valueChanged.connect(self.update_contrast_offset)
+        self.contrast_value_label = QLabel(str(self.contrast_slider.value()), self)
+        self.contrast_value_label.setText("1")
+        
+        self.brightness_label = QLabel('Brightness:', self)
+        self.brightness_slider = QSlider(Qt.Horizontal)
+        self.brightness_slider.setMinimum(-100)
+        self.brightness_slider.setMaximum(100)
+        self.brightness_slider.setValue(0)
+        self.brightness_slider.valueChanged.connect(self.update_brightness_offset)
+        self.brightness_value_label = QLabel(str(self.brightness_slider.value()), self)
+
+        self.hue_label = QLabel('Hue:', self)
+        self.hue_slider = QSlider(Qt.Horizontal)
+        self.hue_slider.setMinimum(0)
+        self.hue_slider.setMaximum(180)
+        self.hue_slider.setValue(0)
+        self.hue_slider.valueChanged.connect(self.update_hue_offset)
+        self.hue_value_label = QLabel(str(self.hue_slider.value()), self)
+
+        self.saturation_label = QLabel('saturation:', self)
+        self.saturation_slider = QSlider(Qt.Horizontal)
+        self.saturation_slider.setMinimum(-100)
+        self.saturation_slider.setMaximum(100)
+        self.saturation_slider.setValue(0)
+        self.saturation_slider.valueChanged.connect(self.update_saturation_offset)
+        self.saturation_value_label = QLabel(str(self.saturation_slider.value()), self)
+
+
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.applyAdjustments)
+        
+        layout = QVBoxLayout(self)
+
+        contrast_layout = QHBoxLayout()
+        contrast_layout.addWidget(self.contrast_label)
+        contrast_layout.addWidget(self.contrast_slider)
+        contrast_layout.addWidget(self.contrast_value_label)
+
+        brightness_layout = QHBoxLayout()
+        brightness_layout.addWidget(self.brightness_label)
+        brightness_layout.addWidget(self.brightness_slider)
+        brightness_layout.addWidget(self.brightness_value_label)
+
+        saturation_layout = QHBoxLayout()
+        saturation_layout.addWidget(self.saturation_label)
+        saturation_layout.addWidget(self.saturation_slider)
+        saturation_layout.addWidget(self.saturation_value_label)
+        
+        hue_layout = QHBoxLayout()
+        hue_layout.addWidget(self.hue_label)
+        hue_layout.addWidget(self.hue_slider)
+        hue_layout.addWidget(self.hue_value_label)
+
+        self.reset_button=QPushButton('reset')
+        self.reset_button.setFixedWidth(100)
+        self.reset_button.clicked.connect(self.reset)
+        layout.addWidget(self.reset_button,alignment=Qt.AlignRight)
+        
+        layout.addLayout(contrast_layout)
+        layout.addLayout(brightness_layout)
+        layout.addLayout(saturation_layout)
+        layout.addLayout(hue_layout)
+        
+
+        self.setLayout(layout)
+
+        self.contrast_slider.valueChanged.connect(self.update_contrast_value_label)
+        self.brightness_slider.valueChanged.connect(self.update_brightness_value_label)
+        self.saturation_slider.valueChanged.connect(self.update_saturation_value_label)
+        self.hue_slider.valueChanged.connect(self.update_hue_value_label)
+
+        #slow is smooth and smooth is fast. when applying every little change instantly it takes a lot of unneccessary resources
+        #which slows down the widget
+        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.hue_slider.valueChanged.connect(lambda:self.timer.start(0))
+
+    def applyAdjustments(self):
+        self.parent().applyColorsTransformations(self.contrast_offset,self.brightness_offset,self.saturation_offset,self.hue_offset)
+        
+    def update_contrast_offset(self,contrast_val):
+        self.contrast_offset = contrast_val
+
+        
+    def update_brightness_offset(self,brightness_val):
+        self.brightness_offset = brightness_val
+
+    def update_saturation_offset(self,saturation_val):
+        self.saturation_offset = saturation_val
+        
+    def update_hue_offset(self,hue_val):
+        self.hue_offset = hue_val
+
+    
+    def update_contrast_value_label(self, value):
+        self.contrast_value_label.setText(str(value/100.0))
+
+    def update_brightness_value_label(self, value):
+        self.brightness_value_label.setText(str(value))
+
+
+    def update_saturation_value_label(self, value):
+        self.saturation_value_label.setText(str(value))
+    def update_hue_value_label(self, value):
+        self.hue_value_label.setText(str(value))
+
+    def reset(self):
+        self.contrast_offset = 100
+        self.saturation_offset=0
+        self.hue_offset = 0
+        self.brightness_offset = 0
+        
+        self.contrast_slider.setValue(self.contrast_offset)
+        self.brightness_slider.setValue(self.brightness_offset)
+        self.hue_slider.setValue(self.hue_offset)
+        self.saturation_slider.setValue(self.saturation_offset)
+        
+    
+    def keyPressEvent(self, event):
+            if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+                self.close()
+
+        
+class CircularButton(QPushButton):
+    def __init__(self, color, parent=None):
+        super().__init__(parent)
+        self.color=color
+        self.setFixedSize(50, 50)
+        self.setStyleSheet(f"background-color: {color}; border-radius: 25px;")
+        self.clicked.connect(self.toggleBorder)
+
+    def toggleBorder(self):
+        self.parent().setStyleColor(self.color)
+        self.parent().clearBorders()
+        self.setStyleSheet(self.styleSheet() + "border: 2px solid white;")
+
+
+class SettingsWidget(QWidget):
+    colorChanged=pyqtSignal(str)
+    def __init__(self):
+        super().__init__()
+        with open('config/config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle('Settings')
+        self.setGeometry(300, 100, 800, 600)
+        self.setStyleSheet(f"background-color: {self.config_data['background']};color:'white';")
+
+        
+        
+       
+        
+        
+        layout = QVBoxLayout(self)
+        dir_layout=QHBoxLayout()
+        dir_buttons_layout=QVBoxLayout()
+        colors_layout = QHBoxLayout()
+        
+        colors = [
+            "#ce3485",
+            "#8c40d4",  
+            "#2631c9",  
+            "#5588db",  
+            "#4bb7b5", 
+            "#60b67d",  
+            "#c86923" ,
+            "#c41d21",
+            "#c1c100",
+        ]
+        colors_layout.addStretch()
+        self.colors_buttons = []
+        for color in colors:
+            button = CircularButton(color, self)
+            colors_layout.addWidget(button)
+            self.colors_buttons.append(button)
+        colors_layout.addStretch()
+        
+        self.colors_buttons[-1].setStyleSheet("QPushButton {"
+                     "border-image: url(media/batman.png);"
+                     "border-radius: 25px;"
+                     "}")
+        self.model = QStringListModel()
+        self.model.setStringList(self.getImagesPaths())
+
+        self.listView = QListView()
+        self.listView.setModel(self.model)
+        dir_layout.addWidget(self.listView)
+
+        # Add a button to remove directories
+        self.remove_dir_button = QPushButton('Remove Directory')
+        self.remove_dir_button.clicked.connect(self.removeSelectedItems)
+        dir_buttons_layout.addWidget(self.remove_dir_button)
+
+        self.add_dir_button = QPushButton('Add Directory')
+        self.add_dir_button.clicked.connect(self.addItem)
+        dir_buttons_layout.addWidget(self.add_dir_button)
+        dir_buttons_layout.addStretch()
+        dir_layout.addLayout(dir_buttons_layout)
+        layout.addLayout(dir_layout)
+        style_label = QLabel("style")
+        layout.addWidget(style_label)
+        layout.addSpacing(30)
+        layout.addLayout(colors_layout)
+        layout.addStretch()
+        self.setLayout(layout)
+
+    def setStyleColor(self,color):
+        config_file_path = 'config/config.yaml'
+        with open(config_file_path, 'r') as file:
+            self.config_data = yaml.safe_load(file)
+            
+        self.config_data['style_color'] = color
+        
+        with open(config_file_path, 'w') as file:
+            yaml.dump(self.config_data, file)
+        self.colorChanged.emit(color)
+    def clearBorders(self):
+        for button in self.colors_buttons:
+            button.setStyleSheet(button.styleSheet().replace("border: 2px solid white;", ""))
+    
+    def getImagesPaths(self):
+        username = os.getenv('USER')
+        if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                images_directories = config_file.readlines()
+        elif not os.path.exists(f'/home/{username}/.cache/OpenGallery/'):
+            os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                config_file.write('\n')
+        
+        else:
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                config_file.write('\n')
+
+        return images_directories
+
+    def addItem(self):
+        self.showDialog()
+        if self.selected_directory:
+            self.model.insertRow(self.model.rowCount())
+            index = self.model.index(self.model.rowCount() - 1)
+            self.model.setData(index, self.selected_directory)
+
+    def removeSelectedItems(self):
+        indexes = self.listView.selectedIndexes()
+        for index in sorted(indexes, reverse=True):
+            # Get the data at the index with DisplayRole
+            item_data = self.model.data(index, Qt.DisplayRole)
+            self.model.removeRow(index.row())
+            # Also remove from the config file
+            username = os.getenv('USER')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
+                lines = config_file.readlines()
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
+                for line in lines:
+                    if line.strip() != item_data.strip():
+                        config_file.write(line)
+
+
+    def showDialog(self):
+        username = os.getenv('USER')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        self.selected_directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
+
+        if self.selected_directory:
+            if not os.path.exists(f'/home/{username}/.cache/OpenGallery/'):
+                os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'a') as config_file:
+                config_file.write(self.selected_directory + '\n')
+   
+    
+
+    def keyPressEvent(self, event):    
+        if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
+            self.close()
+        
+
+class Menu(QObject):
+    copy_signal = pyqtSignal()
+    delete_signal = pyqtSignal()
+    show_folder = pyqtSignal()
+
+    def __init__(self, graphics_view):
+        super().__init__()
+        self.opened_menu = None
+        with open('config/config.yaml', 'r') as file:
+            self.config_data = yaml.safe_load(file)
+        self.graphics_view = graphics_view
+
+    def eventFilter(self, obj, event):
+        if obj is self.graphics_view and event.type() == QEvent.ContextMenu:
+            if self.opened_menu is not None:
+                self.opened_menu.close()
+            menu = QMenu()
+            copy_action = QAction("Copy", menu)
+            copy_action.triggered.connect(self.copyToClipboardSignal)
+            menu.addAction(copy_action)
+            delete_action = QAction("Delete", menu)
+            delete_action.triggered.connect(self.deleteSignal)
+            menu.addAction(delete_action)
+            show_folder_action = QAction("Show Containing Folder", menu)
+            show_folder_action.triggered.connect(self.showContainingFolderSignal)
+            menu.addAction(show_folder_action)
+
+            self.opened_menu = menu
+            menu.setStyleSheet(f"""
+                QMenu {{
+                    background-color: {self.config_data['background']};
+                    color: white;
+                }}
+                QMenu::item:selected {{
+                    background-color: {self.config_data['light_gray']};
+                }}
+            """)
+            menu.exec_(QCursor.pos())
+            return True
+        return False
+
+    def deleteSignal(self):
+        self.delete_signal.emit()
+
+    def copyToClipboardSignal(self):
+        self.copy_signal.emit()
+
+    def showContainingFolderSignal(self):
+        self.show_folder.emit()
+
+
+    
+        
+ 
+            
+def run_gui():
+    app = QApplication([])    
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
+    main_widget = MainWidget()
+    app.exec_()
+
+
+def run_inference_model():
+    from models.MobileNet import Model
+    model=Model()
+    model.predictAndSave()
+    
+
+                
+if __name__ == '__main__':
+    gui_process = multiprocessing.Process(target=run_gui)
+    inference_process = multiprocessing.Process(target=run_inference_model)
+
+    
+    gui_process.start()
+    inference_process.start()
+
+    gui_process.join()
+    inference_process.join()
