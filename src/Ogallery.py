@@ -15,8 +15,8 @@ import qtawesome as qta
 
 from PyQt5.QtWidgets import *
 
-from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices
-from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl    
+from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen
+from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl,QRectF,QPointF
 from PyQt5.QtCore import pyqtSlot
 from itertools import chain
 
@@ -441,6 +441,8 @@ class ImageViewer(QWidget):
 
         self.edit_history=[]
         self.fullscreen = False
+        #self.image_width=0
+        #self.image_height=0
         #self.setMouseTracking(True)
 
         self.init_ui()
@@ -460,7 +462,7 @@ class ImageViewer(QWidget):
         self.show()
       
     def setupWindow(self):
-        self.setWindowTitle('Image Viewer')
+        self.setWindowTitle('Ogallery')
         self.setGeometry(300, 100, 800, 650)
 
         
@@ -503,8 +505,9 @@ class ImageViewer(QWidget):
         
         self.show_containing_folder_button = self.create_button('mdi.folder-search-outline', 'Show containing folder', self.show_containing_folder, parent=self)
         self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
-        self.gaussianBlur_button = self.create_button('mdi.blur', 'Blur', self.gaussianBlur, parent=self)
-        self.rotate_button = self.create_button('mdi.crop-rotate', 'Rotate?', self.rotateCCW)
+        self.rotate_button = self.create_button('mdi6.rotate-left', 'Rotate', self.rotateCCW)
+        self.crop_button=self.create_button('fa.crop', 'crop', self.add_crop_rect, parent=self)
+
         self.flip_button = self.create_button('mdi.reflect-horizontal', 'Right click to flip vertically', self.flipH, parent=self)
         self.adjust_button = self.create_button('ei.adjust-alt', 'Adjust', self.adjust, parent=self)
         self.blur_background_button = self.create_button('fa.user', 'Portrait', self.blurBackground, parent=self)
@@ -515,21 +518,44 @@ class ImageViewer(QWidget):
         self.compare_button.released.connect(self.show_edited_image)
         self.revert_button = self.create_button(None, 'Revert', self.revert, parent=self,text='revert')
         self.save_button = self.create_button('fa5.save', '', self.save_image, parent=self)
-
         self.flip_button.setContextMenuPolicy(Qt.CustomContextMenu)
         self.flip_button.customContextMenuRequested.connect(self.flipV)
         self.rotate_button.setContextMenuPolicy(Qt.CustomContextMenu)
         self.rotate_button.customContextMenuRequested.connect(self.rotateCW)
 
         self.editing_buttons=[ self.scan_qrc_button ,self.adjust_button ,self.gray_button,
-                self.gaussianBlur_button,self.rotate_button,self.flip_button,
+                self.rotate_button,self.crop_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
         self.navigsetupLayoutation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
 
 
+    def add_crop_rect(self):
+            rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
+            edge_margin=int(min(self.image_width, self.image_height)*.07)
+            self.crop_rect = ResizableRectItem(rect,edge_margin)
+            self.scene.addItem(self.crop_rect)
+            self.rightBrowse.setVisible(False)
+            self.leftBrowse.setVisible(False)
+    def applyCrop(self):
+        if hasattr(self, 'crop_rect'):
+                coords = self.crop_rect.get_relative_coordinates()
+                print(f"Rectangle coordinates: x={coords['x']}, y={coords['y']}, "
+                      f"width={coords['width']}, height={coords['height']}")
+                if hasattr(self, 'edited_image'):
+                    img=self.edited_image
+                else :
+                    image_path = self.image_files[self.current_index]
+                    img = cv2.imread(image_path)
+                cropped_image = img[coords['y']:coords['y']+coords['height'], coords['x']:coords['x']+coords['width']]
+                self.edited_image=cropped_image
+                self.edit_history.append(self.edited_image)
+                self.show_edited_image()
+                #clean up
+                self.rightBrowse.setVisible(True)
+                self.leftBrowse.setVisible(True)
 
-
+    
     def setupLayout(self):
         layout = QVBoxLayout(self)
         self.Hlayout = QHBoxLayout()
@@ -629,7 +655,9 @@ class ImageViewer(QWidget):
         if self.image_files:
             image_path = self.image_files[self.current_index]
             pixmap = QPixmap(image_path)
-
+            image_size = pixmap.size()
+            self.image_width=image_size.width()
+            self.image_height=image_size.height()
             # Clear the scene before adding a new item
             self.scene.clear()
 
@@ -646,7 +674,7 @@ class ImageViewer(QWidget):
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
 
 
-            self.setWindowTitle(f'Image Viewer - {os.path.basename(image_path)}')
+            self.setWindowTitle(f'Ogallery - {os.path.basename(image_path)}')
             
 
 
@@ -725,7 +753,9 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_F1:
             help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
             QDesktopServices.openUrl(QUrl(help_page))
-            
+        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+            self.applyCrop()
+        super().keyPressEvent(event)
     
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -821,19 +851,7 @@ class ImageViewer(QWidget):
         self.edit_history.append(self.edited_image)
         self.show_edited_image()
         
-        
-    def gaussianBlur(self):
-        if hasattr(self, 'edited_image'):
-            img=self.edited_image
-        else :
-            image_path = self.image_files[self.current_index]
-            img = cv2.imread(image_path)
-        
-        Blurred_img=cv2.GaussianBlur(img,ksize=(3,3),sigmaX=1)
-        self.edited_image=Blurred_img
-        self.edit_history.append(self.edited_image)
-        self.show_edited_image()
-        
+       
         
     def rotateCCW(self):
         if hasattr(self, 'edited_image'):
@@ -1619,11 +1637,142 @@ class Menu(QObject):
     def showContainingFolderSignal(self):
         self.show_folder.emit()
 
-
-    
+class ResizableRectItem(QGraphicsRectItem):
+    def __init__(self, rect,edge_margin ,parent=None):
+        super().__init__(rect, parent)
+        self.setFlag(QGraphicsRectItem.ItemIsMovable)
+        self.setFlag(QGraphicsRectItem.ItemIsSelectable)
+        self.setFlag(QGraphicsRectItem.ItemSendsGeometryChanges)
         
- 
+        self.resizing = None
+        self.resize_start_pos = None
+        self.resize_start_rect = None
+        
+        # Define a small margin for easier edge detection
+        self.edge_margin = edge_margin
+
+    def shape(self):
+        path = QPainterPath()
+        path.addRect(self.rect())
+        return path
+
+    def mousePressEvent(self, event):
+        self.resizing = self.get_resize_edge(event.pos())
+        if self.resizing:
+            self.resize_start_pos = event.pos()
+            self.resize_start_rect = self.rect()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.resizing:
+            delta = event.pos() - self.resize_start_pos
+            new_rect = QRectF(self.resize_start_rect)
+            pos_delta = QPointF(0, 0)
             
+            if 'left' in self.resizing:
+                new_width = new_rect.width() - delta.x()
+                if new_width > 0:
+                    new_rect.setLeft(new_rect.right() - new_width)
+                    pos_delta.setX(delta.x())
+            if 'right' in self.resizing:
+                new_rect.setRight(new_rect.right() + delta.x())
+            if 'top' in self.resizing:
+                new_height = new_rect.height() - delta.y()
+                if new_height > 0:
+                    new_rect.setTop(new_rect.bottom() - new_height)
+                    pos_delta.setY(delta.y())
+            if 'bottom' in self.resizing:
+                new_rect.setBottom(new_rect.bottom() + delta.y())
+            
+            # Ensure the rectangle has a minimum size
+            min_size = 10  # You can adjust this value
+            if new_rect.width() < min_size:
+                new_rect.setWidth(min_size)
+            if new_rect.height() < min_size:
+                new_rect.setHeight(min_size)
+            
+            self.setRect(new_rect)
+            
+            # Update the position of the item
+            new_pos = self.pos() + pos_delta
+            self.setPos(new_pos)
+            
+            self.scene().update()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if self.resizing:
+            self.resizing = None
+        else:
+            super().mouseReleaseEvent(event)
+
+    def paint(self, painter, option, widget=None):
+        super().paint(painter, option, widget)
+        if self.isSelected():
+            painter.setPen(QPen(Qt.blue, 2, Qt.DashLine))
+            painter.drawRect(self.rect())
+
+    def hoverMoveEvent(self, event):
+        resize_edge = self.get_resize_edge(event.pos())
+        if resize_edge:
+            self.setCursor(self.get_cursor_for_edge(resize_edge))
+        else:
+            self.setCursor(Qt.ArrowCursor)
+        super().hoverMoveEvent(event)
+
+    def get_resize_edge(self, pos):
+        rect = self.rect()
+        x, y = pos.x(), pos.y()
+        
+        left = abs(x - rect.left()) < self.edge_margin
+        right = abs(x - rect.right()) < self.edge_margin
+        top = abs(y - rect.top()) < self.edge_margin
+        bottom = abs(y - rect.bottom()) < self.edge_margin
+
+        if left and top:
+            return 'top_left'
+        elif left and bottom:
+            return 'bottom_left'
+        elif right and top:
+            return 'top_right'
+        elif right and bottom:
+            return 'bottom_right'
+        elif left:
+            return 'left'
+        elif right:
+            return 'right'
+        elif top:
+            return 'top'
+        elif bottom:
+            return 'bottom'
+        
+        return None
+
+    def get_cursor_for_edge(self, edge):
+        cursor_map = {
+            'top_left': Qt.SizeFDiagCursor,
+            'top_right': Qt.SizeBDiagCursor,
+            'bottom_left': Qt.SizeBDiagCursor,
+            'bottom_right': Qt.SizeFDiagCursor,
+            'left': Qt.SizeHorCursor,
+            'right': Qt.SizeHorCursor,
+            'top': Qt.SizeVerCursor,
+            'bottom': Qt.SizeVerCursor
+        }
+        return cursor_map.get(edge, Qt.ArrowCursor)
+
+    def get_relative_coordinates(self):
+        scene_pos = self.scenePos()
+        rect = self.rect()
+        return {
+            'x': int(scene_pos.x()),
+            'y': int(scene_pos.y()),
+            'width': int(rect.width()),
+            'height': int(rect.height())
+        }
+
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
