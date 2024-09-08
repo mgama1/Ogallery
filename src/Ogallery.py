@@ -749,12 +749,18 @@ class ImageViewer(QWidget):
         
         if event.key()==Qt.Key_C:
             self.copyToClipboard()
-         
+
+        if event.key()==Qt.Key_I:
+            self.showImageInfo()
+            
         if event.key()==Qt.Key_F1:
             help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
             QDesktopServices.openUrl(QUrl(help_page))
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.applyCrop()
+        if event.key()==Qt.Key_Z:
+            self.checkZeroDisplacement()
+        
         super().keyPressEvent(event)
     
     def mouseDoubleClickEvent(self, event):
@@ -840,8 +846,30 @@ class ImageViewer(QWidget):
         clipboard = QApplication.clipboard()
         clipboard.setPixmap(QPixmap(image_path))
         
+    def showImageInfo(self):
+        file_size=self.format_file_size(os.path.getsize(self.image_files[self.current_index]))
         
-    
+        msg_box = InfoMessageBox()
+        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        msg_box.setIconPixmap(pixmap)
+        msg=f"""size: {self.image_width}x{self.image_height}
+        file size: {file_size}
+        """
+        msg_box.setText(msg)
+        msg_box.setWindowTitle('Image details')
+        msg_box.exec_()
+        
+    def format_file_size(self,size_in_bytes):
+        # Convert the file size to KB, MB, or GB depending on its size
+        if size_in_bytes < 1024:
+            return f"{size_in_bytes} bytes"
+        elif size_in_bytes < 1024 ** 2:
+            return f"{size_in_bytes / 1024:.2f} KB"
+        elif size_in_bytes < 1024 ** 3:
+            return f"{size_in_bytes / (1024 ** 2):.2f} MB"
+        else:
+            return f"{size_in_bytes / (1024 ** 3):.2f} GB"
+            
     def  BGR2GRAY(self):
         if hasattr(self, 'edited_image'):
             img=self.edited_image
@@ -1072,7 +1100,28 @@ class ImageViewer(QWidget):
                 
                 self.show_image()
             
-            
+    def checkZeroDisplacement(self):
+        """
+        Given an image img that has gone through rotation 4 times in the same direction, it is essentially the same image img
+        many other transformations can lead to this zero displacement effect
+        """
+        if hasattr(self, 'edited_image'):
+            img_path = self.image_files[self.current_index]
+            original_img=cv2.imread(img_path)
+            if original_img.shape ==self.edited_image.shape:
+                img_diff=self.edited_image-original_img
+                if np.sum(img_diff)==0:
+                    print("True")
+                else:
+                    print("false")
+                
+            else:
+                print("false")
+        else:
+            print("False")
+                
+        
+        
     def revert(self):
         self.purge()
         self.show_image()
@@ -1091,12 +1140,10 @@ class ImageViewer(QWidget):
             choice = msg_box.get_choice()
             
             if choice=="overwrite":
-                print("overwrite")
                 cv2.imwrite(img_path, self.edited_image)
                 file_name=img_path
 
             if choice=="copy":
-                print("copy")
                 mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
                 path = os.path.splitext(img_path)
                 file_name=f"{path[0]}_{mod_time}{path[-1]}"
