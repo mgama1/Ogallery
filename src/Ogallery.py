@@ -788,7 +788,9 @@ class ImageViewer(QWidget):
             msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
             msg_box.revert_signal.connect(self.revert)
             msg_box.exec_()
-        
+            if msg_box.get_choice()=='save':
+                self.save_image()
+            
         self.current_index = (self.current_index + 1) % len(self.image_files)
         self.purge()
         self.show_image()
@@ -798,7 +800,9 @@ class ImageViewer(QWidget):
             msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
             msg_box.revert_signal.connect(self.revert)
             msg_box.exec_()
-            
+            if msg_box.get_choice()=='save':
+                self.save_image()
+                
         self.current_index = (self.current_index - 1) % len(self.image_files)
         self.purge()
         self.show_image()
@@ -1070,23 +1074,43 @@ class ImageViewer(QWidget):
             
             
     def revert(self):
+        self.purge()
+        self.show_image()
+    def purge(self):
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
         self.edit_history=[]
-        self.show_image()
-    def purge(self):
+        
         self.closeAllQRCodes()
         
     def save_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SavingMessageBox(self.image_files[self.current_index],self.edited_image)
+            img_path=self.image_files[self.current_index]
+            msg_box = SavingMessageBox(img_path,self.edited_image)
             msg_box.exec_()
-            delattr(self,'edited_image')
-            self.edit_history=[]
             choice = msg_box.get_choice()
-            file_name=msg_box.getFileName()
+            
+            if choice=="overwrite":
+                print("overwrite")
+                cv2.imwrite(img_path, self.edited_image)
+                file_name=img_path
+
+            if choice=="copy":
+                print("copy")
+                mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
+                path = os.path.splitext(img_path)
+                file_name=f"{path[0]}_{mod_time}{path[-1]}"
+                cv2.imwrite(file_name,self.edited_image)
+                
             saved={'index':self.current_index,'choice':choice,'file_name':file_name}
             self.main_widget.imageViewerSaved(saved)
+            
+            delattr(self,'edited_image')
+            self.edit_history=[]
+            
+            
+            
+            
             
         else:
             self.showErrorMessage("no changes were made!")

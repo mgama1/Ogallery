@@ -38,15 +38,10 @@ class SavingMessageBox(QMessageBox):
 
     def handle_overwrite(self):
         self.choice = "overwrite"
-        self.file_name=self.image_path
-        cv2.imwrite(self.file_name, self.edited_image)
+
 
     def handle_copy(self):
         self.choice = "copy"
-        mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-        path = os.path.splitext(self.image_path)
-        self.file_name=f"{path[0]}_{mod_time}{path[-1]}"
-        cv2.imwrite(self.file_name,self.edited_image)
         
     def get_choice(self):
         return self.choice
@@ -98,13 +93,17 @@ class SaveDiscardMessageBox(QMessageBox):
         self.discard_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['red']}; }}")
         
     def handle_save(self):
-        msg_box = SavingMessageBox(self.image_path,self.edited_image)
-        msg_box.exec_()
+        self.choice='save'
+        
 
     def handle_discard(self):
-        self.revert_signal.emit()
+        self.choice='discard'
+        #self.revert_signal.emit()
         
-        
+    def get_choice(self):
+        return self.choice
+    def getFileName(self):
+        return self.file_name
  
 
 class QPushButtonHighlight(QPushButton):
