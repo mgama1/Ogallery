@@ -2,7 +2,7 @@
 ![image](https://github.com/user-attachments/assets/50b261f9-c025-4c53-80aa-e6197499c0ef)
 
 ## Website
-https://mgama1.github.io/Ogallery/
+https://ogalleryapp.github.io/
 ### Viewer features:
  - fullscreen mode
  - show containing folder
