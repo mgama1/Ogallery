@@ -506,7 +506,7 @@ class ImageViewer(QWidget):
         self.show_containing_folder_button = self.create_button('mdi.folder-search-outline', 'Show containing folder', self.show_containing_folder, parent=self)
         self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
         self.rotate_button = self.create_button('mdi6.rotate-left', 'Rotate', self.rotateCCW)
-        self.crop_button=self.create_button('fa.crop', 'crop', self.add_crop_rect, parent=self)
+        self.crop_button=self.create_button('mdi.crop', 'crop', self.add_crop_rect, parent=self)
 
         self.flip_button = self.create_button('mdi.reflect-horizontal', 'Right click to flip vertically', self.flipH, parent=self)
         self.adjust_button = self.create_button('ei.adjust-alt', 'Adjust', self.adjust, parent=self)
@@ -1131,10 +1131,11 @@ class ImageViewer(QWidget):
         self.purge()
         self.show_image()
     def purge(self):
+        print("adios mfs")
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
         self.edit_history=[]
-        
+        self.scene.clear()
         self.closeAllQRCodes()
         
     def save_image(self):
@@ -1249,6 +1250,7 @@ class ImageViewer(QWidget):
 
     
     def closeEvent(self, event):
+        
         # Override the closeEvent method to handle the window close event
         self.purge()
         self.finishedSignal.emit()
