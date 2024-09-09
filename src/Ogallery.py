@@ -1138,7 +1138,7 @@ class ImageViewer(QWidget):
         self.closeAllQRCodes()
         
     def save_image(self):
-        if hasattr(self, 'edited_image'):
+        if not self.checkZeroDisplacement():
             img_path=self.image_files[self.current_index]
             msg_box = SavingMessageBox(img_path,self.edited_image)
             msg_box.exec_()
