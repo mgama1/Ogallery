@@ -1,12 +1,11 @@
 import time
 s=time.time()
-
 import threading
 import yaml
 from pyzbar.pyzbar import decode as decodeqr
 import multiprocessing
 import os
-
+import gc
 import subprocess
 
 from PIL import Image
@@ -677,7 +676,6 @@ class ImageViewer(QWidget):
             self.setWindowTitle(f'Ogallery - {os.path.basename(image_path)}')
             
 
-
     def show_edited_image(self):
         try:
             self.scene.clear()
@@ -1131,11 +1129,15 @@ class ImageViewer(QWidget):
         self.purge()
         self.show_image()
     def purge(self):
-        print("adios mfs")
+        """
+        Clears and releases the following resources: edited_image, edit_history , scene. 
+        as well as Runs the garbage collector and closes no longer needed widgets 
+        """
         if hasattr(self, 'edited_image'):
             delattr(self,'edited_image')
         self.edit_history=[]
         self.scene.clear()
+        gc.collect()
         self.closeAllQRCodes()
         
     def save_image(self):
