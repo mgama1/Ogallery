@@ -758,8 +758,7 @@ class ImageViewer(QWidget):
             QDesktopServices.openUrl(QUrl(help_page))
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.applyCrop()
-        if event.key()==Qt.Key_Z:
-            print(self.checkZeroDisplacement())
+        
         
         super().keyPressEvent(event)
     
@@ -790,26 +789,24 @@ class ImageViewer(QWidget):
             button.setVisible(self.fullscreen)
         
     def next_image(self):
-        if hasattr(self, 'edited_image'):
-            if not self.checkZeroDisplacement():
-                msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
-                msg_box.revert_signal.connect(self.revert)
-                msg_box.exec_()
-                if msg_box.get_choice()=='save':
-                    self.save_image()
+        if not self.checkZeroDisplacement():
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+            if msg_box.get_choice()=='save':
+                self.save_image()
                 
         self.current_index = (self.current_index + 1) % len(self.image_files)
         self.purge()
         self.show_image()
 
     def previous_image(self):
-        if hasattr(self, 'edited_image'):
-            if not self.checkZeroDisplacement():
-                msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
-                msg_box.revert_signal.connect(self.revert)
-                msg_box.exec_()
-                if msg_box.get_choice()=='save':
-                    self.save_image()
+        if not self.checkZeroDisplacement():
+            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+            msg_box.revert_signal.connect(self.revert)
+            msg_box.exec_()
+            if msg_box.get_choice()=='save':
+                self.save_image()
                 
         self.current_index = (self.current_index - 1) % len(self.image_files)
         self.purge()
@@ -1126,7 +1123,7 @@ class ImageViewer(QWidget):
             else:
                 return False
         else:
-            return False
+            return True
                 
         
         
