@@ -1717,11 +1717,12 @@ class Menu(QObject):
         self.show_folder.emit()
 
 class ResizableRectItem(QGraphicsRectItem):
-    def __init__(self, rect,edge_margin ,parent=None):
+    def __init__(self, rect, edge_margin, parent=None):
         super().__init__(rect, parent)
         self.setFlag(QGraphicsRectItem.ItemIsMovable)
         self.setFlag(QGraphicsRectItem.ItemIsSelectable)
         self.setFlag(QGraphicsRectItem.ItemSendsGeometryChanges)
+        self.setAcceptHoverEvents(True)  # Enable hover events
         
         self.resizing = None
         self.resize_start_pos = None
@@ -1784,6 +1785,7 @@ class ResizableRectItem(QGraphicsRectItem):
     def mouseReleaseEvent(self, event):
         if self.resizing:
             self.resizing = None
+            self.unsetCursor()  # Reset cursor when resizing is done
         else:
             super().mouseReleaseEvent(event)
 
@@ -1798,17 +1800,21 @@ class ResizableRectItem(QGraphicsRectItem):
         if resize_edge:
             self.setCursor(self.get_cursor_for_edge(resize_edge))
         else:
-            self.setCursor(Qt.ArrowCursor)
+            self.unsetCursor()
         super().hoverMoveEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        self.unsetCursor()
+        super().hoverLeaveEvent(event)
 
     def get_resize_edge(self, pos):
         rect = self.rect()
         x, y = pos.x(), pos.y()
         
-        left = abs(x - rect.left()) < self.edge_margin
-        right = abs(x - rect.right()) < self.edge_margin
-        top = abs(y - rect.top()) < self.edge_margin
-        bottom = abs(y - rect.bottom()) < self.edge_margin
+        left = abs(x) < self.edge_margin
+        right = abs(x - rect.width()) < self.edge_margin
+        top = abs(y) < self.edge_margin
+        bottom = abs(y - rect.height()) < self.edge_margin
 
         if left and top:
             return 'top_left'
@@ -1851,7 +1857,7 @@ class ResizableRectItem(QGraphicsRectItem):
             'width': int(rect.width()),
             'height': int(rect.height())
         }
-
+        
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
