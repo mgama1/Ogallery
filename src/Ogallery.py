@@ -759,7 +759,7 @@ class ImageViewer(QWidget):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.applyCrop()
         if event.key()==Qt.Key_Z:
-            self.checkZeroDisplacement()
+            print(self.checkZeroDisplacement())
         
         super().keyPressEvent(event)
     
@@ -791,23 +791,25 @@ class ImageViewer(QWidget):
         
     def next_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
-            msg_box.revert_signal.connect(self.revert)
-            msg_box.exec_()
-            if msg_box.get_choice()=='save':
-                self.save_image()
-            
+            if not self.checkZeroDisplacement():
+                msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+                msg_box.revert_signal.connect(self.revert)
+                msg_box.exec_()
+                if msg_box.get_choice()=='save':
+                    self.save_image()
+                
         self.current_index = (self.current_index + 1) % len(self.image_files)
         self.purge()
         self.show_image()
 
     def previous_image(self):
         if hasattr(self, 'edited_image'):
-            msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
-            msg_box.revert_signal.connect(self.revert)
-            msg_box.exec_()
-            if msg_box.get_choice()=='save':
-                self.save_image()
+            if not self.checkZeroDisplacement():
+                msg_box = SaveDiscardMessageBox(self.image_files[self.current_index],self.edited_image)
+                msg_box.revert_signal.connect(self.revert)
+                msg_box.exec_()
+                if msg_box.get_choice()=='save':
+                    self.save_image()
                 
         self.current_index = (self.current_index - 1) % len(self.image_files)
         self.purge()
@@ -1102,8 +1104,14 @@ class ImageViewer(QWidget):
             
     def checkZeroDisplacement(self):
         """
-        Given an image img that has gone through rotation 4 times in the same direction, it is essentially the same image img
-        many other transformations can lead to this zero displacement effect
+        an image can go through a series of transformations that makes it efficefively equivalent to the orignal image
+        eg: rotation 4 times (or multiple) in the same direction or flipping twice (or multiple)
+        Args:
+            None
+
+        Returns:
+            Boolen
+            
         """
         if hasattr(self, 'edited_image'):
             img_path = self.image_files[self.current_index]
@@ -1111,14 +1119,14 @@ class ImageViewer(QWidget):
             if original_img.shape ==self.edited_image.shape:
                 img_diff=self.edited_image-original_img
                 if np.sum(img_diff)==0:
-                    print("True")
+                    return True
                 else:
-                    print("false")
+                    return False
                 
             else:
-                print("false")
+                return False
         else:
-            print("False")
+            return False
                 
         
         
@@ -1861,7 +1869,7 @@ def run_inference_model():
 if __name__ == '__main__':
     gui_process = multiprocessing.Process(target=run_gui)
     inference_process = multiprocessing.Process(target=run_inference_model)
-
+ 
     
     gui_process.start()
     inference_process.start()
