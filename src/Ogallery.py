@@ -481,6 +481,7 @@ class ImageViewer(QWidget):
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
+        self.menu.show_img_info_sig.connect(self.showImageInfo)
         self.image_view.installEventFilter(self.menu)
 
     def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
@@ -844,14 +845,13 @@ class ImageViewer(QWidget):
         clipboard.setPixmap(QPixmap(image_path))
         
     def showImageInfo(self):
-        file_size=self.format_file_size(os.path.getsize(self.image_files[self.current_index]))
-        
+        img_path=self.image_files[self.current_index]
+        file_size=self.format_file_size(os.path.getsize(img_path))
+        type = (os.path.splitext(img_path)[-1][1:]).upper()
         msg_box = InfoMessageBox()
-        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        pixmap = QPixmap('media/info.png').scaledToWidth(150)
         msg_box.setIconPixmap(pixmap)
-        msg=f"""size: {self.image_width}x{self.image_height}
-        file size: {file_size}
-        """
+        msg=f"size: {self.image_width}x{self.image_height} pixels \nfile size: {file_size}\ntype: {type}"
         msg_box.setText(msg)
         msg_box.setWindowTitle('Image details')
         msg_box.exec_()
@@ -1214,7 +1214,7 @@ class ImageViewer(QWidget):
             None
         '''
         msg_box = InfoMessageBox()
-        pixmap = QPixmap('media/angry.png').scaledToWidth(150)
+        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
         msg_box.setIconPixmap(pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
@@ -1671,7 +1671,7 @@ class Menu(QObject):
     copy_signal = pyqtSignal()
     delete_signal = pyqtSignal()
     show_folder = pyqtSignal()
-
+    show_img_info_sig=pyqtSignal()
     def __init__(self, graphics_view):
         super().__init__()
         self.opened_menu = None
@@ -1684,14 +1684,21 @@ class Menu(QObject):
             if self.opened_menu is not None:
                 self.opened_menu.close()
             menu = QMenu()
+
             copy_action = QAction("Copy", menu)
-            copy_action.triggered.connect(self.copyToClipboardSignal)
+            copy_action.triggered.connect(lambda:self.copy_signal.emit())
             menu.addAction(copy_action)
+
             delete_action = QAction("Delete", menu)
-            delete_action.triggered.connect(self.deleteSignal)
+            delete_action.triggered.connect(lambda:self.delete_signal.emit())
             menu.addAction(delete_action)
+
+            show_info_action = QAction("image details", menu)
+            show_info_action.triggered.connect(lambda:self.show_img_info_sig.emit())
+            menu.addAction(show_info_action)
+
             show_folder_action = QAction("Show Containing Folder", menu)
-            show_folder_action.triggered.connect(self.showContainingFolderSignal)
+            show_folder_action.triggered.connect(lambda:self.show_folder.emit())
             menu.addAction(show_folder_action)
 
             self.opened_menu = menu
@@ -1708,14 +1715,9 @@ class Menu(QObject):
             return True
         return False
 
-    def deleteSignal(self):
-        self.delete_signal.emit()
-
-    def copyToClipboardSignal(self):
-        self.copy_signal.emit()
-
-    def showContainingFolderSignal(self):
-        self.show_folder.emit()
+          
+    
+    
 
 class ResizableRectItem(QGraphicsRectItem):
     def __init__(self, rect, edge_margin, parent=None):
