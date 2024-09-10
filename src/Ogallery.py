@@ -1686,7 +1686,7 @@ class Menu(QObject):
             menu = QMenu()
 
             copy_action = QAction("Copy", menu)
-            copy_action.triggered.connect(lambda:self.copy_signal.emit())
+            copy_action.triggered.connect(self.copy_signal.emit())
             menu.addAction(copy_action)
 
             delete_action = QAction("Delete", menu)
@@ -1781,7 +1781,7 @@ class ResizableRectItem(QGraphicsRectItem):
             new_pos = self.pos() + pos_delta
             self.setPos(new_pos)
             
-            self.scene().update()
+            self.update()
         else:
             super().mouseMoveEvent(event)
 
