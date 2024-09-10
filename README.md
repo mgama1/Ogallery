@@ -4,21 +4,25 @@
 ## Website
 https://ogalleryapp.github.io/
 ### Viewer features:
- - fullscreen mode
+ - Full-screen mode
  - show containing folder
  - copy to clipboard
  - move to trash
  - QR-Code scan
+ - image properties
    
 ### Editing features:
  - grayscale
  - rotation
+ - cropping
  - flipping
- - blur
  - portrait(blur background)
  - Compare
+ - revert
+ - undo/redo
  - Adjust (Contrast, Brightness, Saturation, Hue)
 
-
-## Meet jiffy
-![jellyfish](https://github.com/mgama1/Ogallery/assets/40968723/28a3d604-f660-40a9-a918-221cfaa445d6)
+### search features:
+ - search on common classes
+ - misspelling handling
+ - autocomplete suggestion 
