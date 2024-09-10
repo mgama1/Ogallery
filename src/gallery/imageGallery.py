@@ -214,3 +214,33 @@ class ImageGalleryApp(QMainWindow):
             
         if event.key() == Qt.Key_T:
             self.scroll.setValue(0)
+
+    def closeEvent(self, event):
+        # Perform any necessary cleanup before closing the app
+        
+        # 1. Stop and delete timers
+        self.visiblity_timer.stop()
+        self.visiblity_timer.deleteLater()
+        
+        # 2. Remove and delete all thumbnail widgets
+        for thumbnail_widget in self.thumbnail_widgets:
+            thumbnail_widget.selectedSig.disconnect()  # Disconnect any signals
+            self.grid_layout.removeWidget(thumbnail_widget)
+            thumbnail_widget.deleteLater()
+        
+        self.thumbnail_widgets.clear()  # Clear the list of thumbnails
+        self.image_files.clear()
+        self.selected_indices.clear()
+        # 3. Disconnect any other signals
+        self.scroll.valueChanged.disconnect(self.loadNextBatch)
+        self.backToTopButton.clicked.disconnect()
+
+        # 4. Release references to other resources
+        self.main_widget = None  # Clear the main widget reference
+        
+        # 5. Delete central widget explicitly (optional)
+        self.centralWidget().deleteLater()
+        
+        # 6. Accept the close event
+        event.accept()
+
