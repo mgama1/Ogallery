@@ -440,10 +440,7 @@ class ImageViewer(QWidget):
 
         self.edit_history=[]
         self.fullscreen = False
-        #self.image_width=0
-        #self.image_height=0
-        #self.setMouseTracking(True)
-
+       
         self.init_ui()
         
 
@@ -470,12 +467,18 @@ class ImageViewer(QWidget):
         self.image_view.setAlignment(Qt.AlignCenter)
         self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.image_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
         QTimer.singleShot(0, self.handle_timeout)
         self.image_view.wheelEvent = self.zoom_image
         self.image_view.setFocusPolicy(Qt.NoFocus)
+        
+        # Enable mouse tracking for panning
+        self.image_view.setMouseTracking(True)
+        self.image_view.mousePressEvent = self.start_pan
+        self.image_view.mouseMoveEvent = self.pan_image
+        self.image_view.mouseReleaseEvent = self.stop_pan
+        self.panning = False
     def setupMenu(self):
         self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
@@ -656,47 +659,25 @@ class ImageViewer(QWidget):
             image_path = self.image_files[self.current_index]
             pixmap = QPixmap(image_path)
             image_size = pixmap.size()
-            self.image_width=image_size.width()
-            self.image_height=image_size.height()
-            # Clear the scene before adding a new item
+            self.image_width = image_size.width()
+            self.image_height = image_size.height()
             self.scene.clear()
-
-            # Add a QGraphicsPixmapItem to the scene
-            pixmap_item = QGraphicsPixmapItem(pixmap)
-            self.scene.addItem(pixmap_item)
-
-        
-            
-            # Set the scene rect to match the pixmap size
-            self.scene.setSceneRect(pixmap_item.boundingRect())
-
-            # Fit the image to the view
-            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
-
-
+            self.pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(self.pixmap_item)
+            self.scene.setSceneRect(self.pixmap_item.boundingRect())
+            self.image_view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
             self.setWindowTitle(f'Ogallery - {os.path.basename(image_path)}')
-            
 
     def show_edited_image(self):
         try:
             self.scene.clear()
             pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
-
-
-
-
-            # Add a QGraphicsPixmapItem to the scene
-            pixmap_item = QGraphicsPixmapItem(pixmap)
-            self.scene.addItem(pixmap_item)
-
-            # Set the scene rect to match the pixmap size
-            self.scene.setSceneRect(pixmap_item.boundingRect())
-
-            # Fit the image to the view
-            self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
+            self.pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(self.pixmap_item)
+            self.scene.setSceneRect(self.pixmap_item.boundingRect())
+            self.image_view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
         except:
             self.show_image()
-        
 
         
     def handle_timeout(self):
@@ -708,21 +689,28 @@ class ImageViewer(QWidget):
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
         
     def zoom_image(self, event):
-        # Get the current transformation matrix of the view
-        transform = self.image_view.transform()
+        factor = 1.1 if event.angleDelta().y() > 0 else 0.9
+        self.image_view.scale(factor, factor)
 
-        # Set the transformation anchor to the center of the view
-        self.image_view.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+    def start_pan(self, event):
+        if event.button() == Qt.LeftButton:
+            self.panning = True
+            self.last_pos = event.pos()
+            self.image_view.setCursor(QCursor(Qt.ClosedHandCursor))
 
-        # Get the zoom factor
-        delta = event.angleDelta().y() / 120  # Get the scroll steps (typically 120 per step)
-        zoom_factor = 1.1 if delta > 0 else 0.9  # Define the zoom factor
+    def pan_image(self, event):
+        if self.panning:
+            delta = event.pos() - self.last_pos
+            self.image_view.horizontalScrollBar().setValue(
+                self.image_view.horizontalScrollBar().value() - delta.x())
+            self.image_view.verticalScrollBar().setValue(
+                self.image_view.verticalScrollBar().value() - delta.y())
+            self.last_pos = event.pos()
 
-        # Scale the view using zoom_factor
-        transform.scale(zoom_factor, zoom_factor)
-
-        # Apply the new transformation to the view
-        self.image_view.setTransform(transform)
+    def stop_pan(self, event):
+        if event.button() == Qt.LeftButton:
+            self.panning = False
+            self.image_view.setCursor(QCursor(Qt.ArrowCursor))
 
 
     def keyPressEvent(self, event):
