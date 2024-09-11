@@ -193,7 +193,7 @@ class ImageGalleryApp(QMainWindow):
         self.refreshLayout()
     
 
-    def removeThumbnails(self, thumbnails_indices_list):
+    def removeBatch(self, thumbnails_indices_list):
         # Sort indices in reverse order to avoid index shifting issues
         thumbnails_indices_list.sort(reverse=True)
         for thumbnail_index in thumbnails_indices_list:
@@ -210,7 +210,7 @@ class ImageGalleryApp(QMainWindow):
             self.close()        
 
         if event.key() == Qt.Key_Delete:
-            self.removeThumbnails(self.getIndicesToDelete())
+            self.removeBatch(self.getIndicesToDelete())
             
         if event.key() == Qt.Key_T:
             self.scroll.setValue(0)

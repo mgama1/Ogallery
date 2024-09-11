@@ -14,7 +14,7 @@ import qtawesome as qta
 
 from PyQt5.QtWidgets import *
 
-from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen
+from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen,QFont,QBrush
 from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl,QRectF,QPointF
 from PyQt5.QtCore import pyqtSlot
 from itertools import chain
@@ -1014,44 +1014,48 @@ class ImageViewer(QWidget):
         self.show_edited_image()
     
     def scanQRC(self):
-        decoded_list = decodeqr(Image.open(self.image_files[self.current_index]))
-        self.qrcode_windows = []  # Create a list to store all the QRCodeWindow instances
         
-        parent_rect = self.geometry()
-        img_shape = cv2.imread(self.image_files[self.current_index]).shape
-        scale_factor = self.image_view.transform().m11()
+        decoded_list = decodeqr(Image.open(self.image_files[self.current_index]))
         
         for box in decoded_list:
-            decoded = box[0]
             rpos_x, rpos_y = box.polygon[1]
             
             decoded_text = box.data.decode()
             if decoded_text:
-                qrcode_window = QRCodeWindow(decoded_text)
-                self.qrcode_windows.append(qrcode_window)  # Add the window to the list to keep a reference
                 
-                # Calculate the displayed dimensions
-                displayed_width = img_shape[1] * scale_factor
-                displayed_height = img_shape[0] * scale_factor  # Fixed the height calculation to use img_shape[0]
-                
-                # Get the bounding box of the QR code
-                min_x = min(point.x for point in box.polygon)
-                max_x = max(point.x for point in box.polygon)
-                min_y = min(point.y for point in box.polygon)
-                max_y = max(point.y for point in box.polygon)
-                
-                # Calculate the center of the QR code
-                center_x = (min_x + max_x) / 2
-                center_y = (min_y + max_y) / 2
-                
-                pos_x = int(parent_rect.left() + (parent_rect.width() - displayed_width) // 2 + (center_x * scale_factor) - 25)  # Center the text horizontally
-                pos_y = int(parent_rect.top() + (parent_rect.height() - displayed_height) // 2 + (center_y * scale_factor) - 10)  # Center the text vertically
-                
-                qrcode_window.setGeometry(pos_x, pos_y, 50, 20)  # Adjust the size as needed
-                qrcode_window.setStyleSheet("background-color: rgba(255, 255, 255, 0.5);")
-                
-                qrcode_window.show()
+                self.add_hyperlink_to_scene(f'{decoded_text[:20]}...',decoded_text,rpos_x,rpos_y)
 
+
+    def add_hyperlink_to_scene(self,text,url,pos_x,pos_y):         
+        # Create the text item
+        text_item = ClickableTextItem(text, url)
+
+        # Set the font
+        font = QFont("Arial", 20)
+        text_item.setFont(font)
+        text_item.setDefaultTextColor(QColor("blue"))
+        # Set the position of the text item
+        text_item.setPos(pos_x, pos_y)
+
+        # Calculate the bounding rectangle of the text
+        text_rect = text_item.boundingRect()
+
+        # Create a background rectangle with transparency
+        rect_item = QGraphicsRectItem(QRectF(text_rect))
+
+        # Set a transparent white background (alpha = 150, range 0-255)
+        transparent_white = QColor(255, 255, 255, 150)  # Alpha 150 for transparency
+        rect_item.setBrush(QBrush(transparent_white))
+
+        # Remove the border by setting the pen to no pen
+        rect_item.setPen(QPen(Qt.NoPen))
+
+        # Position the background rectangle at the same position as the text
+        rect_item.setPos(pos_x, pos_y)
+
+        # Add the background rectangle and text item to the scene
+        self.scene.addItem(rect_item)
+        self.scene.addItem(text_item)
 
     def closeAllQRCodes(self):
         if hasattr(self,'qrcode_windows'):
@@ -1861,6 +1865,16 @@ class ResizableRectItem(QGraphicsRectItem):
             'height': int(rect.height())
         }
         
+class ClickableTextItem(QGraphicsTextItem):
+    def __init__(self, html_text, url, parent=None):
+        super().__init__(html_text, parent)
+        self.url = url
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            # Open the hyperlink in the default web browser
+            QDesktopServices.openUrl(QUrl(self.url))
+
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
