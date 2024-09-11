@@ -761,6 +761,8 @@ class ImageViewer(QWidget):
         
         super().keyPressEvent(event)
     
+    
+
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.toggleFullScreen()
@@ -786,6 +788,8 @@ class ImageViewer(QWidget):
     def toggleButtonsVisibility(self,buttons_list):
         for button in buttons_list:
             button.setVisible(self.fullscreen)
+        self.back_button.setVisible(self.fullscreen)
+        self.show_containing_folder_button.setVisible(self.fullscreen)
         
     def next_image(self):
         if not self.checkZeroDisplacement():
