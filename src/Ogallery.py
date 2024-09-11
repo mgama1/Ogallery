@@ -1026,40 +1026,37 @@ class ImageViewer(QWidget):
                 self.add_hyperlink_to_scene(f'{decoded_text[:20]}...',decoded_text,rpos_x,rpos_y)
 
 
-    def add_hyperlink_to_scene(self,text,url,pos_x,pos_y):         
+    def add_hyperlink_to_scene(self, text, url, pos_x, pos_y):
         # Create the text item
-        text_item = ClickableTextItem(text, url)
-
+        text_item = ClickableTextItem(text, url, self.scene)
         # Set the font
-        font = QFont("Arial", 20)
+        font = QFont("Arial", int(self.image_width*.015))
         text_item.setFont(font)
         text_item.setDefaultTextColor(QColor("blue"))
         # Set the position of the text item
         text_item.setPos(pos_x, pos_y)
-
+        
         # Calculate the bounding rectangle of the text
         text_rect = text_item.boundingRect()
-
         # Create a background rectangle with transparency
         rect_item = QGraphicsRectItem(QRectF(text_rect))
-
         # Set a transparent white background (alpha = 150, range 0-255)
         transparent_white = QColor(255, 255, 255, 150)  # Alpha 150 for transparency
         rect_item.setBrush(QBrush(transparent_white))
-
         # Remove the border by setting the pen to no pen
         rect_item.setPen(QPen(Qt.NoPen))
-
         # Position the background rectangle at the same position as the text
         rect_item.setPos(pos_x, pos_y)
-
+        
         # Add the background rectangle and text item to the scene
         self.scene.addItem(rect_item)
         self.scene.addItem(text_item)
+        
+        # Store the rect_item in the text_item for later removal
+        text_item.background_rect = rect_item
 
     
 
-         
         
     def convert_cv_image_to_qpixmap(self, cv_image):
         # Check if the image has an alpha channel (4 channels)
@@ -1834,14 +1831,20 @@ class ResizableRectItem(QGraphicsRectItem):
         }
         
 class ClickableTextItem(QGraphicsTextItem):
-    def __init__(self, html_text, url, parent=None):
+    def __init__(self, html_text, url, scene, parent=None):
         super().__init__(html_text, parent)
         self.url = url
+        self.scene = scene
+        self.background_rect = None
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             # Open the hyperlink in the default web browser
             QDesktopServices.openUrl(QUrl(self.url))
+            # Remove the text item and its background rectangle from the scene
+            if self.background_rect:
+                self.scene.removeItem(self.background_rect)
+            self.scene.removeItem(self)
 
 def run_gui():
     app = QApplication([])    
