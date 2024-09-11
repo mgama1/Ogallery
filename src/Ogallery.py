@@ -1057,11 +1057,7 @@ class ImageViewer(QWidget):
         self.scene.addItem(rect_item)
         self.scene.addItem(text_item)
 
-    def closeAllQRCodes(self):
-        if hasattr(self,'qrcode_windows'):
-            for window in self.qrcode_windows:
-                window.close()
-            self.qrcode_windows = []  
+    
 
          
         
@@ -1142,7 +1138,6 @@ class ImageViewer(QWidget):
         self.edit_history=[]
         self.scene.clear()
         gc.collect()
-        self.closeAllQRCodes()
         
     def save_image(self):
         if not self.checkZeroDisplacement():
@@ -1262,33 +1257,6 @@ class ImageViewer(QWidget):
         self.finishedSignal.emit()
         event.accept()
         
-
-
-
-class QRCodeWindow(QWidget):
-    def __init__(self, decoded_text):
-        super().__init__()
-        self.setGeometry(0,0,15,15)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-
-        self.qrtext_label = QLabel(self)
-        # Set the text as a hyperlink
-        self.qrtext_label.setText(f'<a href="{decoded_text}">{decoded_text}</a>')
-        self.qrtext_label.setOpenExternalLinks(True)  # Open the link in a web browser
-        self.qrtext_label.adjustSize()
-        #self.qrtext_label.setGeometry(0, 0, self.width() // 2, self.qrtext_label.height())
-
-        self.close_button = QPushButton("x", self)
-        #self.close_button.setGeometry(self.width()-5,0, 20, 20)
-        self.close_button.clicked.connect(self.close)
-        self.qrtext_label.setMaximumWidth(200)
-        self.close_button.setFixedSize(15,15)
-        layout=QVBoxLayout()
-        layout.addWidget(self.close_button)
-        layout.addWidget(self.qrtext_label)
-        self.setLayout(layout)
-
 
 
 
