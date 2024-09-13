@@ -1092,12 +1092,11 @@ class ImageViewer(QWidget):
             Boolen
             
         """
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img_path = self.image_files[self.current_index]
             original_img=cv2.imread(img_path)
             if original_img.shape ==self.edited_image.shape:
-                img_diff=self.edited_image-original_img
-                if np.sum(img_diff)==0:
+                if np.array_equal(original_img,self.edited_image):
                     return True
                 else:
                     return False
@@ -1117,9 +1116,8 @@ class ImageViewer(QWidget):
         Clears and releases the following resources: edited_image, edit_history , scene. 
         as well as Runs the garbage collector and closes no longer needed widgets 
         """
-        if hasattr(self, 'edited_image'):
-            delattr(self,'edited_image')
-        self.edit_history=[]
+        self.edited_image=None
+        self.edit_history=CircularBuffer(10)
         self.scene.clear()
         gc.collect()
         
@@ -1143,8 +1141,8 @@ class ImageViewer(QWidget):
             saved={'index':self.current_index,'choice':choice,'file_name':file_name}
             self.main_widget.imageViewerSaved(saved)
             
-            delattr(self,'edited_image')
-            self.edit_history=[]
+            self.edited_image=None
+            self.edit_history=CircularBuffer(10)
             
             
             
