@@ -437,10 +437,10 @@ class ImageViewer(QWidget):
             self.config_data = yaml.safe_load(file)
         self.current_index = main_widget.images.index(image_path)
         self.image_files = self.main_widget.images
-
-        self.edit_history=[]
+        
+        self.edit_history=CircularBuffer(10)
         self.fullscreen = False
-       
+        self.edited_image=None
         self.init_ui()
         
 
@@ -534,30 +534,37 @@ class ImageViewer(QWidget):
 
 
     def add_crop_rect(self):
+            
+            self.image_view.mousePressEvent = None
+            self.image_view.mouseMoveEvent = None
+            self.image_view.mouseReleaseEvent = None
+
             rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
             edge_margin=int(min(self.image_width, self.image_height)*.07)
             self.crop_rect = ResizableRectItem(rect,edge_margin)
             self.scene.addItem(self.crop_rect)
             self.rightBrowse.setVisible(False)
             self.leftBrowse.setVisible(False)
+            
     def applyCrop(self):
         if hasattr(self, 'crop_rect'):
                 coords = self.crop_rect.get_relative_coordinates()
                 print(f"Rectangle coordinates: x={coords['x']}, y={coords['y']}, "
                       f"width={coords['width']}, height={coords['height']}")
-                if hasattr(self, 'edited_image'):
+                if self.edited_image is not None:
                     img=self.edited_image
                 else :
                     image_path = self.image_files[self.current_index]
                     img = cv2.imread(image_path)
                 cropped_image = img[coords['y']:coords['y']+coords['height'], coords['x']:coords['x']+coords['width']]
+                
+                self.edit_history.add(self.edited_image)
                 self.edited_image=cropped_image
-                self.edit_history.append(self.edited_image)
                 self.show_edited_image()
                 #clean up
                 self.rightBrowse.setVisible(True)
                 self.leftBrowse.setVisible(True)
-
+                delattr(self,"crop_rect")
     
     def setupLayout(self):
         layout = QVBoxLayout(self)
@@ -689,16 +696,22 @@ class ImageViewer(QWidget):
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
         
     def zoom_image(self, event):
+        if hasattr(self, 'crop_rect'):
+            return
         factor = 1.1 if event.angleDelta().y() > 0 else 0.9
         self.image_view.scale(factor, factor)
 
     def start_pan(self, event):
+        if hasattr(self, 'crop_rect'):
+            return
         if event.button() == Qt.LeftButton:
             self.panning = True
             self.last_pos = event.pos()
             self.image_view.setCursor(QCursor(Qt.ClosedHandCursor))
 
     def pan_image(self, event):
+        if hasattr(self, 'crop_rect'):
+            return
         if self.panning:
             delta = event.pos() - self.last_pos
             self.image_view.horizontalScrollBar().setValue(
@@ -708,6 +721,8 @@ class ImageViewer(QWidget):
             self.last_pos = event.pos()
 
     def stop_pan(self, event):
+        if hasattr(self, 'crop_rect'):
+            return
         if event.button() == Qt.LeftButton:
             self.panning = False
             self.image_view.setCursor(QCursor(Qt.ArrowCursor))
@@ -860,7 +875,7 @@ class ImageViewer(QWidget):
             return f"{size_in_bytes / (1024 ** 3):.2f} GB"
             
     def  BGR2GRAY(self):
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
@@ -868,58 +883,61 @@ class ImageViewer(QWidget):
         
         gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
         gray_3C=cv2.merge([gray,gray,gray])
+        
+        self.edit_history.add(self.edited_image)
         self.edited_image=gray_3C
-        self.edit_history.append(self.edited_image)
         self.show_edited_image()
         
        
         
     def rotateCCW(self):
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
-        rotatedImg=cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        self.edited_image=rotatedImg
-        self.edit_history.append(self.edited_image)
+        rotated_img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        self.edit_history.add(self.edited_image)  # Push the current state before the edit
+        self.edited_image = rotated_img
         self.show_edited_image()
 
     def rotateCW(self):
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        self.edit_history.add(self.edited_image)
         self.edited_image=rotatedImg
-        self.edit_history.append(self.edited_image)
         self.show_edited_image()
     
     def flipH(self):
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
+        
+       
         flipped_img=cv2.flip(img, 1)
-        self.edited_image=flipped_img
-        self.edit_history.append(self.edited_image)
+         # the edit history is lagging by one to offset the fact that we are already displaying the last edited image
+        self.edit_history.add(self.edited_image) 
+        self.edited_image = flipped_img
         self.show_edited_image()
-
     def flipV(self):
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
             img = cv2.imread(image_path)
         
         flipped_img=cv2.flip(img, 0)
+        self.edit_history.add(self.edited_image)
         self.edited_image=flipped_img
-        self.edit_history.append(self.edited_image)
         self.show_edited_image()
 
     def change_contrast(self, contrast_factor):
@@ -979,7 +997,7 @@ class ImageViewer(QWidget):
         self.changeSaturation(s_shift_value)
         self.changeHue(shift_value)
         self.edited_image=self.colors_transformation_image
-        #self.edit_history.append(self.edited_image)
+        #self.edit_history.add(self.edited_image)
         self.show_edited_image()
         
            
@@ -987,7 +1005,7 @@ class ImageViewer(QWidget):
     def blurBackground(self):
         import rembg
 
-        if hasattr(self, 'edited_image'):
+        if self.edited_image is not None:
             img=self.edited_image
         else :
             image_path = self.image_files[self.current_index]
@@ -1072,20 +1090,13 @@ class ImageViewer(QWidget):
         
         
     def undo(self):
-        if len(self.edit_history)>1:
-            
-            self.edit_history.pop()  
-            self.edited_image=self.edit_history[-1]
+        state=self.edit_history.pop()
+        if state is not None:
+            self.edited_image=state
             self.show_edited_image()
-            
-
         else:
-            if hasattr(self, 'edited_image'):
-                self.edit_history=[]
-                delattr(self,'edited_image')
-                
-                self.show_image()
-            
+                self.edited_image=None
+                self.show_image() 
     def checkZeroDisplacement(self):
         """
         an image can go through a series of transformations that makes it efficefively equivalent to the orignal image
@@ -1837,6 +1848,48 @@ class ClickableTextItem(QGraphicsTextItem):
             if self.background_rect:
                 self.scene.removeItem(self.background_rect)
             self.scene.removeItem(self)
+
+
+
+class CircularBuffer:
+    def __init__(self, size):
+        self.size = size
+        self.buffer = [None] * size
+        self.head = 0
+        self.tail = 0
+        self.full = False
+        self.count = 0  # To keep track of the number of items in the buffer
+
+    def add(self, item):
+        if self.count < self.size:
+            self.buffer[self.head] = item
+            self.head = (self.head + 1) % self.size
+            self.count += 1
+        else:
+            self.buffer[self.head] = item
+            self.head = (self.head + 1) % self.size
+            self.tail = (self.tail + 1) % self.size
+        self.full = self.head == self.tail
+
+    def pop(self):
+        if self.count == 0:
+            return None
+        self.head = (self.head - 1 + self.size) % self.size
+        item = self.buffer[self.head]
+        self.buffer[self.head] = None
+        self.count -= 1
+        self.full = False
+        return item
+
+    def get_buffer(self):
+        if self.full:
+            return self.buffer[self.tail:] + self.buffer[:self.tail]
+        elif self.head > self.tail:
+            return self.buffer[self.tail:self.head]
+        else:
+            return self.buffer[self.tail:] + self.buffer[:self.head]
+
+
 
 def run_gui():
     app = QApplication([])    
