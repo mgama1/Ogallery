@@ -14,7 +14,7 @@ import qtawesome as qta
 
 from PyQt5.QtWidgets import *
 
-from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen,QFont,QBrush
+from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen,QFont,QBrush,QTransform
 from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl,QRectF,QPointF
 from PyQt5.QtCore import pyqtSlot
 from itertools import chain
@@ -463,22 +463,11 @@ class ImageViewer(QWidget):
 
         
     def setupGraphicsView(self):
-        self.image_view = QGraphicsView(self)
-        self.image_view.setAlignment(Qt.AlignCenter)
-        self.image_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.image_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.image_view = PanningGraphicsView(self)
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
         QTimer.singleShot(0, self.handle_timeout)
-        self.image_view.wheelEvent = self.zoom_image
-        self.image_view.setFocusPolicy(Qt.NoFocus)
-        
-        # Enable mouse tracking for panning
-        self.image_view.setMouseTracking(True)
-        self.image_view.mousePressEvent = self.start_pan
-        self.image_view.mouseMoveEvent = self.pan_image
-        self.image_view.mouseReleaseEvent = self.stop_pan
-        self.panning = False
+
     def setupMenu(self):
         self.menu = Menu(self.image_view)
         self.menu.copy_signal.connect(self.copyToClipboard)
@@ -486,6 +475,7 @@ class ImageViewer(QWidget):
         self.menu.show_folder.connect(self.show_containing_folder)
         self.menu.show_img_info_sig.connect(self.showImageInfo)
         self.image_view.installEventFilter(self.menu)
+
 
     def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
         button = QPushButton(parent)
@@ -534,11 +524,6 @@ class ImageViewer(QWidget):
 
 
     def add_crop_rect(self):
-            
-            self.image_view.mousePressEvent = None
-            self.image_view.mouseMoveEvent = None
-            self.image_view.mouseReleaseEvent = None
-
             rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
             edge_margin=int(min(self.image_width, self.image_height)*.07)
             self.crop_rect = ResizableRectItem(rect,edge_margin)
@@ -696,36 +681,35 @@ class ImageViewer(QWidget):
             self.image_view.fitInView(pixmap_item, Qt.KeepAspectRatio)
         
     def zoom_image(self, event):
-        if hasattr(self, 'crop_rect'):
-            return
         factor = 1.1 if event.angleDelta().y() > 0 else 0.9
         self.image_view.scale(factor, factor)
 
     def start_pan(self, event):
-        if hasattr(self, 'crop_rect'):
-            return
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and not self.scene.itemAt(self.image_view.mapToScene(event.pos()), QTransform()):
             self.panning = True
-            self.last_pos = event.pos()
-            self.image_view.setCursor(QCursor(Qt.ClosedHandCursor))
+            self.pan_start_pos = event.pos()
+            self.image_view.viewport().setCursor(QCursor(Qt.ClosedHandCursor))
+            return True
+        return False
 
     def pan_image(self, event):
-        if hasattr(self, 'crop_rect'):
-            return
-        if self.panning:
-            delta = event.pos() - self.last_pos
+        if self.panning and self.pan_start_pos:
+            delta = event.pos() - self.pan_start_pos
             self.image_view.horizontalScrollBar().setValue(
                 self.image_view.horizontalScrollBar().value() - delta.x())
             self.image_view.verticalScrollBar().setValue(
                 self.image_view.verticalScrollBar().value() - delta.y())
-            self.last_pos = event.pos()
+            self.pan_start_pos = event.pos()
+            return True
+        return False
 
     def stop_pan(self, event):
-        if hasattr(self, 'crop_rect'):
-            return
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.panning:
             self.panning = False
-            self.image_view.setCursor(QCursor(Qt.ArrowCursor))
+            self.pan_start_pos = None
+            self.image_view.viewport().setCursor(QCursor(Qt.ArrowCursor))
+            return True
+        return False
 
 
     def keyPressEvent(self, event):
@@ -1687,9 +1671,57 @@ class Menu(QObject):
             return True
         return False
 
-          
-    
-    
+class PanningGraphicsView(QGraphicsView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setDragMode(QGraphicsView.NoDrag)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setFrameShape(QFrame.NoFrame)
+        self.panning = False
+        self.pan_start_x = 0
+        self.pan_start_y = 0
+
+    def is_crop_rect(self, item):
+        return isinstance(item, ResizableRectItem)
+
+    def mousePressEvent(self, event):
+        item = self.itemAt(event.pos())
+        if event.button() == Qt.LeftButton and not self.is_crop_rect(item):
+            self.panning = True
+            self.pan_start_x = event.x()
+            self.pan_start_y = event.y()
+            self.setCursor(Qt.ClosedHandCursor)
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.panning:
+            self.horizontalScrollBar().setValue(
+                self.horizontalScrollBar().value() - (event.x() - self.pan_start_x))
+            self.verticalScrollBar().setValue(
+                self.verticalScrollBar().value() - (event.y() - self.pan_start_y))
+            self.pan_start_x = event.x()
+            self.pan_start_y = event.y()
+            event.accept()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self.panning:
+            self.panning = False
+            self.setCursor(Qt.ArrowCursor)
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
+
+    def wheelEvent(self, event):
+        factor = 1.1 if event.angleDelta().y() > 0 else 0.9
+        self.scale(factor, factor)
 
 class ResizableRectItem(QGraphicsRectItem):
     def __init__(self, rect, edge_margin, parent=None):
