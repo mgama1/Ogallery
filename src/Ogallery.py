@@ -232,7 +232,6 @@ class MainWidget(QWidget):
         if self.selectImages():
                 
             if self.result:
-                images_model=ImagesModel()
                 self.images=self.result
                 self.image_gallery=ImageGalleryApp(self)
                 self.image_gallery.show()
@@ -333,26 +332,61 @@ class MainWidget(QWidget):
                     return 0
         self.queryText=self.map_arabic_to_english(self.queryText)
         self.queryText=self.suggestClasses(self.queryText)
-        if self.queryText=='':
-            self.showErrorMessage("no matches found!")
-            return 0
+        
             
         db=pd.read_csv("db.csv")
         self.result=[]
-        self.filtered=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+        self.filtered_classes=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
         #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
         #instead of continously checking and updating. we only check and update upon search
-        for filePath in self.filtered:
+        for filePath in self.filtered_classes:
             if os.path.exists(filePath):
                 self.result.append(filePath)
-            #else:delete from db.csv
+
+        # file names pattern matching
+        images_model=ImagesModel()
+        for images_dir in images_model.images_directories:
+            filename_matches=self.searchFileNames(images_dir,self.queryText,images_model.file_types)
+            self.result.extend(filename_matches)
+        
+        self.result.sort(key=lambda x: os.path.getmtime(x),reverse=True)
+
         if len(self.result)<1:
             self.showErrorMessage("no matches found!")
             return 0
         return 1
     
     
+
+    def searchFileNames(self, parent_dir, search_string,file_types):
+        """
+        Searches for files in a parent directory recursively, matching file names containing a search string
+        and filtering by specific file extensions.
         
+        Args:
+            parent_dir (str): The directory to search in.
+            search_string (str): The string to search for in file names.
+            
+        Returns:
+            list: A list of matched file paths.
+        """
+        matched_files = []
+        search_string = search_string.lower()  # Convert search_string to lowercase
+
+        for root, dirs, files in os.walk(parent_dir):
+            for file in files:
+                # Check if file matches the search string and has a valid extension
+                if search_string in file.lower():
+                    file_extension = file.split('.')[-1].lower()  # Get the file extension and convert to lowercase
+                    if file_extension in file_types:  # Only match specified file types
+                        file_path = os.path.join(root, file)
+                        #to avoid duplication in the case that an image has a substring the same as the class
+                        if file_path not in self.result:
+                            matched_files.append(file_path)
+        
+        return matched_files
+
+    
         
     def suggestClasses(self,query):
         '''
@@ -382,7 +416,7 @@ class MainWidget(QWidget):
                 return classi
         
         #No matches returned.
-        return ''
+        return query
     
     
     def keyPressEvent(self, event):
