@@ -758,7 +758,7 @@ class ImageViewer(QWidget):
         self.toggleButtonsVisibility(self.editing_buttons)
         if not self.fullscreen:
             self.showFullScreen()
-            if self.edit_history:
+            if self.edited_image is not None:
                 QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
             else:
                 QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
@@ -766,7 +766,7 @@ class ImageViewer(QWidget):
             self.fullscreen = True
         else:
             self.showNormal()
-            if self.edit_history:
+            if self.edited_image is not None:
                 QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
             else:
                 QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
@@ -970,9 +970,9 @@ class ImageViewer(QWidget):
         
         
     def applyColorsTransformations(self,contrast_factor,brightness_offset,s_shift_value,shift_value):
-        if self.edit_history:
-            self.colors_transformation_image=self.edit_history[-1]
-        else:   
+        if self.edit_history.count>=1:
+            self.colors_transformation_image= self.edit_history.peek()
+        else:
             image_path = self.image_files[self.current_index]
             self.colors_transformation_image = cv2.imread(image_path)
                 
@@ -1910,7 +1910,12 @@ class CircularBuffer:
         self.count -= 1
         self.full = False
         return item
-
+    def peek(self):
+        if self.count == 0:
+            return None
+        # Get the most recent item, which is one index before head
+        last_index = (self.head - 1 + self.size) % self.size
+        return self.buffer[last_index]
     def get_buffer(self):
         if self.full:
             return self.buffer[self.tail:] + self.buffer[:self.tail]
