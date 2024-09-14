@@ -466,6 +466,7 @@ class ImageViewer(QWidget):
         self.image_view = PanningGraphicsView(self)
         self.scene = QGraphicsScene()
         self.image_view.setScene(self.scene)
+        self.image_view.setFocusPolicy(Qt.NoFocus)
         QTimer.singleShot(0, self.handle_timeout)
 
     def setupMenu(self):
