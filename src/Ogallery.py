@@ -578,7 +578,6 @@ class ImageViewer(QWidget):
                     img = cv2.imread(image_path)
                 cropped_image = img[coords['y']:coords['y']+coords['height'], coords['x']:coords['x']+coords['width']]
                 
-                self.edit_history.add(self.edited_image)
                 self.edited_image=cropped_image
                 self.edit_history.add(self.edited_image)
                 self.show_edited_image()
@@ -1122,7 +1121,7 @@ class ImageViewer(QWidget):
             self.show_edited_image()
         else:
                 self.edited_image=None
-                self.edit_history=CircularBuffer(10)
+                self.edit_history.clear()
                 self.show_image() 
     def checkZeroDisplacement(self):
         """
@@ -1160,7 +1159,7 @@ class ImageViewer(QWidget):
         as well as Runs the garbage collector and closes no longer needed widgets 
         """
         self.edited_image=None
-        self.edit_history=CircularBuffer(10)
+        self.edit_history.clear()
         self.scene.clear()
         gc.collect()
         
@@ -1185,7 +1184,7 @@ class ImageViewer(QWidget):
             self.main_widget.imageViewerSaved(saved)
             
             self.edited_image=None
-            self.edit_history=CircularBuffer(10)
+            self.edit_history.clear()
             
             
             
@@ -1959,6 +1958,13 @@ class CircularBuffer:
         # Get the most recent item, which is one index before head
         last_index = (self.head - 1 + self.size) % self.size
         return self.buffer[last_index]
+    def clear(self):
+        self.buffer = [None] * self.size
+        self.head = 0
+        self.tail = 0
+        self.full = False
+        self.count = 0 
+
     def get_buffer(self):
         if self.full:
             return self.buffer[self.tail:] + self.buffer[:self.tail]
