@@ -580,6 +580,7 @@ class ImageViewer(QWidget):
                 
                 self.edit_history.add(self.edited_image)
                 self.edited_image=cropped_image
+                self.edit_history.add(self.edited_image)
                 self.show_edited_image()
                 #clean up
                 self.rightBrowse.setVisible(True)
@@ -902,9 +903,10 @@ class ImageViewer(QWidget):
         
         gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) 
         gray_3C=cv2.merge([gray,gray,gray])
-        
-        self.edit_history.add(self.edited_image)
+
         self.edited_image=gray_3C
+        self.edit_history.add(self.edited_image)
+        
         self.show_edited_image()
         
        
@@ -917,8 +919,9 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         
         rotated_img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        self.edit_history.add(self.edited_image)  # Push the current state before the edit
         self.edited_image = rotated_img
+        self.edit_history.add(self.edited_image)  # Push the current state before the edit
+        
         self.show_edited_image()
 
     def rotateCW(self):
@@ -929,8 +932,9 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         
         rotatedImg=cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-        self.edit_history.add(self.edited_image)
         self.edited_image=rotatedImg
+        self.edit_history.add(self.edited_image)
+        
         self.show_edited_image()
     
     def flipH(self):
@@ -944,8 +948,9 @@ class ImageViewer(QWidget):
        
         flipped_img=cv2.flip(img, 1)
          # the edit history is lagging by one to offset the fact that we are already displaying the last edited image
-        self.edit_history.add(self.edited_image) 
         self.edited_image = flipped_img
+        self.edit_history.add(self.edited_image) 
+        
         self.show_edited_image()
     def flipV(self):
         if self.edited_image is not None:
@@ -955,8 +960,9 @@ class ImageViewer(QWidget):
             img = cv2.imread(image_path)
         
         flipped_img=cv2.flip(img, 0)
-        self.edit_history.add(self.edited_image)
         self.edited_image=flipped_img
+        self.edit_history.add(self.edited_image)
+        
         self.show_edited_image()
 
     def change_contrast(self, contrast_factor):
@@ -1040,6 +1046,7 @@ class ImageViewer(QWidget):
         blurred_bg_image = cv2.add(foreground, background)/255
         blurred_bg_image = (blurred_bg_image * 255).astype(np.uint8)
         self.edited_image=blurred_bg_image
+        self.edit_history.add(self.edited_image)
         self.show_edited_image()
     
     def scanQRC(self):
@@ -1109,12 +1116,13 @@ class ImageViewer(QWidget):
         
         
     def undo(self):
-        state=self.edit_history.pop()
-        if state is not None:
-            self.edited_image=state
+        if self.edit_history.count>1:
+            self.edit_history.pop()
+            self.edited_image=self.edit_history.peek()
             self.show_edited_image()
         else:
                 self.edited_image=None
+                self.edit_history=CircularBuffer(10)
                 self.show_image() 
     def checkZeroDisplacement(self):
         """
