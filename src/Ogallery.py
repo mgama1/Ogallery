@@ -1730,7 +1730,7 @@ class PanningGraphicsView(QGraphicsView):
         self.pan_start_y = 0
 
     def is_crop_rect(self, item):
-        return isinstance(item, ResizableRectItem)
+        return isinstance(item, CornerBasedRectItem)
 
     def mousePressEvent(self, event):
         item = self.itemAt(event.pos())
@@ -1962,7 +1962,7 @@ class CornerBasedRectItem(QGraphicsItem):
             'y': int(min(self.y0, self.y1, self.y2, self.y3)),
             'width': int(max(self.x0, self.x1, self.x2, self.x3) - min(self.x0, self.x1, self.x2, self.x3)),
             'height': int(max(self.y0, self.y1, self.y2, self.y3) - min(self.y0, self.y1, self.y2, self.y3))
-        }        
+        }       
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
