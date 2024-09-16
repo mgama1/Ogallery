@@ -563,7 +563,7 @@ class ImageViewer(QWidget):
             #edge_margin=int(min(self.image_width, self.image_height)*.07)
             #self.crop_rect = ResizableRectItem(rect,edge_margin,self.image_width,self.image_height)
             #self.scene.addItem(self.crop_rect)
-            self.crop_rect = CornerBasedRectItem(0, 0, self.image_width//2, self.image_height//2, self.image_width, self.image_height)
+            self.crop_rect = CornerBasedRectItem(0, 0, self.image_width, self.image_height, self.image_width, self.image_height)
             self.scene.addItem(self.crop_rect)
             self.rightBrowse.setVisible(False)
             self.leftBrowse.setVisible(False)
