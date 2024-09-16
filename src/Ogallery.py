@@ -561,7 +561,7 @@ class ImageViewer(QWidget):
     def add_crop_rect(self):
             rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
             edge_margin=int(min(self.image_width, self.image_height)*.07)
-            self.crop_rect = ResizableRectItem(rect,edge_margin)
+            self.crop_rect = ResizableRectItem(rect,edge_margin,self.image_width,self.image_height)
             self.scene.addItem(self.crop_rect)
             self.rightBrowse.setVisible(False)
             self.leftBrowse.setVisible(False)
@@ -576,7 +576,9 @@ class ImageViewer(QWidget):
                 else :
                     image_path = self.image_files[self.current_index]
                     img = cv2.imread(image_path)
-                cropped_image = img[coords['y']:coords['y']+coords['height'], coords['x']:coords['x']+coords['width']]
+                x=coords['x']
+                y=coords['y']
+                cropped_image = img[y:y+coords['height'], x:x+coords['width']]
                 
                 self.edited_image=cropped_image
                 self.edit_history.add(self.edited_image)
@@ -1764,7 +1766,7 @@ class PanningGraphicsView(QGraphicsView):
         self.scale(factor, factor)
 
 class ResizableRectItem(QGraphicsRectItem):
-    def __init__(self, rect, edge_margin, parent=None):
+    def __init__(self, rect, edge_margin, width, height, parent=None):
         super().__init__(rect, parent)
         self.setFlag(QGraphicsRectItem.ItemIsMovable)
         self.setFlag(QGraphicsRectItem.ItemIsSelectable)
@@ -1774,7 +1776,8 @@ class ResizableRectItem(QGraphicsRectItem):
         self.resizing = None
         self.resize_start_pos = None
         self.resize_start_rect = None
-        
+        self.image_width = width
+        self.image_height = height
         # Define a small margin for easier edge detection
         self.edge_margin = edge_margin
 
@@ -1819,15 +1822,39 @@ class ResizableRectItem(QGraphicsRectItem):
             if new_rect.height() < min_size:
                 new_rect.setHeight(min_size)
             
-            self.setRect(new_rect)
-            
-            # Update the position of the item
             new_pos = self.pos() + pos_delta
+            
+            # Apply constraints to keep the rectangle within image boundaries
+            self.constrain_rect(new_rect, new_pos)
+            
+            self.setRect(new_rect)
             self.setPos(new_pos)
             
             self.update()
         else:
             super().mouseMoveEvent(event)
+            # Constrain the movement within image boundaries
+            new_pos = self.pos()
+            new_rect = self.rect()
+            self.constrain_rect(new_rect, new_pos)
+            self.setPos(new_pos)
+
+    def constrain_rect(self, rect, pos):
+        # Ensure the rectangle stays within the image boundaries
+        if pos.x() < 0:
+            pos.setX(0)
+        if pos.y() < 0:
+            pos.setY(0)
+        if pos.x() + rect.width() > self.image_width:
+            pos.setX(self.image_width - rect.width())
+        if pos.y() + rect.height() > self.image_height:
+            pos.setY(self.image_height - rect.height())
+        
+        # Adjust rectangle size if it exceeds image boundaries
+        if rect.width() > self.image_width:
+            rect.setWidth(self.image_width)
+        if rect.height() > self.image_height:
+            rect.setHeight(self.image_height)
 
     def mouseReleaseEvent(self, event):
         if self.resizing:
@@ -1904,7 +1931,6 @@ class ResizableRectItem(QGraphicsRectItem):
             'width': int(rect.width()),
             'height': int(rect.height())
         }
-        
 class ClickableTextItem(QGraphicsTextItem):
     def __init__(self, html_text, url, scene, parent=None):
         super().__init__(html_text, parent)
