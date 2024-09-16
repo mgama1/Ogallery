@@ -559,9 +559,11 @@ class ImageViewer(QWidget):
 
 
     def add_crop_rect(self):
-            rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
-            edge_margin=int(min(self.image_width, self.image_height)*.07)
-            self.crop_rect = ResizableRectItem(rect,edge_margin,self.image_width,self.image_height)
+            #rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
+            #edge_margin=int(min(self.image_width, self.image_height)*.07)
+            #self.crop_rect = ResizableRectItem(rect,edge_margin,self.image_width,self.image_height)
+            #self.scene.addItem(self.crop_rect)
+            self.crop_rect = CornerBasedRectItem(0, 0, self.image_width//2, self.image_height//2, self.image_width, self.image_height)
             self.scene.addItem(self.crop_rect)
             self.rightBrowse.setVisible(False)
             self.leftBrowse.setVisible(False)
@@ -1765,176 +1767,7 @@ class PanningGraphicsView(QGraphicsView):
         factor = 1.1 if event.angleDelta().y() > 0 else 0.9
         self.scale(factor, factor)
 
-class ResizableRectItem(QGraphicsRectItem):
-    def __init__(self, rect, edge_margin, width, height, parent=None):
-        super().__init__(rect, parent)
-        self.setFlag(QGraphicsRectItem.ItemIsMovable)
-        self.setFlag(QGraphicsRectItem.ItemIsSelectable)
-        self.setFlag(QGraphicsRectItem.ItemSendsGeometryChanges)
-        self.setAcceptHoverEvents(True)  # Enable hover events
-        
-        self.resizing = None
-        self.resize_start_pos = None
-        self.resize_start_rect = None
-        self.image_width = width
-        self.image_height = height
-        # Define a small margin for easier edge detection
-        self.edge_margin = edge_margin
 
-    def shape(self):
-        path = QPainterPath()
-        path.addRect(self.rect())
-        return path
-
-    def mousePressEvent(self, event):
-        self.resizing = self.get_resize_edge(event.pos())
-        if self.resizing:
-            self.resize_start_pos = event.pos()
-            self.resize_start_rect = self.rect()
-        else:
-            super().mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        if self.resizing:
-            delta = event.pos() - self.resize_start_pos
-            new_rect = QRectF(self.resize_start_rect)
-            pos_delta = QPointF(0, 0)
-            
-            if 'left' in self.resizing:
-                new_width = new_rect.width() - delta.x()
-                if new_width > 0:
-                    new_rect.setLeft(new_rect.right() - new_width)
-                    pos_delta.setX(delta.x())
-            if 'right' in self.resizing:
-                new_rect.setRight(new_rect.right() + delta.x())
-            if 'top' in self.resizing:
-                new_height = new_rect.height() - delta.y()
-                if new_height > 0:
-                    new_rect.setTop(new_rect.bottom() - new_height)
-                    pos_delta.setY(delta.y())
-            if 'bottom' in self.resizing:
-                new_rect.setBottom(new_rect.bottom() + delta.y())
-            
-            # Ensure the rectangle has a minimum size
-            min_size = 10  # You can adjust this value
-            if new_rect.width() < min_size:
-                new_rect.setWidth(min_size)
-            if new_rect.height() < min_size:
-                new_rect.setHeight(min_size)
-            
-            new_pos = self.pos() + pos_delta
-            
-            # Apply constraints to keep the rectangle within image boundaries
-            self.constrain_rect(new_rect, new_pos)
-            
-            self.setRect(new_rect)
-            self.setPos(new_pos)
-            
-            self.update()
-        else:
-            super().mouseMoveEvent(event)
-            # Constrain the movement within image boundaries
-            new_pos = self.pos()
-            new_rect = self.rect()
-            self.constrain_rect(new_rect, new_pos)
-            self.setPos(new_pos)
-
-    def constrain_rect(self, rect, pos):
-        # Ensure the rectangle stays within the image boundaries
-        if pos.x() < 0:
-            pos.setX(0)
-            rect.setLeft(0)
-        if pos.y() < 0:
-            pos.setY(0)
-            rect.setTop(0)
-        if pos.x() + rect.width() > self.image_width:
-            pos.setX(self.image_width - rect.width())
-            rect.setRight(self.image_width)
-        if pos.y() + rect.height() > self.image_height:
-            pos.setY(self.image_height - rect.height())
-            rect.setBottom(self.image_height)
-        
-        # Adjust rectangle size if it exceeds image boundaries
-        if rect.width() > self.image_width:
-            rect.setWidth(self.image_width)
-        if rect.height() > self.image_height:
-            rect.setHeight(self.image_height)
-
-    def mouseReleaseEvent(self, event):
-        if self.resizing:
-            self.resizing = None
-            self.unsetCursor()  # Reset cursor when resizing is done
-        else:
-            super().mouseReleaseEvent(event)
-
-    def paint(self, painter, option, widget=None):
-        super().paint(painter, option, widget)
-        if self.isSelected():
-            painter.setPen(QPen(Qt.blue, 2, Qt.DashLine))
-            painter.drawRect(self.rect())
-
-    def hoverMoveEvent(self, event):
-        resize_edge = self.get_resize_edge(event.pos())
-        if resize_edge:
-            self.setCursor(self.get_cursor_for_edge(resize_edge))
-        else:
-            self.unsetCursor()
-        super().hoverMoveEvent(event)
-
-    def hoverLeaveEvent(self, event):
-        self.unsetCursor()
-        super().hoverLeaveEvent(event)
-
-    def get_resize_edge(self, pos):
-        rect = self.rect()
-        x, y = pos.x(), pos.y()
-        
-        left = abs(x) < self.edge_margin
-        right = abs(x - rect.width()) < self.edge_margin
-        top = abs(y) < self.edge_margin
-        bottom = abs(y - rect.height()) < self.edge_margin
-
-        if left and top:
-            return 'top_left'
-        elif left and bottom:
-            return 'bottom_left'
-        elif right and top:
-            return 'top_right'
-        elif right and bottom:
-            return 'bottom_right'
-        elif left:
-            return 'left'
-        elif right:
-            return 'right'
-        elif top:
-            return 'top'
-        elif bottom:
-            return 'bottom'
-        
-        return None
-
-    def get_cursor_for_edge(self, edge):
-        cursor_map = {
-            'top_left': Qt.SizeFDiagCursor,
-            'top_right': Qt.SizeBDiagCursor,
-            'bottom_left': Qt.SizeBDiagCursor,
-            'bottom_right': Qt.SizeFDiagCursor,
-            'left': Qt.SizeHorCursor,
-            'right': Qt.SizeHorCursor,
-            'top': Qt.SizeVerCursor,
-            'bottom': Qt.SizeVerCursor
-        }
-        return cursor_map.get(edge, Qt.ArrowCursor)
-
-    def get_relative_coordinates(self):
-        scene_pos = self.scenePos()
-        rect = self.rect()
-        return {
-            'x': int(scene_pos.x()),
-            'y': int(scene_pos.y()),
-            'width': int(rect.width()),
-            'height': int(rect.height())
-        }
 
 class ClickableTextItem(QGraphicsTextItem):
     def __init__(self, html_text, url, scene, parent=None):
@@ -2005,7 +1838,131 @@ class CircularBuffer:
             return self.buffer[self.tail:] + self.buffer[:self.head]
 
 
+from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtCore import Qt, QRectF, QPointF
+from PyQt5.QtGui import QPen, QPainter, QPainterPath
 
+class CornerBasedRectItem(QGraphicsItem):
+    def __init__(self, x, y, width, height, image_width, image_height, parent=None):
+        super().__init__(parent)
+        self.x0 = x
+        self.y0 = y
+        self.x1 = x + width
+        self.y1 = y
+        self.x2 = x
+        self.y2 = y + height
+        self.x3 = x + width
+        self.y3 = y + height
+        self.image_width = image_width
+        self.image_height = image_height
+        self.dragging = None
+        self.drag_start = None
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
+        self.setAcceptHoverEvents(True)
+
+    def boundingRect(self):
+        return QRectF(min(self.x0, self.x1, self.x2, self.x3),
+                      min(self.y0, self.y1, self.y2, self.y3),
+                      max(self.x0, self.x1, self.x2, self.x3) - min(self.x0, self.x1, self.x2, self.x3),
+                      max(self.y0, self.y1, self.y2, self.y3) - min(self.y0, self.y1, self.y2, self.y3))
+
+    def paint(self, painter, option, widget=None):
+        painter.setPen(QPen(Qt.red, 2))
+        painter.drawRect(self.boundingRect())
+        if self.isSelected():
+            painter.setPen(QPen(Qt.blue, 2, Qt.DashLine))
+            painter.drawRect(self.boundingRect())
+
+    def mousePressEvent(self, event):
+        self.dragging = self.get_drag_area(event.pos())
+        self.drag_start = event.pos()
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            delta = event.pos() - self.drag_start
+            if self.dragging == 'left':
+                new_x = self.x0 + delta.x()
+                if 0 <= new_x < self.x1 - 100:
+                    self.x0 = self.x2 = new_x
+            elif self.dragging == 'right':
+                new_x = self.x1 + delta.x()
+                if self.x0 + 100 < new_x <= self.image_width:
+                    self.x1 = self.x3 = new_x
+            elif self.dragging == 'top':
+                new_y = self.y0 + delta.y()
+                if 0 <= new_y < self.y2 - 100:
+                    self.y0 = self.y1 = new_y
+            elif self.dragging == 'bottom':
+                new_y = self.y2 + delta.y()
+                if self.y0 + 100 < new_y <= self.image_height:
+                    self.y2 = self.y3 = new_y
+            elif self.dragging == 'move':
+                new_x0 = self.x0 + delta.x()
+                new_y0 = self.y0 + delta.y()
+                if 0 <= new_x0 and new_x0 + (self.x1 - self.x0) <= self.image_width and \
+                   0 <= new_y0 and new_y0 + (self.y2 - self.y0) <= self.image_height:
+                    self.x0 += delta.x()
+                    self.y0 += delta.y()
+                    self.x1 += delta.x()
+                    self.y1 += delta.y()
+                    self.x2 += delta.x()
+                    self.y2 += delta.y()
+                    self.x3 += delta.x()
+                    self.y3 += delta.y()
+            self.drag_start = event.pos()
+            self.update()
+            self.scene().update()
+        else:
+            super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.dragging = None
+        super().mouseReleaseEvent(event)
+
+    def hoverMoveEvent(self, event):
+        drag_area = self.get_drag_area(event.pos())
+        if drag_area:
+            self.setCursor(self.get_cursor_for_area(drag_area))
+        else:
+            self.setCursor(Qt.OpenHandCursor)
+        super().hoverMoveEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        self.unsetCursor()
+        super().hoverLeaveEvent(event)
+
+    def get_drag_area(self, pos):
+        margin = 5  # pixels
+        if abs(pos.x() - self.x0) < margin and self.y0 < pos.y() < self.y2:
+            return 'left'
+        elif abs(pos.x() - self.x1) < margin and self.y1 < pos.y() < self.y3:
+            return 'right'
+        elif abs(pos.y() - self.y0) < margin and self.x0 < pos.x() < self.x1:
+            return 'top'
+        elif abs(pos.y() - self.y2) < margin and self.x2 < pos.x() < self.x3:
+            return 'bottom'
+        elif self.x0 < pos.x() < self.x1 and self.y0 < pos.y() < self.y2:
+            return 'move'
+        return None
+
+    def get_cursor_for_area(self, area):
+        if area in ['left', 'right']:
+            return Qt.SizeHorCursor
+        elif area in ['top', 'bottom']:
+            return Qt.SizeVerCursor
+        elif area == 'move':
+            return Qt.ClosedHandCursor
+        return Qt.ArrowCursor
+
+    def get_relative_coordinates(self):
+        return {
+            'x': int(min(self.x0, self.x1, self.x2, self.x3)),
+            'y': int(min(self.y0, self.y1, self.y2, self.y3)),
+            'width': int(max(self.x0, self.x1, self.x2, self.x3) - min(self.x0, self.x1, self.x2, self.x3)),
+            'height': int(max(self.y0, self.y1, self.y2, self.y3) - min(self.y0, self.y1, self.y2, self.y3))
+        }        
 def run_gui():
     app = QApplication([])    
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
