@@ -1458,10 +1458,10 @@ class Adjust(QWidget):
 
         #slow is smooth and smooth is fast. when applying every little change instantly it takes a lot of unneccessary resources
         #which slows down the widget
-        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(0))
-        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(0))
-        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(0))
-        self.hue_slider.valueChanged.connect(lambda:self.timer.start(0))
+        self.contrast_slider.valueChanged.connect(lambda:self.timer.start(50))
+        self.brightness_slider.valueChanged.connect(lambda:self.timer.start(50))
+        self.saturation_slider.valueChanged.connect(lambda:self.timer.start(50))
+        self.hue_slider.valueChanged.connect(lambda:self.timer.start(50))
 
     def applyAdjustments(self):
         self.parent().applyColorsTransformations(self.contrast_offset,self.brightness_offset,self.saturation_offset,self.hue_offset)
