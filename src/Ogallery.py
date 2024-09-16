@@ -1843,12 +1843,16 @@ class ResizableRectItem(QGraphicsRectItem):
         # Ensure the rectangle stays within the image boundaries
         if pos.x() < 0:
             pos.setX(0)
+            rect.setLeft(0)
         if pos.y() < 0:
             pos.setY(0)
+            rect.setTop(0)
         if pos.x() + rect.width() > self.image_width:
             pos.setX(self.image_width - rect.width())
+            rect.setRight(self.image_width)
         if pos.y() + rect.height() > self.image_height:
             pos.setY(self.image_height - rect.height())
+            rect.setBottom(self.image_height)
         
         # Adjust rectangle size if it exceeds image boundaries
         if rect.width() > self.image_width:
@@ -1931,6 +1935,7 @@ class ResizableRectItem(QGraphicsRectItem):
             'width': int(rect.width()),
             'height': int(rect.height())
         }
+
 class ClickableTextItem(QGraphicsTextItem):
     def __init__(self, html_text, url, scene, parent=None):
         super().__init__(html_text, parent)
