@@ -6,7 +6,6 @@ import secrets
 import base64
 import getpass
 from pathlib import Path
-
 class SecureFolder():
     def __init__(self,password):
         self.password=password
@@ -120,11 +119,11 @@ class SecureFolder():
             with open(filename, "rb") as file:
                 file_data = file.read()
             encrypted_data = f.encrypt(file_data)
-            
-            with open(filename, "wb") as file:
+            encrypted_filename=os.path.dirname(filename)+'/.'+os.path.basename(filename)+'.ogcrypt'
+            with open(encrypted_filename, "wb") as file:
                 file.write(encrypted_data)
 
-            os.rename(filename, f".{filename}.ogcrypt")
+            os.remove(filename)
             print("File encrypted successfully")
     def decrypt(self,filename):
         """
@@ -155,13 +154,14 @@ class SecureFolder():
 
             with open(orig_name, "wb") as file:
                 file.write(decrypted_data)
-            print(orig_name)
+            
             try:
                 os.remove(filename)
             except:
                 print("couldn't delete encrypted file")
             print("File decrypted successfully")
+            
+            return orig_name
+    
 
-    def get_secure_files(self):
-        pass
 

@@ -1,5 +1,7 @@
 import os
 import glob
+import fnmatch
+
 class ImagesModel():
     def __init__(self):
         self.file_types=['jpg','jpeg','png','gif']
@@ -21,3 +23,17 @@ class ImagesModel():
         
         return image_files
     
+    def get_secure_files(self):
+        
+        secure_files=[]
+        for images_directory in self.images_directories:
+                secure_files+=self.find_secure_files(images_directory)
+        return secure_files
+    
+    def find_secure_files(self,parent_dir):
+        matches = []
+        # Use os.walk for efficient traversal
+        for root, dirnames, filenames in os.walk(parent_dir):
+            for filename in fnmatch.filter(filenames, '*.ogcrypt'):
+                matches.append(os.path.join(root, filename))
+        return matches
