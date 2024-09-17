@@ -9,7 +9,8 @@ import getpass
 class SecureFolder():
     def __init__(self,password):
         self.password=password
-        self.correct_password=False
+        self.validate_password()
+
     def generate_salt(self,size=16):
         """
         Generate the salt used for key derivation, 
@@ -44,7 +45,26 @@ class SecureFolder():
             file.write(encrypted_master_key)
 
 
-
+    def validate_password(self):
+        """
+        
+        """
+        try:
+            with open("config/encrypted_master_key.key", "rb") as file:
+                encrypted_master_key = file.read()
+            master_key=Fernet(self.get_key()).decrypt(encrypted_master_key)
+            if master_key:
+                return True
+             
+        except FileNotFoundError:
+            #there is no existing master key so this is the first use
+            self.generate_master_key()
+            print("password has been set!")
+            return True
+        except cryptography.fernet.InvalidToken:
+            print("password is incorrect")
+            return False
+        
     def get_master_key(self):
         """
         Load and decrypt the master key
@@ -54,13 +74,11 @@ class SecureFolder():
         try:
             with open("config/encrypted_master_key.key", "rb") as file:
                 encrypted_master_key = file.read()
-            self.correct_password=True
             return Fernet(self.get_key()).decrypt(encrypted_master_key)
         except FileNotFoundError:
             print("password has been set!")
             return None
         except cryptography.fernet.InvalidToken:
-            self.correct_password=False
             return "password is incorrect"
 
     def generate_key(self,salt):
@@ -96,7 +114,7 @@ class SecureFolder():
             self.generate_master_key()
             master_key =self.get_master_key()
 
-        if self.correct_password:
+        if self.validate_password():
             f = Fernet(master_key)
             with open(filename, "rb") as file:
                 file_data = file.read()
@@ -104,9 +122,8 @@ class SecureFolder():
             
             with open(filename, "wb") as file:
                 file.write(encrypted_data)
-        else:
-            print("wrong password")
-
+        
+            print("File encrypted successfully")
     def decrypt(self,filename):
         """
         decrypts the encrypted file and writes over it
@@ -119,7 +136,7 @@ class SecureFolder():
         if not master_key:
             return None
         
-        if self.correct_password:
+        if self.validate_password():
             f = Fernet(master_key)
             with open(filename, "rb") as file:
                 encrypted_data = file.read()
@@ -133,5 +150,4 @@ class SecureFolder():
                 file.write(decrypted_data)
             print("File decrypted successfully")
 
-        else:
-            print("wrong password")
+        
