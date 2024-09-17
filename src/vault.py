@@ -1,10 +1,11 @@
 import cryptography
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-
+import os
 import secrets
 import base64
 import getpass
+from pathlib import Path
 
 class SecureFolder():
     def __init__(self,password):
@@ -122,7 +123,8 @@ class SecureFolder():
             
             with open(filename, "wb") as file:
                 file.write(encrypted_data)
-        
+
+            os.rename(filename, f".{filename}.ogcrypt")
             print("File encrypted successfully")
     def decrypt(self,filename):
         """
@@ -146,8 +148,20 @@ class SecureFolder():
             except cryptography.fernet.InvalidToken:
                 print("Invalid token, most likely the password is incorrect")
                 return
-            with open(filename, "wb") as file:
+            
+            decrypted_filename = Path(filename)
+            orig_name = decrypted_filename.with_suffix('')  # Removes the extension .ogcrypt
+            orig_name = orig_name.parent / orig_name.name.lstrip('.')  # Removes leading dot
+
+            with open(orig_name, "wb") as file:
                 file.write(decrypted_data)
+            print(orig_name)
+            try:
+                os.remove(filename)
+            except:
+                print("couldn't delete encrypted file")
             print("File decrypted successfully")
 
-        
+    def get_secure_files(self):
+        pass
+

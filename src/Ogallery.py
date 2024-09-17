@@ -1177,7 +1177,7 @@ class ImageViewer(QWidget):
             if choice=="overwrite":
                 cv2.imwrite(img_path, self.edited_image)
                 file_name=img_path
-
+                print(img_path)
             if choice=="copy":
                 mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
                 path = os.path.splitext(img_path)
