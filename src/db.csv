@@ -454,3 +454,7 @@ directory,class,synonyms
 /home/mgama1/Downloads/x/3.jpg,q_sea,"q_beach ,q_water "
 /home/mgama1/Downloads/x/1.jpg,q_document,"q_docs , q_text "
 /home/mgama1/Downloads/x/2.jpg,q_cat,"q_kitty ,q_kitten "
+/home/mgama1/Pictures/Screenshots/Screenshot from 2024-09-18 21-27-47.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Downloads/x/7.jpg,q_dog,"q_puppy ,q_pupper ,q_doggo ,q_doggy "
+/home/mgama1/Downloads/x/6.jpg,,
+/home/mgama1/Downloads/x/8.jpg,q_dog,"q_puppy ,q_pupper ,q_doggo ,q_doggy "

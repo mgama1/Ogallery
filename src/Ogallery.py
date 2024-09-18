@@ -927,23 +927,42 @@ class ImageViewer(QWidget):
         """)
         # Show the menu at the button's position
         menu.exec_(self.options_button.mapToGlobal(self.options_button.rect().bottomLeft()))
+   
     def addToLockedFolder(self):
-        password=self.requestPassword()
-        secure_folder=SecureFolder(password)
-        if secure_folder==1:
-            secure_folder.encrypt()
-        elif secure_folder==2:
-            print("a new password has been set!")
+        secure_folder=SecureFolder()
+        
+        if secure_folder.hasExistingPassword():
+            password=self.requestPassword()
+            if secure_folder.encrypt(self.image_files[self.current_index],password):
+                self.image_files.pop(self.current_index)
+                self.show_image()
+                #td remove from gallery
+            else:
+                self.showErrorMessage("Password is incorrect!")
         else:
-            print("password is incorrect")
-        print(password)
+            password=self.createPassword()
+            if password:
+                secure_folder.generate_master_key(password)
+
+            else:
+                self.showErrorMessage("Passwords do not match. Please make sure both fields are identical")
+        
     def requestPassword(self):
-        text, ok = QInputDialog.getText(self, 'Locked Folder', 'Enter your name:')
+        text, ok = QInputDialog.getText(self, 'Locked Folder', 'Enter a password')
         if ok:
             return text
         #self.show()
 
-
+    def createPassword(self):
+        text, ok = QInputDialog.getText(self, 'Locked Folder - setup', 'Enter a password:')
+        if ok:
+            password=text
+            text, ok = QInputDialog.getText(self, 'Locked Folder - setup', 'confirm password:')
+            if ok:
+                confirmed_password=text
+                if password==confirmed_password:
+                    return password
+        
 
 
     def  BGR2GRAY(self):
