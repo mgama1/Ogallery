@@ -32,7 +32,6 @@ class ImagesModel():
     
     def find_secure_files(self,parent_dir):
         matches = []
-        # Use os.walk for efficient traversal
         for root, dirnames, filenames in os.walk(parent_dir):
             for filename in fnmatch.filter(filenames, '*.ogcrypt'):
                 matches.append(os.path.join(root, filename))

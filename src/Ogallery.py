@@ -512,10 +512,10 @@ class ImageViewer(QWidget):
         self.image_view.installEventFilter(self.menu)
 
 
-    def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None):
+    def create_button(self, icon_name=None, tooltip_text='', callback=None, parent=None,text=None,sf=1):
         button = QPushButton(parent)
         if icon_name:
-            button.setIcon(qta.icon(icon_name, color='white'))
+            button.setIcon(qta.icon(icon_name, color='white',scale_factor=sf))
         else:
             button.setText(text)
         button.setToolTip(tooltip_text)
@@ -531,7 +531,7 @@ class ImageViewer(QWidget):
         self.rightBrowse = self.create_button('fa.angle-right', '', self.next_image, parent=self)
         self.back_button = self.create_button(None, '', self.close, parent=self,text='↩')
         
-        self.show_containing_folder_button = self.create_button('mdi.folder-search-outline', 'Show containing folder', self.show_containing_folder, parent=self)
+        self.options_button = self.create_button('mdi.dots-vertical', 'options', self.showOptionsMenu, parent=self,sf=1.7)
         self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
         self.rotate_button = self.create_button('mdi6.rotate-left', 'Rotate', self.rotateCCW)
         self.crop_button=self.create_button('mdi.crop', 'crop', self.add_crop_rect, parent=self)
@@ -555,7 +555,7 @@ class ImageViewer(QWidget):
                 self.rotate_button,self.crop_button,self.flip_button,
                  self.blur_background_button,self.compare_button, self.revert_button,self.undo_button,self.save_button
                 ]
-        self.navigsetupLayoutation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.show_containing_folder_button]
+        self.navigsetupLayoutation_buttons=[self.leftBrowse,self.rightBrowse ,self.back_button,self.options_button]
 
 
     def add_crop_rect(self):
@@ -600,7 +600,7 @@ class ImageViewer(QWidget):
         
         header_layout.addWidget(self.back_button)
         header_layout.addStretch(1)
-        header_layout.addWidget(self.show_containing_folder_button)
+        header_layout.addWidget(self.options_button)
 
         for button in self.editing_buttons:
             button.setFixedHeight(40)
@@ -662,11 +662,19 @@ class ImageViewer(QWidget):
             font-size: 16pt;} \
             QPushButton:hover {background-color: #2e2e2e;} "
         )
+
+        options_button_style=(
+            "QPushButton {background-color: rgba(22, 22, 22, 0); \
+            border: none; \
+            color: white; \
+            font-size: 32pt;} \
+            QPushButton:hover {background-color: #2e2e2e;} "
+        )
         self.back_button.setStyleSheet(header_button_style)
-        self.show_containing_folder_button.setStyleSheet(header_button_style)
+        self.options_button.setStyleSheet(options_button_style)
         
         self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
-        self.show_containing_folder_button.setFixedSize(self.NAVBUTTONWIDTH,40)
+        self.options_button.setFixedSize(self.NAVBUTTONWIDTH,40)
         self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
         self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
 
@@ -815,7 +823,7 @@ class ImageViewer(QWidget):
         for button in buttons_list:
             button.setVisible(self.fullscreen)
         self.back_button.setVisible(self.fullscreen)
-        self.show_containing_folder_button.setVisible(self.fullscreen)
+        self.options_button.setVisible(self.fullscreen)
         
     def next_image(self):
         if not self.checkZeroDisplacement():
@@ -897,6 +905,28 @@ class ImageViewer(QWidget):
         else:
             return f"{size_in_bytes / (1024 ** 3):.2f} GB"
             
+    
+    def showOptionsMenu(self):
+        menu = QMenu(self)
+        menu.addAction("show containing folder", self.show_containing_folder)
+        
+
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: #212121; 
+            }
+            QMenu::item {
+                color: #ffffff;
+                background-color: transparent;  /* Background color of each item */
+            }
+            QMenu::item:selected {
+                background-color: #2e2e2e;  /* Background color when hovering over an item */
+                color: #ffffff;  /* Text color when hovering */
+            }
+        """)
+        # Show the menu at the button's position
+        menu.exec_(self.options_button.mapToGlobal(self.options_button.rect().bottomLeft()))
+    
     def  BGR2GRAY(self):
         if self.edited_image is not None:
             img=self.edited_image
