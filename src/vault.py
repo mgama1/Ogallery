@@ -7,9 +7,17 @@ import base64
 import getpass
 from pathlib import Path
 class SecureFolder():
-    def __init__(self,password):
-        self.password=password
-        self.validate_password()
+    def __init__(self):
+        pass
+        
+    def hasExistingPassword(self):
+        try:
+            with open("config/encrypted_master_key.key", "rb") as file:
+                file.read()
+                return True
+             
+        except FileNotFoundError:
+            return False
 
     def generate_salt(self,size=16):
         """
@@ -32,12 +40,13 @@ class SecureFolder():
         except:
             return None
         
-    def generate_master_key(self):
+    def generate_master_key(self,password):
         """
         Generate a random master key,encrypt(salt,password),store it
         Returns:
             A base64 encoded master key
         """
+        self.password=password
         master_key = secrets.token_bytes(32)  # 256-bit key
         master_key_encoded= base64.urlsafe_b64encode(master_key)
         encrypted_master_key = Fernet(self.get_key()).encrypt(master_key_encoded)
@@ -58,11 +67,10 @@ class SecureFolder():
              
         except FileNotFoundError:
             #there is no existing master key so this is the first use
-            self.generate_master_key()
-            print("password has been set!")
-            return True
+            #print("password has been set!")
+            return False
         except cryptography.fernet.InvalidToken:
-            print("password is incorrect")
+            #print("password is incorrect")
             return False
         
     def get_master_key(self):
@@ -76,10 +84,9 @@ class SecureFolder():
                 encrypted_master_key = file.read()
             return Fernet(self.get_key()).decrypt(encrypted_master_key)
         except FileNotFoundError:
-            print("password has been set!")
-            return None
+            return False
         except cryptography.fernet.InvalidToken:
-            return "password is incorrect"
+            return False
 
     def generate_key(self,salt):
         """
@@ -100,7 +107,7 @@ class SecureFolder():
         
         return key
    
-    def encrypt(self,filename):
+    def encrypt(self,filename,password):
         """
         encrypts the file and write over it
         Args:
@@ -108,11 +115,9 @@ class SecureFolder():
         Returns:
         
         """
-        
+        self.password=password
         master_key=self.get_master_key()
-        if not master_key:
-            self.generate_master_key()
-            master_key =self.get_master_key()
+        
 
         if self.validate_password():
             f = Fernet(master_key)
@@ -124,8 +129,9 @@ class SecureFolder():
                 file.write(encrypted_data)
 
             os.remove(filename)
-            print("File encrypted successfully")
-    def decrypt(self,filename):
+            return 1
+        return 0
+    def decrypt(self,filename,password):
         """
         decrypts the encrypted file and writes over it
         Args:
@@ -133,9 +139,9 @@ class SecureFolder():
             key (bytes)
         Returns:
         """
+        self.password=password
         master_key=self.get_master_key()
-        if not master_key:
-            return None
+        
         
         if self.validate_password():
             f = Fernet(master_key)
@@ -159,9 +165,10 @@ class SecureFolder():
                 os.remove(filename)
             except:
                 print("couldn't delete encrypted file")
-            print("File decrypted successfully")
             
             return orig_name
+        return 0
+    
     
 
 

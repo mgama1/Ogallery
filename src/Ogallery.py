@@ -28,6 +28,7 @@ from gallery.imageGallery import ImageGalleryApp
 from gallery.imageThumbnail import ImageThumbnailWidget
 from custom import *
 from core import *
+from vault import SecureFolder
 
 
 print(time.time()-s)
@@ -508,7 +509,6 @@ class ImageViewer(QWidget):
         self.menu.copy_signal.connect(self.copyToClipboard)
         self.menu.delete_signal.connect(self.delete_image)
         self.menu.show_folder.connect(self.show_containing_folder)
-        self.menu.show_img_info_sig.connect(self.showImageInfo)
         self.image_view.installEventFilter(self.menu)
 
 
@@ -531,7 +531,7 @@ class ImageViewer(QWidget):
         self.rightBrowse = self.create_button('fa.angle-right', '', self.next_image, parent=self)
         self.back_button = self.create_button(None, '', self.close, parent=self,text='↩')
         
-        self.options_button = self.create_button('mdi.dots-vertical', 'options', self.showOptionsMenu, parent=self,sf=1.7)
+        self.options_button = self.create_button('mdi.dots-vertical', 'options', self.showOptionsMenu, parent=self,sf=1.6)
         self.gray_button = self.create_button('mdi.image-filter-black-white', 'Gray scale', self.BGR2GRAY, parent=self)
         self.rotate_button = self.create_button('mdi6.rotate-left', 'Rotate', self.rotateCCW)
         self.crop_button=self.create_button('mdi.crop', 'crop', self.add_crop_rect, parent=self)
@@ -674,7 +674,7 @@ class ImageViewer(QWidget):
         self.options_button.setStyleSheet(options_button_style)
         
         self.back_button.setFixedSize(self.NAVBUTTONWIDTH,40) 
-        self.options_button.setFixedSize(self.NAVBUTTONWIDTH,40)
+        self.options_button.setFixedSize(self.NAVBUTTONWIDTH//2,40)
         self.leftBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
         self.rightBrowse.setFixedSize(self.NAVBUTTONWIDTH, int(self.height()/1.25))
 
@@ -908,8 +908,9 @@ class ImageViewer(QWidget):
     
     def showOptionsMenu(self):
         menu = QMenu(self)
-        menu.addAction("show containing folder", self.show_containing_folder)
-        
+        menu.addAction("Show containing folder", self.show_containing_folder)
+        menu.addAction("Move to locked folder",self.addToLockedFolder)
+        menu.addAction("Image details",self.showImageInfo)
 
         menu.setStyleSheet("""
             QMenu {
@@ -926,7 +927,25 @@ class ImageViewer(QWidget):
         """)
         # Show the menu at the button's position
         menu.exec_(self.options_button.mapToGlobal(self.options_button.rect().bottomLeft()))
-    
+    def addToLockedFolder(self):
+        password=self.requestPassword()
+        secure_folder=SecureFolder(password)
+        if secure_folder==1:
+            secure_folder.encrypt()
+        elif secure_folder==2:
+            print("a new password has been set!")
+        else:
+            print("password is incorrect")
+        print(password)
+    def requestPassword(self):
+        text, ok = QInputDialog.getText(self, 'Locked Folder', 'Enter your name:')
+        if ok:
+            return text
+        #self.show()
+
+
+
+
     def  BGR2GRAY(self):
         if self.edited_image is not None:
             img=self.edited_image
@@ -1701,7 +1720,6 @@ class Menu(QObject):
     copy_signal = pyqtSignal()
     delete_signal = pyqtSignal()
     show_folder = pyqtSignal()
-    show_img_info_sig=pyqtSignal()
     def __init__(self, graphics_view):
         super().__init__()
         self.opened_menu = None
@@ -1723,9 +1741,6 @@ class Menu(QObject):
             delete_action.triggered.connect(lambda:self.delete_signal.emit())
             menu.addAction(delete_action)
 
-            show_info_action = QAction("image details", menu)
-            show_info_action.triggered.connect(lambda:self.show_img_info_sig.emit())
-            menu.addAction(show_info_action)
 
             show_folder_action = QAction("Show Containing Folder", menu)
             show_folder_action.triggered.connect(lambda:self.show_folder.emit())
