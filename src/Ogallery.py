@@ -969,21 +969,31 @@ class ImageViewer(QWidget):
             return text
 
     def requestNewPassword(self):
-        text, ok = QInputDialog.getText(self, 'Locked Folder - setup', 'Enter a password:')
-        if ok:
+        
+        dialog = CustomDialog(title='Locked Folder setup', message='Enter a password', is_password=True)
+        text=dialog.getText()
+        if text:
             password=text
-            text, ok = QInputDialog.getText(self, 'Locked Folder - setup', 'confirm password:')
-            if ok:
+            dialog = CustomDialog(title='Locked Folder setup', message='confirm password', is_password=True)
+            text=dialog.getText()
+            if text:
                 confirmed_password=text
                 if password==confirmed_password:
-                    return password
-        
+                    if self.isValidPassword(password):
+                        return password
+                    else:
+                        self.showErrorMessage("this is not a valid password")
+                else:
+                    self.showErrorMessage("Passwords do not match. Please make sure both fields are identical")
+            else:
+                return 0
+        else:
+            return 0
     def createPassword(self,password):
         if password:
                 self.secure_folder.generate_master_key(password)
 
-        else:
-            self.showErrorMessage("Passwords do not match. Please make sure both fields are identical")
+        
     def openLockedFolder(self):
         
         self.decrypted_files=[]
@@ -1015,7 +1025,13 @@ class ImageViewer(QWidget):
         
     
 
-
+    def isValidPassword(self,password):
+        if password is None:
+            return False
+        elif len(password)<4:
+            return False
+        else:
+            return True
     
     def  BGR2GRAY(self):
         if self.edited_image is not None:
