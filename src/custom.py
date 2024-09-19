@@ -5,6 +5,7 @@ import datetime
 import os
 import yaml
 
+
 import cv2
 
 
@@ -122,3 +123,50 @@ class QPushButtonHighlight(QPushButton):
 
     def leaveEvent(self, event):
         self.setIcon(self.icon_normal)
+
+class CustomDialog(QDialog):
+    def __init__(self, title="Input", message="Enter text", is_password=False, *args, **kwargs):
+        super(CustomDialog, self).__init__(*args, **kwargs)
+
+        try:
+            # Load colors from config file
+            with open('config/config.yaml', 'r') as file:
+                self.config_data = yaml.safe_load(file)
+
+            # Set window title
+            self.setWindowTitle(title)
+
+            # Set dialog stylesheet (background and text color)
+            self.setStyleSheet(f"background-color: {self.config_data['background']}; color: white;")
+
+            # Create layout
+            layout = QVBoxLayout()
+
+            # Create label with the message
+            self.label = QLabel(message)
+            layout.addWidget(self.label)
+
+            # Create input field (can be plain text or password)
+            self.input = QLineEdit(self)
+            if is_password:
+                self.input.setEchoMode(QLineEdit.Password)  # Hide text for password input
+            self.input.setStyleSheet("color: white;")  # Set text color to white
+            layout.addWidget(self.input)
+
+            # Create button
+            self.ok_button = QPushButton("OK")
+            self.ok_button.setStyleSheet(f"QPushButton:hover {{background-color: {self.config_data['blue']}; }}")
+            self.ok_button.clicked.connect(self.accept)
+            layout.addWidget(self.ok_button)
+
+            # Set the layout
+            self.setLayout(layout)
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def getText(self):
+        """ Returns the input text if OK is clicked, else None. """
+        if self.exec_() == QDialog.Accepted:
+            return self.input.text()
+        return None
