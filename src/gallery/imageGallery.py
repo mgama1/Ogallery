@@ -244,7 +244,6 @@ class ImageGalleryApp(QMainWindow):
         
         # 5. Delete central widget explicitly (optional)
         self.centralWidget().deleteLater()
-        #6
         # 6. Accept the close event
         event.accept()
 

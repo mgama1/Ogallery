@@ -263,6 +263,7 @@ class MainWidget(QWidget):
         self.images=decrypted_files
         self.image_gallery=ImageGalleryApp(self)
         self.image_gallery.finishedSignal.connect(self.closeLockedFolder)
+        self.showMinimized()
         self.image_gallery.show()
 
     def closeLockedFolder(self):
@@ -944,23 +945,19 @@ class ImageViewer(QWidget):
         menu.exec_(self.options_button.mapToGlobal(self.options_button.rect().bottomLeft()))
    
     def addToLockedFolder(self):
-        secure_folder=SecureFolder()
+        self.secure_folder=SecureFolder()
         
-        if secure_folder.hasExistingPassword():
+        if self.secure_folder.hasExistingPassword():
             password=self.requestPassword()
-            if secure_folder.encrypt(self.image_files[self.current_index],password):
+            if self.secure_folder.encrypt(self.image_files[self.current_index],password):
                 self.image_files.pop(self.current_index)
                 self.show_image()
                 #td remove from gallery
             else:
                 self.showErrorMessage("Password is incorrect!")
         else:
-            password=self.createPassword()
-            if password:
-                secure_folder.generate_master_key(password)
-
-            else:
-                self.showErrorMessage("Passwords do not match. Please make sure both fields are identical")
+            password=self.requestNewPassword()
+            self.createPassword(password)
         
     def requestPassword(self):
         text, ok = QInputDialog.getText(self, 'Locked Folder', 'Enter a password')
@@ -968,7 +965,7 @@ class ImageViewer(QWidget):
             return text
         #self.show()
 
-    def createPassword(self):
+    def requestNewPassword(self):
         text, ok = QInputDialog.getText(self, 'Locked Folder - setup', 'Enter a password:')
         if ok:
             password=text
@@ -978,26 +975,36 @@ class ImageViewer(QWidget):
                 if password==confirmed_password:
                     return password
         
+    def createPassword(self,password):
+        if password:
+                self.secure_folder.generate_master_key(password)
 
+        else:
+            self.showErrorMessage("Passwords do not match. Please make sure both fields are identical")
     def openLockedFolder(self):
-        self.password=self.requestPassword()
+        
         self.decrypted_files=[]
         im=ImagesModel()
-        secure_folder=SecureFolder()
-
-        secure_files=im.get_secure_files()
-        if secure_files:
-            for decrypted_file in secure_files:
-                decrypted_file_path=secure_folder.decrypt(decrypted_file,self.password)
-                if decrypted_file_path:
-                    self.decrypted_files.append(str(decrypted_file_path))
-                    print(self.decrypted_files)
-        if self.decrypted_files:
-            self.close()
-            self.main_widget.openLockedFolderGallery(self.decrypted_files)
+        self.secure_folder=SecureFolder()
+        if self.secure_folder.hasExistingPassword():
+            self.password=self.requestPassword()
+            if self.secure_folder.validate_password(self.password):
+                secure_files=im.get_secure_files()
+                if secure_files:
+                    for decrypted_file in secure_files:
+                        decrypted_file_path=self.secure_folder.decrypt(decrypted_file,self.password)
+                        if decrypted_file_path:
+                            self.decrypted_files.append(str(decrypted_file_path))
+                            print(self.decrypted_files)
+                if self.decrypted_files:
+                    self.close()
+                    self.main_widget.openLockedFolderGallery(self.decrypted_files)
+            else:
+                self.showErrorMessage("Password is incorrect!")
             
-            
-            
+        else:
+            password=self.requestNewPassword()
+            self.createPassword(password)
         
     
 

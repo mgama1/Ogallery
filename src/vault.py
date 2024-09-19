@@ -54,10 +54,11 @@ class SecureFolder():
             file.write(encrypted_master_key)
 
 
-    def validate_password(self):
+    def validate_password(self,password):
         """
         
         """
+        self.password=password
         try:
             with open("config/encrypted_master_key.key", "rb") as file:
                 encrypted_master_key = file.read()
@@ -119,7 +120,7 @@ class SecureFolder():
         master_key=self.get_master_key()
         
 
-        if self.validate_password():
+        if self.validate_password(password):
             f = Fernet(master_key)
             with open(filename, "rb") as file:
                 file_data = file.read()
@@ -143,7 +144,7 @@ class SecureFolder():
         master_key=self.get_master_key()
         
         
-        if self.validate_password():
+        if self.validate_password(password):
             f = Fernet(master_key)
             with open(filename, "rb") as file:
                 encrypted_data = file.read()
