@@ -949,10 +949,12 @@ class ImageViewer(QWidget):
         
         if self.secure_folder.hasExistingPassword():
             password=self.requestPassword()
+            if password is None:
+                return 0
             if self.secure_folder.encrypt(self.image_files[self.current_index],password):
                 self.image_files.pop(self.current_index)
+                self.main_widget.imageViewerDeleted(self.current_index)
                 self.show_image()
-                #td remove from gallery
             else:
                 self.showErrorMessage("Password is incorrect!")
         else:
@@ -987,21 +989,22 @@ class ImageViewer(QWidget):
         im=ImagesModel()
         secure_files=im.get_secure_files()
         if not secure_files:
-            self.showErrorMessage("locked folder is empty")
+            self.showErrorMessage("Locked folder is empty!")
             return 0
         self.secure_folder=SecureFolder()
         if self.secure_folder.hasExistingPassword():
             self.password=self.requestPassword()
+            if self.password is None:
+                return 0
             if self.secure_folder.validate_password(self.password):
-                if secure_files:
-                    for decrypted_file in secure_files:
-                        decrypted_file_path=self.secure_folder.decrypt(decrypted_file,self.password)
-                        if decrypted_file_path:
-                            self.decrypted_files.append(str(decrypted_file_path))
-                            print(self.decrypted_files)
-                if self.decrypted_files:
-                    self.close()
-                    self.main_widget.openLockedFolderGallery(self.decrypted_files)
+                for decrypted_file in secure_files:
+                    decrypted_file_path=self.secure_folder.decrypt(decrypted_file,self.password)
+                    self.decrypted_files.append(str(decrypted_file_path))
+                    print(self.decrypted_files)
+                
+                self.close()
+                self.main_widget.openLockedFolderGallery(self.decrypted_files)
+            
             else:
                 self.showErrorMessage("Password is incorrect!")
             

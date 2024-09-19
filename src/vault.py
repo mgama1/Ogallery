@@ -58,6 +58,7 @@ class SecureFolder():
         """
         
         """
+        
         self.password=password
         try:
             with open("config/encrypted_master_key.key", "rb") as file:
