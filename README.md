@@ -3,6 +3,8 @@
 
 ## Website
 https://ogalleryapp.github.io/
+
+explicit list of all the features to keep track on what has been crossed from the backlog
 ### Viewer features:
  - Full-screen mode
  - show containing folder
@@ -22,6 +24,11 @@ https://ogalleryapp.github.io/
  - undo/redo
  - Adjust (Contrast, Brightness, Saturation, Hue)
 
+### Gallery features:
+ - caching
+ - lazy loading
+ - back to top
+ - select and delete batch
 ### search features:
  - search on common classes
  - misspelling handling

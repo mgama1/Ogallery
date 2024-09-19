@@ -262,8 +262,16 @@ class MainWidget(QWidget):
         #time.sleep(5)
         self.images=decrypted_files
         self.image_gallery=ImageGalleryApp(self)
-        
+        self.image_gallery.finishedSignal.connect(self.closeLockedFolder)
         self.image_gallery.show()
+
+    def closeLockedFolder(self):
+        print(self.images) 
+        secure_folder=SecureFolder()
+        for decrypted_file in self.images:
+            secure_folder.encrypt(decrypted_file,"0000")
+        self.images.clear()
+        print("all encrypted again")
     def showMainWidget(self):
         """
         Show the main widget when the ImageViewer is closed
@@ -983,21 +991,15 @@ class ImageViewer(QWidget):
                 decrypted_file_path=secure_folder.decrypt(decrypted_file,self.password)
                 if decrypted_file_path:
                     self.decrypted_files.append(str(decrypted_file_path))
-                    print(self.decrypted_files) # how is it not empty here
+                    print(self.decrypted_files)
         if self.decrypted_files:
             self.close()
             self.main_widget.openLockedFolderGallery(self.decrypted_files)
-            self.main_widget.image_gallery.finishedSignal.connect(self.closeLockedFolder)
+            
             
             
         
-    def closeLockedFolder(self):
-        print(self.decrypted_files) #but empty here??
-        secure_folder=SecureFolder()
-        for decrypted_file in self.decrypted_files:
-            secure_folder.encrypt(decrypted_file,self.password)
-        self.decrypted_files.clear()
-        print("all encrypted again")
+    
 
 
     
