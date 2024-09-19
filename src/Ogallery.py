@@ -259,6 +259,7 @@ class MainWidget(QWidget):
     
     def openLockedFolderGallery(self,decrypted_files):
         self.image_gallery.close()
+        #time.sleep(5)
         self.images=decrypted_files
         self.image_gallery=ImageGalleryApp(self)
         

@@ -233,6 +233,7 @@ class ImageGalleryApp(QMainWindow):
         
         self.thumbnail_widgets.clear()  # Clear the list of thumbnails
         #self.image_files.clear()
+        #QTimer.singleShot(0, lambda:self.image_files.clear())
         self.selected_indices.clear()
         # 3. Disconnect any other signals
         self.scroll.valueChanged.disconnect(self.loadNextBatch)
