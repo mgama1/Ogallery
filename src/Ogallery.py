@@ -1315,9 +1315,14 @@ class ImageViewer(QWidget):
             
             #deleted={'index':self.current_index,'file_name':self.image_files[self.current_index]}
             self.image_files.pop(self.current_index)
-            self.show_image()
-            
             self.main_widget.imageViewerDeleted(self.current_index)
+            try:
+                self.show_image()
+            except:
+                time.sleep(.1)
+                self.current_index = self.current_index % len(self.image_files)
+                self.show_image()
+            
            
     def show_success_message(self):
         '''
