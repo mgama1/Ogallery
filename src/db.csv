@@ -464,3 +464,541 @@ directory,class,synonyms
 /home/mgama1/Downloads/laura2.jpg,,
 /home/mgama1/Downloads/laura3.jpg,,
 /home/mgama1/Downloads/laura1.jpg,q_car,q_automobile 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/logo.png,q_reciept, q_bill 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/logo.png,q_reciept, q_bill 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/grass.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/grass.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/astronaut.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/astronaut.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/motorcycle_left.png,q_motorcycle,q_bike 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/motorcycle_left.png,q_motorcycle,q_bike 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/chessboard_GRAY.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/chessboard_GRAY.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/moon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/moon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/color.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/color.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/coins.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/coins.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/camera.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/camera.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/horse.png,q_dog,"q_puppy ,q_pupper ,q_doggo ,q_doggy "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/horse.png,q_dog,"q_puppy ,q_pupper ,q_doggo ,q_doggy "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/ihc.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/ihc.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/cell.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/cell.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/phantom.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/phantom.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/retina.jpg,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/retina.jpg,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/coffee.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/coffee.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/text.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/text.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/chelsea.png,q_cat,"q_kitty ,q_kitten "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/chelsea.png,q_cat,"q_kitty ,q_kitten "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/gravel.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/gravel.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/chessboard_RGB.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/chessboard_RGB.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/microaneurysms.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/microaneurysms.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/clock_motion.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/clock_motion.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/brick.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/brick.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/no_time_for_that_tiny.gif,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/no_time_for_that_tiny.gif,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/hubble_deep_field.jpg,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/hubble_deep_field.jpg,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/page.png,q_reciept, q_bill 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/page.png,q_reciept, q_bill 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/motorcycle_right.png,q_motorcycle,q_bike 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/motorcycle_right.png,q_motorcycle,q_bike 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/skimage/data/rocket.jpg,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/skimage/data/rocket.jpg,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/scipy/ndimage/tests/dots.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/scipy/ndimage/tests/dots.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/werkzeug/debug/shared/more.png,q_plane,"q_airplane ,q_aeroplane , q_aircraft"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/werkzeug/debug/shared/less.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/werkzeug/debug/shared/more.png,q_plane,"q_airplane ,q_aeroplane , q_aircraft"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/werkzeug/debug/shared/less.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/werkzeug/debug/shared/console.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/werkzeug/debug/shared/console.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/networkx/drawing/tests/baseline/test_house_with_colors.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/networkx/drawing/tests/baseline/test_house_with_colors.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/sympy/plotting/tests/test_region_or.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/sympy/plotting/tests/test_region_xor.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/sympy/plotting/tests/test_region_or.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/sympy/plotting/tests/test_region_xor.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/sympy/plotting/tests/test_region_not.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/sympy/plotting/tests/test_region_not.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/sympy/plotting/tests/test_region_and.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/sympy/plotting/tests/test_region_and.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/view3D.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture16.png,q_helicopter,q_chopper 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture16.png,q_helicopter,q_chopper 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/texture.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/sphere16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shaderutil16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/shadercommand@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/scene16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/model16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/plane16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/model16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/material16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightspot16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightpoint16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightdirectional.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/lightarea16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/group.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/dummy.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cylinder.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cube.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/cone16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/designer/images/camera16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/shadow.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/spherical_checker.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/shadow.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/spherical_checker.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient3D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient4D.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient3D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient4D.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient2D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient1D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient2D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/randomGradient1D.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/paper_trans.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/paper_trans.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/paper_diffuse.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/paper_diffuse.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/grunge_d.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/grunge_d.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/grunge_b.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/grunge_b.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/emissive.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/emissive_mask.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/emissive.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/emissive_mask.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/concentric_milled_steel_aniso.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/concentric_milled_steel_aniso.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/concentric_milled_steel.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/brushed_full_contrast.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/concentric_milled_steel.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/brushed_full_contrast.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/brushed_a.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/brushed_a.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/art_paper_trans.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/art_paper_trans.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/art_paper_normal.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/maps/art_paper_normal.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Materials/designer/images/custommaterial.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/maps/brushnoise.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/maps/white.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/maps/brushnoise.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/maps/white.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick3D/Effects/designer/images/effect.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/tumbler-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/tumbler-icon.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/tumbler-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/tumbler-icon.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/togglebutton-icon16.png,q_id,"q_identity card,q_id card "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/togglebutton-icon16.png,q_id,"q_identity card,q_id card "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/togglebutton-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/togglebutton-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/statusindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/statusindicator-icon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/statusindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/statusindicator-icon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/piemenu-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/piemenu-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/picture-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/piemenu-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/picture-icon.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/picture-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/piemenu-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/picture-icon.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/gauge-icon.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/gauge-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/gauge-icon.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/gauge-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/dial-icon16.png,q_car,q_automobile 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/dial-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/dial-icon16.png,q_car,q_automobile 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/dial-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/delaybutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/delaybutton-icon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/delaybutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/delaybutton-icon.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/circulargauge-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/circulargauge-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/circulargauge-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Extras/designer/images/circulargauge-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/warning.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/window_border.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/warning.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/window_border.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/sunken_frame.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/sunken_frame.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/question.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/slider_handle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/question.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/slider_handle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/information.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/crosshairs.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/information.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/crosshairs.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/critical.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/critical.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/copy.png,q_bus,q_autobus
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/copy.png,q_bus,q_autobus
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/checkers.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/checkmark.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/checkers.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Dialogs/images/checkmark.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/tumbler-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolseparator-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/toolbar-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textfield-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/textarea-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon@2x.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon@2x.png,q_sea,"q_beach ,q_water "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/switch-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/swipeview-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/stackview-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/spinbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/slider-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/scrollview-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/roundbutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/rangeslider-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon@2x.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/radiobutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/progressbar-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pane-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/pageindicator-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/page-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon16.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/label-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/itemdelegate-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/groupbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon16.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon16.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/frame-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/dial-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/delaybutton-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/combobox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/checkbox-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/button-icon.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls.2/designer/images/busyindicator-icon16.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/tab.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/tab_selected.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_small.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/tab.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/tab_selected.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_small.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_large.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_medium.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_large.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/spinner_medium.png,q_building,"q_house , q_home , q_apartment"
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/slider-handle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/slider-groove.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/slider-handle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/slider-groove.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-vertical.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-transient.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-vertical.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-transient.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-horizontal.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/scrollbar-handle-horizontal.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/rightanglearrow.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/rightanglearrow.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/needle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/progress-indeterminate.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/needle.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/progress-indeterminate.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/leftanglearrow.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/knob.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/header.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/leftanglearrow.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/knob.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/header.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/focusframe.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/groupbox.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/focusframe.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/groupbox.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/check@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/editbox.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/check.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/check@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/editbox.png,q_document,"q_docs , q_text "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/check.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/button.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/button_down.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/button.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/button_down.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-up.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-right@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-up@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-up.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-right@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-up@2x.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-left@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-right.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-left@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-right.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-left.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-down@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-down.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-left.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-down@2x.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/PyQt5/Qt5/qml/QtQuick/Controls/Styles/Base/images/arrow-down.png,q_bicycle,q_bike
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/pyzbar/tests/qrcode_rotated.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/pyzbar/tests/qrcode.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/pyzbar/tests/qrcode_rotated.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/pyzbar/tests/qrcode.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/pyzbar/tests/empty.png,,
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/pyzbar/tests/code128_null_character.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/pyzbar/tests/empty.png,,
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/pyzbar/tests/code128_null_character.png,q_forest,q_tree 
+/home/mgama1/Pictures/ogalleryenv/lib/python3.11/site-packages/pyzbar/tests/code128.png,q_id,"q_identity card,q_id card "
+/home/mgama1/Pictures/ogalleryenv/lib64/python3.11/site-packages/pyzbar/tests/code128.png,q_id,"q_identity card,q_id card "
