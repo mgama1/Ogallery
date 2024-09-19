@@ -1,13 +1,14 @@
        
 import qtawesome as qta
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt,QTimer
+from PyQt5.QtCore import Qt,QTimer,pyqtSignal
 import yaml
 import time
 import os
 from .imageThumbnail import ImageThumbnailWidget
 
 class ImageGalleryApp(QMainWindow):
+    finishedSignal = pyqtSignal()
     def __init__(self,main_widget):
         super().__init__()
         with open('config/config.yaml', 'r') as file:
@@ -216,6 +217,8 @@ class ImageGalleryApp(QMainWindow):
             self.scroll.setValue(0)
 
     def closeEvent(self, event):
+        self.finishedSignal.emit()
+
         # Perform any necessary cleanup before closing the app
         
         # 1. Stop and delete timers
@@ -229,7 +232,7 @@ class ImageGalleryApp(QMainWindow):
             thumbnail_widget.deleteLater()
         
         self.thumbnail_widgets.clear()  # Clear the list of thumbnails
-        self.image_files.clear()
+        #self.image_files.clear()
         self.selected_indices.clear()
         # 3. Disconnect any other signals
         self.scroll.valueChanged.disconnect(self.loadNextBatch)
@@ -240,7 +243,7 @@ class ImageGalleryApp(QMainWindow):
         
         # 5. Delete central widget explicitly (optional)
         self.centralWidget().deleteLater()
-        
+        #6
         # 6. Accept the close event
         event.accept()
 

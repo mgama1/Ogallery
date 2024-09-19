@@ -257,6 +257,12 @@ class MainWidget(QWidget):
     def imageViewerSaved(self,saved_dic):
         self.image_gallery.updateThumbnail(saved_dic)
     
+    def openLockedFolderGallery(self,decrypted_files):
+        self.image_gallery.close()
+        self.images=decrypted_files
+        self.image_gallery=ImageGalleryApp(self)
+        
+        self.image_gallery.show()
     def showMainWidget(self):
         """
         Show the main widget when the ImageViewer is closed
@@ -911,7 +917,7 @@ class ImageViewer(QWidget):
         menu.addAction("Show containing folder", self.show_containing_folder)
         menu.addAction("Move to locked folder",self.addToLockedFolder)
         menu.addAction("Image details",self.showImageInfo)
-
+        menu.addAction("Open Locked folder",self.openLockedFolder)
         menu.setStyleSheet("""
             QMenu {
                 background-color: #212121; 
@@ -964,7 +970,36 @@ class ImageViewer(QWidget):
                     return password
         
 
+    def openLockedFolder(self):
+        self.password=self.requestPassword()
+        self.decrypted_files=[]
+        im=ImagesModel()
+        secure_folder=SecureFolder()
 
+        secure_files=im.get_secure_files()
+        if secure_files:
+            for decrypted_file in secure_files:
+                decrypted_file_path=secure_folder.decrypt(decrypted_file,self.password)
+                if decrypted_file_path:
+                    self.decrypted_files.append(str(decrypted_file_path))
+                    print(self.decrypted_files) # how is it not empty here
+        if self.decrypted_files:
+            self.close()
+            self.main_widget.openLockedFolderGallery(self.decrypted_files)
+            self.main_widget.image_gallery.finishedSignal.connect(self.closeLockedFolder)
+            
+            
+        
+    def closeLockedFolder(self):
+        print(self.decrypted_files) #but empty here??
+        secure_folder=SecureFolder()
+        for decrypted_file in self.decrypted_files:
+            secure_folder.encrypt(decrypted_file,self.password)
+        self.decrypted_files.clear()
+        print("all encrypted again")
+
+
+    
     def  BGR2GRAY(self):
         if self.edited_image is not None:
             img=self.edited_image
