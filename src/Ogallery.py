@@ -246,10 +246,10 @@ class MainWidget(QWidget):
     
         else:
             self.showErrorMessage("please setup the images directories")
-    def openViewer(self,image_path):
+    def openViewer(self,image_path,secure_mode):
         
         
-        ImageViewer(self,image_path)
+        ImageViewer(self,image_path,secure_mode=secure_mode)
 
     def imageViewerDeleted(self,index):
         self.image_gallery.removeThumbnail(index)
@@ -261,7 +261,7 @@ class MainWidget(QWidget):
         self.image_gallery.close()
         #time.sleep(5)
         self.images=decrypted_files
-        self.image_gallery=ImageGalleryApp(self)
+        self.image_gallery=ImageGalleryApp(self,secure_mode=True)
         self.image_gallery.finishedSignal.connect(self.closeLockedFolder)
         self.showMinimized()
         self.image_gallery.show()
@@ -480,8 +480,9 @@ class MainWidget(QWidget):
 
 class ImageViewer(QWidget):
     finishedSignal = pyqtSignal()
-    def __init__(self,main_widget,image_path):
+    def __init__(self,main_widget,image_path,secure_mode=False):
         super().__init__()
+        self.secure_mode=secure_mode
         self.main_widget = main_widget  
         self.NAVBUTTONWIDTH=60
         with open('config/config.yaml', 'r') as file:
@@ -627,6 +628,9 @@ class ImageViewer(QWidget):
 
         layout.addLayout(self.editing_buttons_layout)
         
+        if self.secure_mode:
+            for button in self.editing_buttons:
+                button.setVisible(False)
         # Set absolute positions for leftBrowse and rightBrowse
         self.leftBrowse.setParent(self)
         self.leftBrowse.setGeometry(10, self.height() // 2 - self.leftBrowse.height() // 2, self.leftBrowse.width(), self.leftBrowse.height())
@@ -924,10 +928,13 @@ class ImageViewer(QWidget):
     
     def showOptionsMenu(self):
         menu = QMenu(self)
-        menu.addAction("Show containing folder", self.show_containing_folder)
-        menu.addAction("Move to locked folder",self.addToLockedFolder)
-        menu.addAction("Image details",self.showImageInfo)
-        menu.addAction("Open Locked folder",self.openLockedFolder)
+        if self.secure_mode:
+            menu.addAction("Move out of locked folder",self.removeFromLockedFolder)
+        else:
+            menu.addAction("Show containing folder", self.show_containing_folder)
+            menu.addAction("Move to locked folder",self.addToLockedFolder)
+            menu.addAction("Image details",self.showImageInfo)
+            menu.addAction("Open Locked folder",self.openLockedFolder)
         menu.setStyleSheet("""
             QMenu {
                 background-color: #212121; 
@@ -1033,6 +1040,8 @@ class ImageViewer(QWidget):
         else:
             return True
     
+    def removeFromLockedFolder(self):
+        pass
     def  BGR2GRAY(self):
         if self.edited_image is not None:
             img=self.edited_image

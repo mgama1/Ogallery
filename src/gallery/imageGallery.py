@@ -9,11 +9,11 @@ from .imageThumbnail import ImageThumbnailWidget
 
 class ImageGalleryApp(QMainWindow):
     finishedSignal = pyqtSignal()
-    def __init__(self,main_widget):
+    def __init__(self,main_widget,secure_mode=False):
         super().__init__()
         with open('config/config.yaml', 'r') as file:
             self.config_data = yaml.safe_load(file)
-
+        self.secure_mode=secure_mode
         self.main_widget = main_widget  # Keep a reference to MainWidget 
         self.image_files = self.main_widget.images
         self.thumbnail_widgets = []  # To store references to thumbnail widgets
@@ -48,7 +48,7 @@ class ImageGalleryApp(QMainWindow):
         # Add thumbnails to the grid layout
         row, col = 0, 0
         for index, image_file in enumerate(self.image_files):
-            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self.config_data, self.main_widget)
+            thumbnail_widget = ImageThumbnailWidget(image_file, self.image_files, self.config_data, self.main_widget,self.secure_mode)
             thumbnail_widget.selectedSig.connect(lambda selected_index: self.selected_indices.append(selected_index))
             self.grid_layout.addWidget(thumbnail_widget, row, col)
             self.thumbnail_widgets.append(thumbnail_widget) 

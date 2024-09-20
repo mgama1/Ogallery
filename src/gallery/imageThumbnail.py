@@ -10,11 +10,11 @@ from .Othumbnails import ThumbnailMaker
 
 class ImageThumbnailWidget(QWidget):
     selectedSig=pyqtSignal(int)
-    def __init__(self, image_path, image_files,config_data,main_widget):
+    def __init__(self, image_path, image_files,config_data,main_widget,secure_mode=False):
         super().__init__()
         username = os.getenv('USER')
         self.cache_dir = f"/home/{username}/.cache/OpenGallery/"
-        
+        self.secure_mode=secure_mode
         self.config_data=config_data
         self.image_path = image_path
         self.image_files = image_files
@@ -71,7 +71,7 @@ class ImageThumbnailWidget(QWidget):
         if event.button() == Qt.LeftButton:
             self.setStyleSheet(f"background-color: {self.config_data['royal_blue']};")
             
-            self.main_widget.openViewer(self.image_path)
+            self.main_widget.openViewer(self.image_path,self.secure_mode)
     
         if event.button() == Qt.RightButton:
             
