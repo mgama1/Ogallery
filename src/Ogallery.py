@@ -257,22 +257,18 @@ class MainWidget(QWidget):
     def imageViewerSaved(self,saved_dic):
         self.image_gallery.updateThumbnail(saved_dic)
     
-    def openLockedFolderGallery(self,decrypted_files):
+    def openLockedFolderGallery(self,decrypted_files,password):
         self.image_gallery.close()
         #time.sleep(5)
         self.images=decrypted_files
         self.image_gallery=ImageGalleryApp(self,secure_mode=True)
-        self.image_gallery.finishedSignal.connect(self.closeLockedFolder)
+        #you have to connect before showing
+        self.image_gallery.finishedSignal.connect(lambda:SecureFolder().closeLockedFolder(self.images,password))
         self.showMinimized()
         self.image_gallery.show()
 
-    def closeLockedFolder(self):
-        print(self.images) 
-        secure_folder=SecureFolder()
-        for decrypted_file in self.images:
-            secure_folder.encrypt(decrypted_file,"0000")
-        self.images.clear()
-        print("all encrypted again")
+        
+        
     def showMainWidget(self):
         """
         Show the main widget when the ImageViewer is closed
@@ -1021,7 +1017,7 @@ class ImageViewer(QWidget):
                     print(self.decrypted_files)
                 
                 self.close()
-                self.main_widget.openLockedFolderGallery(self.decrypted_files)
+                self.main_widget.openLockedFolderGallery(self.decrypted_files,self.password)
             
             else:
                 self.showErrorMessage("Password is incorrect!")
@@ -1041,7 +1037,14 @@ class ImageViewer(QWidget):
             return True
     
     def removeFromLockedFolder(self):
-        pass
+        self.image_files.pop(self.current_index)
+        self.main_widget.imageViewerDeleted(self.current_index)
+        try:
+            self.show_image()
+        except:
+            time.sleep(.1)
+            self.current_index = self.current_index % len(self.image_files)
+            self.show_image()
     def  BGR2GRAY(self):
         if self.edited_image is not None:
             img=self.edited_image

@@ -174,3 +174,9 @@ class SecureFolder():
     
 
 
+    def closeLockedFolder(self,decrypted_images,password):
+        print(decrypted_images)
+        for decrypted_file in decrypted_images:
+            self.encrypt(decrypted_file,password)
+        decrypted_images.clear()
+        print("all encrypted again")
