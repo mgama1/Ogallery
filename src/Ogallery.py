@@ -672,7 +672,7 @@ class ImageViewer(QWidget):
         
         
         header_button_style=(
-            "QPushButton {background-color: rgba(22, 22, 22, .5); \
+            "QPushButton {background-color: rgba(22, 22, 22, 0); \
             border: none; \
             color: white; \
             font-size: 16pt;} \
@@ -721,8 +721,9 @@ class ImageViewer(QWidget):
             self.scene.addItem(self.pixmap_item)
             self.scene.setSceneRect(self.pixmap_item.boundingRect())
             self.image_view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
-            self.setWindowTitle(f'Ogallery - {os.path.basename(image_path)}')
-
+            self.setWindowTitle(os.path.basename(image_path))
+        else:
+            self.close()
     def show_edited_image(self):
         try:
             self.scene.clear()
@@ -848,9 +849,8 @@ class ImageViewer(QWidget):
             msg_box.exec_()
             if msg_box.get_choice()=='save':
                 self.save_image()
-                
+        self.purge()        
         self.current_index = (self.current_index + 1) % len(self.image_files)
-        self.purge()
         self.show_image()
 
     def previous_image(self):
@@ -860,9 +860,8 @@ class ImageViewer(QWidget):
             msg_box.exec_()
             if msg_box.get_choice()=='save':
                 self.save_image()
-                
+        self.purge()        
         self.current_index = (self.current_index - 1) % len(self.image_files)
-        self.purge()
         self.show_image()
         
     
@@ -966,14 +965,14 @@ class ImageViewer(QWidget):
         
     def requestPassword(self):
         
-        dialog = CustomDialog(title='Locked Folder', message='Enter the password', is_password=True)
+        dialog = CustomDialog(title='Locked Folder', message='Enter your password', is_password=True)
         text = dialog.getText()
         if text:
             return text
 
     def requestNewPassword(self):
         
-        dialog = CustomDialog(title='Locked Folder setup', message='Enter a password', is_password=True)
+        dialog = CustomDialog(title='Locked Folder setup', message='choose a password', is_password=True)
         text=dialog.getText()
         if text:
             password=text
@@ -1346,6 +1345,7 @@ class ImageViewer(QWidget):
             self.showErrorMessage("no changes were made!")
     
     def delete_image(self):
+        self.purge()
         file_name=self.image_files[self.current_index]
         if os.path.exists(file_name):
             
