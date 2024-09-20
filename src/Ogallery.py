@@ -966,7 +966,7 @@ class ImageViewer(QWidget):
         
     def requestPassword(self):
         
-        dialog = CustomDialog(title='Locked Folder', message='Enter a password', is_password=True)
+        dialog = CustomDialog(title='Locked Folder', message='Enter the password', is_password=True)
         text = dialog.getText()
         if text:
             return text
