@@ -46,7 +46,6 @@ class MainWidget(QWidget):
         self.init_ui()
         self.import_data_in_background()
     def import_data_in_background(self):
-        # Run the import in a separate thread
         thread = threading.Thread(target=self.import_libraries)
         thread.start()
 
@@ -61,14 +60,13 @@ class MainWidget(QWidget):
 
     
 
-        # Any additional setup for pandas or numpy can be done here
     
     def init_ui(self):
         self.setWindowTitle('OGallery')
         self.setGeometry(300, 100, 750, 500)
 
         
-        #self.model=Model()
+        
         with open('./config/classes_synonyms.yaml', 'r') as file:
             classes_synonyms = yaml.safe_load(file)
         # Flatten keys and values of model.classes_synonyms
@@ -118,7 +116,7 @@ class MainWidget(QWidget):
         header_layout.addWidget(self.info_button)
                 
         layout.addLayout(header_layout)
-        #layout.addWidget(self.logo_label)
+        
         horizontal_layout.addStretch(1)
         horizontal_layout.addWidget(self.search_button)
         horizontal_layout.addWidget(self.query_line)
@@ -258,7 +256,7 @@ class MainWidget(QWidget):
     
     def openLockedFolderGallery(self,decrypted_files,password):
         self.image_gallery.close()
-        #time.sleep(5)
+        
         self.images=decrypted_files
         self.image_gallery=ImageGalleryApp(self,secure_mode=True)
         #you have to connect before showing
@@ -382,8 +380,9 @@ class MainWidget(QWidget):
         Returns:
             list: A list of matched file paths.
         """
+        #todo:move this to image model
         matched_files = []
-        search_string = search_string.lower()  # Convert search_string to lowercase
+        search_string = search_string.lower()  
 
         for root, dirs, files in os.walk(parent_dir):
             for file in files:
@@ -427,7 +426,7 @@ class MainWidget(QWidget):
             if lev_distance(query,classi)==2:
                 return classi
         
-        #No matches returned.
+        #No matches found.
         return query
     
     
@@ -538,7 +537,7 @@ class ImageViewer(QWidget):
         return button
 
     def setupButtons(self):
-        # Passing 'self' as the parent ensures these buttons are tied to the main window
+        
         self.leftBrowse = self.create_button('fa.angle-left', '', self.previous_image, parent=self)
         self.rightBrowse = self.create_button('fa.angle-right', '', self.next_image, parent=self)
         self.back_button = self.create_button(None, '', self.close, parent=self,text='↩')
@@ -571,10 +570,6 @@ class ImageViewer(QWidget):
 
 
     def add_crop_rect(self):
-            #rect = QRectF(0, 0, self.image_width, self.image_height)  # Example rectangle
-            #edge_margin=int(min(self.image_width, self.image_height)*.07)
-            #self.crop_rect = ResizableRectItem(rect,edge_margin,self.image_width,self.image_height)
-            #self.scene.addItem(self.crop_rect)
             self.crop_rect = CornerBasedRectItem(0, 0, self.image_width, self.image_height, self.image_width, self.image_height)
             self.scene.addItem(self.crop_rect)
             self.rightBrowse.setVisible(False)
@@ -777,7 +772,7 @@ class ImageViewer(QWidget):
 
     def keyPressEvent(self, event):
         
-        #Navigating images in the directory
+        
         if event.key() == Qt.Key_Right:
             self.next_image()
         if event.key() == Qt.Key_Left:
@@ -792,7 +787,6 @@ class ImageViewer(QWidget):
         if event.key()==Qt.Key_Delete:
             self.delete_image()
             
-        #saving edited images         
         if event.key()==Qt.Key_S :
             self.save_image()
             
@@ -825,17 +819,16 @@ class ImageViewer(QWidget):
         if not self.fullscreen:
             self.showFullScreen()
             if self.edited_image is not None:
-                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+                QTimer.singleShot(100, self.show_edited_image)  
             else:
-                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
-
+                QTimer.singleShot(100, self.show_image)  
             self.fullscreen = True
         else:
             self.showNormal()
             if self.edited_image is not None:
-                QTimer.singleShot(100, self.show_edited_image)  # Delayed call to show_edited_image()
+                QTimer.singleShot(100, self.show_edited_image)  
             else:
-                QTimer.singleShot(100, self.show_image)  # Delayed call to show_image()
+                QTimer.singleShot(100, self.show_image)  
             self.fullscreen = False
     
     def toggleButtonsVisibility(self,buttons_list):
@@ -913,7 +906,9 @@ class ImageViewer(QWidget):
         msg_box.exec_()
         
     def format_file_size(self,size_in_bytes):
-        # Convert the file size to KB, MB, or GB depending on its size
+        '''
+        Convert the file size to KB, MB, or GB depending on its size
+        '''
         if size_in_bytes < 1024:
             return f"{size_in_bytes} bytes"
         elif size_in_bytes < 1024 ** 2:
@@ -1071,7 +1066,7 @@ class ImageViewer(QWidget):
         
         rotated_img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         self.edited_image = rotated_img
-        self.edit_history.add(self.edited_image)  # Push the current state before the edit
+        self.edit_history.add(self.edited_image)  
         
         self.show_edited_image()
 
@@ -1098,7 +1093,7 @@ class ImageViewer(QWidget):
         
        
         flipped_img=cv2.flip(img, 1)
-         # the edit history is lagging by one to offset the fact that we are already displaying the last edited image
+         
         self.edited_image = flipped_img
         self.edit_history.add(self.edited_image) 
         
@@ -1133,12 +1128,11 @@ class ImageViewer(QWidget):
         
         
     def changeSaturation(self,offset_value):
-        # Convert the image to HSV
+        
         hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
         # Create a mask for pixels with high saturation
         saturation_mask = hsv_image[:, :, 1] > 10
         # Shift the hue channel by the specified value
-        #hsv_image[:, :, 1] = np.clip(hsv_image[:, :, 1].astype(float) + offset_value, 0, 255).astype(np.uint8)
         hsv_image[:, :, 1] = np.where(saturation_mask, np.clip(hsv_image[:, :, 1].astype(int) + offset_value, 0, 255), hsv_image[:, :, 1]).astype(np.uint8)
 
         
@@ -1146,7 +1140,6 @@ class ImageViewer(QWidget):
         self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     def changeHue(self,shift_value):        
-        # Convert the image to HSV
         hsv_image = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2HSV)
     
         # Shift the hue channel by the specified value
@@ -1173,6 +1166,7 @@ class ImageViewer(QWidget):
         self.changeSaturation(s_shift_value)
         self.changeHue(shift_value)
         self.edited_image=self.colors_transformation_image
+        #todo
         #self.edit_history.add(self.edited_image)
         self.show_edited_image()
         
@@ -1214,13 +1208,10 @@ class ImageViewer(QWidget):
 
 
     def add_hyperlink_to_scene(self, text, url, pos_x, pos_y):
-        # Create the text item
         text_item = ClickableTextItem(text, url, self.scene)
-        # Set the font
         font = QFont("Arial", int(self.image_width*.015))
         text_item.setFont(font)
         text_item.setDefaultTextColor(QColor("blue"))
-        # Set the position of the text item
         text_item.setPos(pos_x, pos_y)
         
         # Calculate the bounding rectangle of the text
@@ -1235,7 +1226,6 @@ class ImageViewer(QWidget):
         # Position the background rectangle at the same position as the text
         rect_item.setPos(pos_x, pos_y)
         
-        # Add the background rectangle and text item to the scene
         self.scene.addItem(rect_item)
         self.scene.addItem(text_item)
         
