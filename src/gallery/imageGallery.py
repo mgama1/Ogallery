@@ -104,7 +104,7 @@ class ImageGalleryApp(QMainWindow):
 
     def loadNextBatch(self):
         self.backToTopButton.setVisible(True)  # Show the button when scrolling
-        self.visiblity_timer.start(2000)  # Start a timer for x seconds to hide the button
+        self.visiblity_timer.start(3000)  # Start a timer for x seconds to hide the button
         
         self.scroll_value = self.scroll.value()
         if self.scroll_value >= self.scrollbar_threshold:
