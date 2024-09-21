@@ -841,7 +841,8 @@ class ImageViewer(QWidget):
     
     def toggleButtonsVisibility(self,buttons_list):
         for button in buttons_list:
-            button.setVisible(self.fullscreen)
+            if not self.secure_mode:
+                button.setVisible(self.fullscreen)
         self.back_button.setVisible(self.fullscreen)
         self.options_button.setVisible(self.fullscreen)
         
@@ -1404,29 +1405,32 @@ class ImageViewer(QWidget):
     
     
 
-    def show_containing_folder(self):
-        image_path=(self.image_files[self.current_index])
-        dir_path=image_path[0:image_path.rfind('/')]
 
+    def show_containing_folder(self):
+        image_path = self.image_files[self.current_index]
+        dir_path = image_path[0:image_path.rfind('/')]
+        
         commands = [
-            f"nautilus --select",  # Default for GNOME desktop environment            f"nemo {dir_path}",          # Default for Cinnamon desktop environment
-            f"xdg-open",      # Default for most desktop environments
-            f"thunar"         # Default for XFCE desktop environment
+            (["nautilus", "--select", image_path], "GNOME"),  # For GNOME desktop environment
+            (["nemo", image_path], "Cinnamon"),               # For Cinnamon desktop environment
+            (["xdg-open", dir_path], "Generic XDG"),          # For most desktop environments
+            (["thunar", dir_path], "XFCE")                    # For XFCE desktop environment
         ]
         
-        for command in commands:
+        for command, env in commands:
             try:
-                command_run=command.split()
-                if command=='nautilus --select':
-                    command_run.append(image_path)
-                else:
-                    command_run.append(dir_path)
-                
-                subprocess.run(command_run, check=True)
+                subprocess.run(command, check=True, timeout=5)  # Adding timeout for responsiveness
+                print(f"Opened folder using {env}")
                 return True
             except subprocess.CalledProcessError:
                 continue
-
+            except subprocess.TimeoutExpired:
+                print(f"Command for {env} timed out")
+                continue
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                continue
+        
         # If none of the commands were successful
         return False
 
