@@ -721,7 +721,7 @@ class ImageViewer(QWidget):
             self.scene.addItem(self.pixmap_item)
             self.scene.setSceneRect(self.pixmap_item.boundingRect())
             self.image_view.fitInView(self.pixmap_item, Qt.KeepAspectRatio)
-            self.setWindowTitle(os.path.basename(image_path))
+            self.setWindowTitle(os.path.splitext(os.path.basename(image_path))[0])
         else:
             self.close()
     def show_edited_image(self):
@@ -785,7 +785,10 @@ class ImageViewer(QWidget):
             self.previous_image()
     
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
-            self.close()
+            if self.fullscreen:
+                self.toggleFullScreen()
+            else:
+                self.close()
         
         if event.key()==Qt.Key_Delete:
             self.delete_image()
@@ -926,7 +929,6 @@ class ImageViewer(QWidget):
         if self.secure_mode:
             menu.addAction("Move out of locked folder",self.removeFromLockedFolder)
         else:
-            menu.addAction("Show containing folder", self.show_containing_folder)
             menu.addAction("Move to locked folder",self.addToLockedFolder)
             menu.addAction("Image details",self.showImageInfo)
             menu.addAction("Open Locked folder",self.openLockedFolder)
