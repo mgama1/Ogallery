@@ -210,7 +210,6 @@ class MainWidget(QWidget):
         self.background_label.setGeometry(0, 0, self.width(), self.height())
 
     def updateBackground(self,color):
-        print(f"color sent {color}")
         pixmap = QPixmap(f'media/{color}.png')
         self.background_label.setPixmap(pixmap)
         self.search_button.setIconHover(qta.icon('fa.search',color=color,scale_factor=1.1))
@@ -584,8 +583,8 @@ class ImageViewer(QWidget):
     def applyCrop(self):
         if hasattr(self, 'crop_rect'):
                 coords = self.crop_rect.get_relative_coordinates()
-                print(f"Rectangle coordinates: x={coords['x']}, y={coords['y']}, "
-                      f"width={coords['width']}, height={coords['height']}")
+                #print(f"Rectangle coordinates: x={coords['x']}, y={coords['y']}, "
+                #      f"width={coords['width']}, height={coords['height']}")
                 if self.edited_image is not None:
                     img=self.edited_image
                 else :
@@ -1016,7 +1015,6 @@ class ImageViewer(QWidget):
                 for decrypted_file in secure_files:
                     decrypted_file_path=self.secure_folder.decrypt(decrypted_file,self.password)
                     self.decrypted_files.append(str(decrypted_file_path))
-                    print(self.decrypted_files)
                 
                 self.close()
                 self.main_widget.openLockedFolderGallery(self.decrypted_files,self.password)
@@ -1327,7 +1325,6 @@ class ImageViewer(QWidget):
             if choice=="overwrite":
                 cv2.imwrite(img_path, self.edited_image)
                 file_name=img_path
-                print(img_path)
             if choice=="copy":
                 mod_time = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
                 path = os.path.splitext(img_path)
@@ -1358,7 +1355,6 @@ class ImageViewer(QWidget):
             except OSError as e:
                 print(f"Error moving file to trash: {e.filename} - {e.strerror}")
             
-            #deleted={'index':self.current_index,'file_name':self.image_files[self.current_index]}
             self.image_files.pop(self.current_index)
             self.main_widget.imageViewerDeleted(self.current_index)
             try:
@@ -1419,7 +1415,7 @@ class ImageViewer(QWidget):
         
         for command, env in commands:
             try:
-                subprocess.run(command, check=True, timeout=5)  # Adding timeout for responsiveness
+                subprocess.run(command, check=True, timeout=5)  # timeout for responsiveness
                 print(f"Opened folder using {env}")
                 return True
             except subprocess.CalledProcessError:
@@ -1431,7 +1427,6 @@ class ImageViewer(QWidget):
                 print(f"An error occurred: {e}")
                 continue
         
-        # If none of the commands were successful
         return False
 
 
@@ -1439,7 +1434,6 @@ class ImageViewer(QWidget):
     
     def closeEvent(self, event):
         
-        # Override the closeEvent method to handle the window close event
         self.purge()
         self.finishedSignal.emit()
         event.accept()
@@ -1465,7 +1459,6 @@ class InfoWidget(QWidget):
 
         layout = QVBoxLayout()
 
-        # Horizontal Layout for Image and Text
         horizontal_layout = QHBoxLayout()
 
         # Image Label
@@ -1736,7 +1729,6 @@ class SettingsWidget(QWidget):
         self.listView.setModel(self.model)
         dir_layout.addWidget(self.listView)
 
-        # Add a button to remove directories
         self.remove_dir_button = QPushButton('Remove Directory')
         self.remove_dir_button.clicked.connect(self.removeSelectedItems)
         dir_buttons_layout.addWidget(self.remove_dir_button)
@@ -1933,9 +1925,7 @@ class ClickableTextItem(QGraphicsTextItem):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            # Open the hyperlink in the default web browser
             QDesktopServices.openUrl(QUrl(self.url))
-            # Remove the text item and its background rectangle from the scene
             if self.background_rect:
                 self.scene.removeItem(self.background_rect)
             self.scene.removeItem(self)
@@ -1949,7 +1939,7 @@ class CircularBuffer:
         self.head = 0
         self.tail = 0
         self.full = False
-        self.count = 0  # To keep track of the number of items in the buffer
+        self.count = 0  
 
     def add(self, item):
         if self.count < self.size:
@@ -1972,9 +1962,16 @@ class CircularBuffer:
         self.full = False
         return item
     def peek(self):
+        '''
+        Returns the most recent item
+        Argrs:
+            None
+        Returns:
+            most recent item (numpy array)
+        '''
         if self.count == 0:
             return None
-        # Get the most recent item, which is one index before head
+        
         last_index = (self.head - 1 + self.size) % self.size
         return self.buffer[last_index]
     def clear(self):
@@ -2089,7 +2086,7 @@ class CornerBasedRectItem(QGraphicsItem):
         super().hoverLeaveEvent(event)
 
     def get_drag_area(self, pos):
-        margin = 5  # pixels
+        margin = 10  # pixels
         if abs(pos.x() - self.x0) < margin and self.y0 < pos.y() < self.y2:
             return 'left'
         elif abs(pos.x() - self.x1) < margin and self.y1 < pos.y() < self.y3:
