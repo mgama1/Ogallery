@@ -1446,15 +1446,24 @@ class InfoWidget(QWidget):
             button.setFixedHeight(50)
         for button in footer_buttons:
             button.setStyleSheet(button_style)
+class OGSlider(QSlider):
+    def __init__(self, orientation,default_value, parent=None):
+        super().__init__(orientation, parent)
+        self.default_value=default_value
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.setValue(self.default_value)
+        #super().mouseDoubleClickEvent(event)
 
 
 class Adjust(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.contrast_offset = 100
-        self.saturation_offset=0
-        self.hue_offset = 0
-        self.brightness_offset = 0
+    
+        self.contrast_offset = self.contrast_default= 100
+        self.saturation_offset = self.saturation_default=0
+        self.hue_offset = self.hue_deafult=0
+        self.brightness_offset = self.brightness_default= 0
         
         self.init_ui()
 
@@ -1464,7 +1473,7 @@ class Adjust(QWidget):
         self.setGeometry(300, 100, 400, 400)
         self.setStyleSheet(f"background-color: #212121;color:'white';")
         self.contrast_label = QLabel('Contrast:', self)
-        self.contrast_slider = QSlider(Qt.Horizontal)
+        self.contrast_slider = OGSlider(Qt.Horizontal,self.contrast_default)
         self.contrast_slider.setMinimum(30)
         self.contrast_slider.setMaximum(200)
         self.contrast_slider.setValue(100)
@@ -1473,7 +1482,7 @@ class Adjust(QWidget):
         self.contrast_value_label.setText("1")
         
         self.brightness_label = QLabel('Brightness:', self)
-        self.brightness_slider = QSlider(Qt.Horizontal)
+        self.brightness_slider = OGSlider(Qt.Horizontal,self.brightness_default)
         self.brightness_slider.setMinimum(-100)
         self.brightness_slider.setMaximum(100)
         self.brightness_slider.setValue(0)
@@ -1481,7 +1490,7 @@ class Adjust(QWidget):
         self.brightness_value_label = QLabel(str(self.brightness_slider.value()), self)
 
         self.hue_label = QLabel('Hue:', self)
-        self.hue_slider = QSlider(Qt.Horizontal)
+        self.hue_slider = OGSlider(Qt.Horizontal,self.hue_deafult)
         self.hue_slider.setMinimum(0)
         self.hue_slider.setMaximum(180)
         self.hue_slider.setValue(0)
@@ -1489,7 +1498,7 @@ class Adjust(QWidget):
         self.hue_value_label = QLabel(str(self.hue_slider.value()), self)
 
         self.saturation_label = QLabel('saturation:', self)
-        self.saturation_slider = QSlider(Qt.Horizontal)
+        self.saturation_slider = OGSlider(Qt.Horizontal,self.saturation_default)
         self.saturation_slider.setMinimum(-100)
         self.saturation_slider.setMaximum(100)
         self.saturation_slider.setValue(0)
