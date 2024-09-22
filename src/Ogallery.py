@@ -1092,8 +1092,31 @@ class ImageViewer(QWidget):
         self.colors_transformation_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
 
     
-    def change_brightness(self,brightness_offset):       
-        self.colors_transformation_image = cv2.add(self.colors_transformation_image, brightness_offset)
+
+    def change_brightness(self, brightness_offset):
+        # Ensure brightness_offset is within the -100 to 100 range
+        brightness_offset = max(-100, min(100, brightness_offset))
+        
+        # Convert brightness_offset to a factor
+        # Map -100 to 0.5, 0 to 1.0, and 100 to 1.5
+        brightness_factor = 1 + (brightness_offset / 200)
+
+        # Convert the image to LAB color space
+        lab = cv2.cvtColor(self.colors_transformation_image, cv2.COLOR_BGR2LAB)
+
+        # Split the LAB image into L, A, and B channels
+        l, a, b = cv2.split(lab)
+
+        # Apply the brightness adjustment to the L channel
+        l = np.clip(l.astype(float) * brightness_factor, 0, 255).astype(np.uint8)
+
+        # Merge the color channels
+        adjusted_lab = cv2.merge((l, a, b))
+
+        # Convert the LAB image back to BGR color space
+        self.colors_transformation_image = cv2.cvtColor(adjusted_lab, cv2.COLOR_LAB2BGR)
+
+
         
         
         
@@ -1103,12 +1126,18 @@ class ImageViewer(QWidget):
         else:
             image_path = self.image_files[self.current_index]
             self.colors_transformation_image = cv2.imread(image_path)
-                
-        self.change_contrast(contrast_factor)
-        self.change_brightness(brightness_offset)
-        self.changeSaturation(s_shift_value)
-        self.changeHue(shift_value)
+        if contrast_factor!=100:        
+            self.change_contrast(contrast_factor)
+        if brightness_offset!=0:
+            self.change_brightness(brightness_offset)
+        if s_shift_value !=0:
+            self.changeSaturation(s_shift_value)
+        if shift_value!=0:
+            self.changeHue(shift_value)
+        
         self.edited_image=self.colors_transformation_image
+        if (contrast_factor,brightness_offset,s_shift_value,shift_value)==(100,0,0,0):
+            self.edited_image=self.edit_history.peek()
         #todo
         #self.edit_history.add(self.edited_image)
         self.show_edited_image()
@@ -1348,7 +1377,7 @@ class ImageViewer(QWidget):
         
         for command, env in commands:
             try:
-                subprocess.run(command, check=True, timeout=5)  # timeout for responsiveness
+                subprocess.run(command, check=True, timeout=3)  # timeout for responsiveness
                 print(f"Opened folder using {env}")
                 return True
             except subprocess.CalledProcessError:
@@ -1453,7 +1482,7 @@ class OGSlider(QSlider):
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.setValue(self.default_value)
-        #super().mouseDoubleClickEvent(event)
+        #super().mouseDoubleClickEvent(event) //this is intentional
 
 
 class Adjust(QWidget):
