@@ -47,7 +47,7 @@ class Model:
         confidences = np.max(predictions, axis=1)
         results = []
         for i, idx in enumerate(classes_indices):
-            if confidences[i] > 0.70:
+            if confidences[i] > 0.75:
                 results.append((pred_files_list[i], self.classes[idx]))
             else:
                 results.append((pred_files_list[i], None))

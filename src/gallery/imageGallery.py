@@ -21,7 +21,7 @@ class ImageGalleryApp(QMainWindow):
         self.initial_batch=12
         self.batch_size =   9  # Number of thumbnails to load per batch
         self.loaded_count =   0  
-        self.scrollbar_threshold =   20  # Scrollbar threshold for loading thumbnails
+        self.scrollbar_threshold =   0  # Scrollbar threshold for loading thumbnails
         self.selected_indices=[]
         st=time.time()
         self.init_ui()
@@ -103,6 +103,7 @@ class ImageGalleryApp(QMainWindow):
             self.loaded_count += 1
 
     def loadNextBatch(self):
+        
         self.backToTopButton.setVisible(True)  # Show the button when scrolling
         self.visiblity_timer.start(3000)  # Start a timer for x seconds to hide the button
         
@@ -112,9 +113,9 @@ class ImageGalleryApp(QMainWindow):
                 if self.loaded_count < len(self.image_files):  # Load only if there's more to load
                     self.thumbnail_widgets[self.loaded_count].load_thumbnail()
                     self.loaded_count += 1
-            self.scrollbar_threshold += 20  # Adjust the threshold by a fixed amount
+            self.scrollbar_threshold += 180  # Adjust the threshold by a fixed amount
 
-            
+        
     def updateThumbnail(self, saved):
         self.edited_index=saved["index"]
         choice=saved["choice"]
@@ -190,7 +191,7 @@ class ImageGalleryApp(QMainWindow):
         thumbnail_widget = self.thumbnail_widgets.pop(thumbnail_index)
         self.grid_layout.removeWidget(thumbnail_widget)
         thumbnail_widget.deleteLater()  # Delete the widget to free up resources
-
+        self.loaded_count -= 1 #offset the pointer because a loaded image is removed and shifted the array
         self.refreshLayout()
     
 
@@ -203,7 +204,7 @@ class ImageGalleryApp(QMainWindow):
             self.image_files.pop(thumbnail_index)
             self.grid_layout.removeWidget(thumbnail_widget)
             thumbnail_widget.deleteLater()  # Delete the widget to free up resources
-    
+            self.loaded_count -= 1  #offset the pointer because a loaded image is removed and shifted the array
         self.refreshLayout()
 
     def keyPressEvent(self, event):
