@@ -741,6 +741,9 @@ class ImageViewer(QWidget):
 
         if event.key()==Qt.Key_I:
             self.showImageInfo()
+
+        if event.key()==Qt.Key_Z:
+            self.undo()
             
         if event.key()==Qt.Key_F1:
             help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
