@@ -749,7 +749,7 @@ class ImageViewer(QWidget):
             self.undo()
             
         if event.key()==Qt.Key_F1:
-            help_page = 'https://mgama1.github.io/Ogallery/page/guide.html'
+            help_page = 'https://ogalleryapp.github.io/page/guide.html'
             QDesktopServices.openUrl(QUrl(help_page))
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.applyCrop()
@@ -1475,7 +1475,7 @@ class InfoWidget(QWidget):
         footer_layout.addWidget(authors_button)
 
         website_button = QPushButton('Website', self)
-        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://mgama1.github.io/Ogallery/')))
+        website_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://ogalleryapp.github.io/')))
         footer_layout.addWidget(website_button)
         footer_buttons=[about_button,authors_button,website_button]
         layout.addLayout(footer_layout)
