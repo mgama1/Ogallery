@@ -665,6 +665,9 @@ class ImageViewer(QWidget):
         try:
             self.scene.clear()
             pixmap = QPixmap(self.convert_cv_image_to_qpixmap(self.edited_image))
+            image_size = pixmap.size()
+            self.image_width = image_size.width()
+            self.image_height = image_size.height()
             self.pixmap_item = QGraphicsPixmapItem(pixmap)
             self.scene.addItem(self.pixmap_item)
             self.scene.setSceneRect(self.pixmap_item.boundingRect())
@@ -1235,13 +1238,15 @@ class ImageViewer(QWidget):
         
         
     def undo(self):
+        #in case crop is initalized but not finalized
+        self.cleanCrop()
+
         if self.edit_history.count>1:
             self.edit_history.pop()
             self.edited_image=self.edit_history.peek()
             self.show_edited_image()
         else:
-                self.edited_image=None
-                self.edit_history.clear()
+                self.purge()
                 self.show_image() 
     def checkZeroDisplacement(self):
         """
@@ -1280,9 +1285,18 @@ class ImageViewer(QWidget):
         """
         self.edited_image=None
         self.edit_history.clear()
+        #in case crop is initalized but not finalized
+        self.cleanCrop()
+        
+        
         self.scene.clear()
         gc.collect()
-        
+    def cleanCrop(self):
+        if hasattr(self, 'crop_rect'):
+            self.rightBrowse.setVisible(True)
+            self.leftBrowse.setVisible(True)
+            delattr(self,'crop_rect')
+
     def save_image(self):
         if not self.checkZeroDisplacement():
             img_path=self.image_files[self.current_index]
