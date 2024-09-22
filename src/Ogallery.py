@@ -824,7 +824,7 @@ class ImageViewer(QWidget):
     def adjust(self):
         try:
             self.adjust_instance = Adjust(self)
-            self.adjust_instance.show()
+            self.adjust_instance.exec_()
         except Exception as e:
             print(f"Error adjusting image: {e}")
 
@@ -1142,7 +1142,10 @@ class ImageViewer(QWidget):
         #self.edit_history.add(self.edited_image)
         self.show_edited_image()
         
-           
+    def finalizeAdjust(self):
+        if self.edited_image is not None:
+            self.edit_history.add(self.edited_image)
+
     
     def blurBackground(self):
         import rembg
@@ -1485,7 +1488,7 @@ class OGSlider(QSlider):
         #super().mouseDoubleClickEvent(event) //this is intentional
 
 
-class Adjust(QWidget):
+class Adjust(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
     
@@ -1631,7 +1634,9 @@ class Adjust(QWidget):
             if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
                 self.close()
 
-        
+    def closeEvent(self, event):
+        self.parent().finalizeAdjust()
+        event.accept()
 class CircularButton(QPushButton):
     def __init__(self, color, parent=None):
         super().__init__(parent)
