@@ -71,7 +71,11 @@ pip install -r requirements.txt
 python3 ogallery.py
 ```
 
+Note that AI search may take a while to work after the first use
 
+### Beta Notice
+
+Ogallery is currently in beta. While we've worked hard to ensure stability, you may encounter bugs or incomplete features. We appreciate your feedback and patience as we continue to improve the application.
 
 ### License
 
