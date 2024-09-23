@@ -7,7 +7,7 @@ Ogallery is an open-source image gallery application designed to revolutionize t
 ## Website
 Visit the website from ![here](https://ogalleryapp.github.io)
 
-## Explicit list of all the features
+## List of all the features
 
 ### Viewer features:
  - Secure folder
@@ -29,12 +29,12 @@ Visit the website from ![here](https://ogalleryapp.github.io)
  - Revert
  - Undo
  
-
 ### Gallery features:
  - Caching
  - Lazy loading
  - Back to top
  - Select and delete batch
+
 ### search features:
  - Search on common classes
  - Search filenames
@@ -44,7 +44,7 @@ Visit the website from ![here](https://ogalleryapp.github.io)
 
 
 ## installation
-If you wish to run the App in a python virtual environment
+If you wish to run the app in a python virtual environment
 
 1- Install venv (if not already installed)
 
@@ -56,17 +56,17 @@ sudo apt install python3-venv
 ```bash
 python3 -m venv ogalleryenv
 ```
-3-Activate the virtual environment
+3- Activate the virtual environment
 
 ```bash
 source ogalleryenv/bin/activate
 ```
-4-Install dependencies
+4- Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
-5-Finally run the app
+5- Finally run the app
 ```bash
 python3 ogallery.py
 ```
