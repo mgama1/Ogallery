@@ -57,7 +57,7 @@ def get_media_path(media_filename):
     else:
         # Running in a normal Python environment
         basedir = os.path.dirname(os.path.abspath(__file__))
-        config_path = os.path.join(basedir,  media_filename)
+        config_path = os.path.join(basedir, 'media',  media_filename)
     
     if os.path.exists(config_path):
         return config_path
@@ -1791,6 +1791,9 @@ class SettingsWidget(QWidget):
     
     def getImagesPaths(self):
         username = os.getenv('USER')
+        #if not os.path.exists(f'/home/{username}/.cache/OpenGallery'):
+            #os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
                 images_directories = config_file.readlines()
@@ -2145,7 +2148,8 @@ class CornerBasedRectItem(QGraphicsItem):
             'height': int(max(self.y0, self.y1, self.y2, self.y3) - min(self.y0, self.y1, self.y2, self.y3))
         }       
 def run_gui():
-    app = QApplication([])    
+    app = QApplication([])   
+    app.setApplicationName("Ogallery") 
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 1px solid white; }")  
     main_widget = MainWidget()
     app.exec_()

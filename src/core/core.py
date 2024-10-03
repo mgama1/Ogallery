@@ -6,10 +6,22 @@ class ImagesModel():
     def __init__(self):
         self.file_types=['jpg','jpeg','png','gif']
         username = os.getenv('USER')
-        config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
+        if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
+            config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'
 
-        with open(config_file_path, 'r') as config_file:
-            self.images_directories = [line.strip() for line in config_file.readlines() if line.strip()]
+            with open(config_file_path, 'r') as config_file:
+                self.images_directories = [line.strip() for line in config_file.readlines() if line.strip()]
+        
+        elif not os.path.exists(f'/home/{username}/.cache/OpenGallery/'):
+            os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file_path:
+                config_file_path.write('\n')
+            self.images_directories =[]
+        else:
+            with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file_path:
+                config_file_path.write('\n')
+            self.images_directories =[]
+    
     
     def getImagesPaths(self):
         

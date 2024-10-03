@@ -2,15 +2,33 @@ from PIL import Image
 import numpy as np
 from skimage import transform
 import os
+import sys
 import pandas as pd
 from core.core import *
+
+
+def getModelPath(model_name):
+    if getattr(sys, 'frozen', False):
+        # Running in a PyInstaller bundle
+        basedir = sys._MEIPASS
+        #model_path = os.path.join(basedir, 'models', model_name)
+        model_path = os.path.join(basedir, model_name)
+
+    else:
+        # Running in a normal Python environment
+        basedir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(basedir, model_name)
+    
+    return model_path
+    
+
 class Model:
     def __init__(self):
         from tensorflow import keras
 
         self.images_model=ImagesModel()
-        model_path = os.path.join('models', 'ogalleryv2.h5')
-        self.savedModel = keras.models.load_model(model_path)
+        #model_path = os.path.join('models', 'ogalleryv2.h5')
+        self.savedModel = keras.models.load_model(getModelPath('ogalleryv2.h5'))
         self.file_types=['jpg','jpeg','png']
         self.classes=['ID', 'bicycle', 'boat', 'building', 'bus', 'car', 'cat', 'document', 'dog', 'forest', 'glacier', 'helicopter', 'motorcycle', 'mountain', 'plane', 'reciept', 'sea', 'street', 'train', 'truck']
         #spaces before and after words are intentional to avoid retreiving unintentional substring 

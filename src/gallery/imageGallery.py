@@ -17,7 +17,7 @@ def get_config_path(config_filename):
         config_path = os.path.join(basedir, 'config', config_filename)
     else:
         # Running in a normal Python environment
-        basedir = os.path.dirname(os.path.abspath(__file__))
+        basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         config_path = os.path.join(basedir, 'config', config_filename)
     
     if os.path.exists(config_path):
