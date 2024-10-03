@@ -1,22 +1,25 @@
 import time
+import os
+import sys
 s=time.time()
+os.environ['QT_API'] = 'pyqt5'
 import threading
 import yaml
 from pyzbar.pyzbar import decode as decodeqr
 import multiprocessing
-import os
 import gc
 import subprocess
 
 from PIL import Image
-
-import qtawesome as qta
-
-from PyQt5.QtWidgets import *
-
 from PyQt5.QtGui import QPixmap,QImage,QIcon,QCursor,QDesktopServices,QColor,QPainterPath,QPen,QFont,QBrush,QTransform
 from PyQt5.QtCore import Qt,pyqtSignal,QTimer,QStringListModel,QObject,QEvent,QUrl,QRectF,QPointF
 from PyQt5.QtCore import pyqtSlot
+
+from PyQt5.QtWidgets import *
+
+
+import qtawesome as qta
+
 from itertools import chain
 
 
@@ -27,10 +30,42 @@ from itertools import chain
 from gallery.imageGallery import ImageGalleryApp
 from gallery.imageThumbnail import ImageThumbnailWidget
 from custom import *
-from core import *
-from vault import SecureFolder
+from core.core import *
+from core.vault import SecureFolder
 
 
+def get_config_path(config_filename):
+    if getattr(sys, 'frozen', False):
+        # Running in a PyInstaller bundle
+        basedir = sys._MEIPASS
+        config_path = os.path.join(basedir, 'config', config_filename)
+    else:
+        # Running in a normal Python environment
+        basedir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(basedir, 'config', config_filename)
+    
+    if os.path.exists(config_path):
+        return config_path
+    
+    # If not found, raise an error
+    raise FileNotFoundError(f"Config file not found at {config_path}")
+def get_media_path(media_filename):
+    if getattr(sys, 'frozen', False):
+        # Running in a PyInstaller bundle
+        basedir = sys._MEIPASS
+        config_path = os.path.join(basedir, 'media', media_filename)
+    else:
+        # Running in a normal Python environment
+        basedir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(basedir,  media_filename)
+    
+    if os.path.exists(config_path):
+        return config_path
+    
+    # If not found, raise an error
+    raise FileNotFoundError(f"Config file not found at {config_path}")
+
+#basedir = os.path.dirname(__file__)
 print(time.time()-s)
 
 
@@ -39,7 +74,7 @@ class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
 
         
@@ -67,7 +102,7 @@ class MainWidget(QWidget):
 
         
         
-        with open('./config/classes_synonyms.yaml', 'r') as file:
+        with open(get_config_path('classes_synonyms.yaml'), 'r') as file:
             classes_synonyms = yaml.safe_load(file)
         # Flatten keys and values of model.classes_synonyms
         self.classes_plus = chain(classes_synonyms.keys(), classes_synonyms.values())
@@ -75,9 +110,9 @@ class MainWidget(QWidget):
         self.classes_plus = [item.strip().replace("q_",'') for cls in self.classes_plus for item in cls.split(',') if item.strip()] 
         
 
-        self.setWindowIcon(QIcon('media/iconc.ico'))
+        self.setWindowIcon(QIcon(get_media_path('iconc.ico')))
         
-        config_file_path = 'config/config.yaml'
+        config_file_path = get_config_path('config.yaml')
         if not os.path.exists(config_file_path):
             with open(config_file_path, 'w') as file:
                 initial_data = {'style_color': '#8c40d4'}
@@ -199,7 +234,7 @@ class MainWidget(QWidget):
         
         
         color=self.config_data["style_color"]
-        pixmap = QPixmap(f'media/{color}.png')
+        pixmap = QPixmap(get_media_path(f'{color}.png'))
         
             
         self.background_label = QLabel(self)
@@ -208,7 +243,7 @@ class MainWidget(QWidget):
         self.background_label.setGeometry(0, 0, self.width(), self.height())
 
     def updateBackground(self,color):
-        pixmap = QPixmap(f'media/{color}.png')
+        pixmap = QPixmap(get_media_path(f'{color}.png'))
         self.background_label.setPixmap(pixmap)
         self.search_button.setIconHover(qta.icon('fa.search',color=color,scale_factor=1.1))
         self.info_button.setIconHover(qta.icon('ei.info-circle',color=color))
@@ -285,17 +320,18 @@ class MainWidget(QWidget):
                     self.showErrorMessage("Forgetting something?")
                     return 0
         self.queryText=self.suggestClasses(self.queryText)
-        
-            
-        db=pd.read_csv("db.csv")
         self.result=[]
-        self.filtered_classes=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
-        #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
-        #instead of continously checking and updating. we only check and update upon search
-        for filePath in self.filtered_classes:
-            if os.path.exists(filePath):
-                self.result.append(filePath)
-
+        
+        try:   
+            db=pd.read_csv("db.csv")
+            self.filtered_classes=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
+            #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
+            #instead of continously checking and updating. we only check and update upon search
+            for filePath in self.filtered_classes:
+                if os.path.exists(filePath):
+                    self.result.append(filePath)
+        except:
+            print("no csv for now")
         # file names pattern matching
         images_model=ImagesModel()
         for images_dir in images_model.images_directories:
@@ -396,7 +432,7 @@ class MainWidget(QWidget):
             None
         """
         msg_box = InfoMessageBox()
-        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        pixmap = QPixmap(get_media_path('warning.png')).scaledToWidth(150)
         msg_box.setIconPixmap(pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
@@ -422,7 +458,7 @@ class ImageViewer(QWidget):
         self.secure_mode=secure_mode
         self.main_widget = main_widget  
         self.NAVBUTTONWIDTH=60
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.current_index = main_widget.images.index(image_path)
         self.image_files = self.main_widget.images
@@ -847,7 +883,7 @@ class ImageViewer(QWidget):
         file_size=self.format_file_size(os.path.getsize(img_path))
         type = (os.path.splitext(img_path)[-1][1:]).upper()
         msg_box = InfoMessageBox()
-        pixmap = QPixmap('media/info.png').scaledToWidth(150)
+        pixmap = QPixmap(get_media_path('info.png')).scaledToWidth(150)
         msg_box.setIconPixmap(pixmap)
         msg=f"size: {self.image_width}x{self.image_height} pixels \nfile size: {file_size}\ntype: {type}"
         msg_box.setText(msg)
@@ -1375,7 +1411,7 @@ class ImageViewer(QWidget):
             None
         '''
         msg_box = InfoMessageBox()
-        pixmap = QPixmap('media/warning.png').scaledToWidth(150)
+        pixmap = QPixmap(get_media_path('warning.png')).scaledToWidth(150)
         msg_box.setIconPixmap(pixmap)
         msg_box.setText(msg)
         msg_box.setWindowTitle('Warning')
@@ -1429,7 +1465,7 @@ class InfoWidget(QWidget):
         this info widget is only for app description and information not error messages and what not
         '''
         super().__init__()
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.setStyleSheet(f"background-color: {self.config_data['background']};color:white;"
                           )
@@ -1445,7 +1481,7 @@ class InfoWidget(QWidget):
 
         # Image Label
         image_label = QLabel(self)
-        pixmap = QPixmap('media/info.png').scaledToWidth(150)
+        pixmap = QPixmap(get_media_path('info.png')).scaledToWidth(150)
         image_label.setPixmap(pixmap)
         image_label.setMaximumWidth(150)
         horizontal_layout.addWidget(image_label)
@@ -1672,7 +1708,7 @@ class SettingsWidget(QWidget):
     colorChanged=pyqtSignal(str)
     def __init__(self):
         super().__init__()
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
             
         self.init_ui()
@@ -1740,7 +1776,7 @@ class SettingsWidget(QWidget):
         self.setLayout(layout)
 
     def setStyleColor(self,color):
-        config_file_path = 'config/config.yaml'
+        config_file_path = get_config_path('config.yaml')
         with open(config_file_path, 'r') as file:
             self.config_data = yaml.safe_load(file)
             
@@ -1818,7 +1854,7 @@ class Menu(QObject):
     def __init__(self, graphics_view):
         super().__init__()
         self.opened_menu = None
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.graphics_view = graphics_view
 

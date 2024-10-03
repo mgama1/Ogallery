@@ -5,13 +5,32 @@ from PyQt5.QtCore import Qt,QTimer,pyqtSignal
 import yaml
 import time
 import os
+import sys
+
 from .imageThumbnail import ImageThumbnailWidget
+#basedir = os.path.dirname(__file__)
+
+def get_config_path(config_filename):
+    if getattr(sys, 'frozen', False):
+        # Running in a PyInstaller bundle
+        basedir = sys._MEIPASS
+        config_path = os.path.join(basedir, 'config', config_filename)
+    else:
+        # Running in a normal Python environment
+        basedir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(basedir, 'config', config_filename)
+    
+    if os.path.exists(config_path):
+        return config_path
+    
+    # If not found, raise an error
+    raise FileNotFoundError(f"Config file not found at {config_path}")
 
 class ImageGalleryApp(QMainWindow):
     finishedSignal = pyqtSignal()
     def __init__(self,main_widget,secure_mode=False):
         super().__init__()
-        with open('config/config.yaml', 'r') as file:
+        with open(get_config_path('config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.secure_mode=secure_mode
         self.main_widget = main_widget  # Keep a reference to MainWidget 

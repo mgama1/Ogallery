@@ -1,4 +1,6 @@
 src/ogalleryenv/
+src/build/
+src/dist/
 src/ogenv/
 src/OGallery.ipynb
 src/.ipynb_checkpoints/

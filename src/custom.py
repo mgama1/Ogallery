@@ -8,12 +8,13 @@ import yaml
 
 import cv2
 
+basedir = os.path.dirname(__file__)
 
         
 class SavingMessageBox(QMessageBox):
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        with open('config/config.yaml', 'r') as file:
+        with open(os.path.join(basedir,'config/config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
 
         self.image_path=image_path
@@ -54,7 +55,7 @@ class InfoMessageBox(QMessageBox):
     def __init__(self,*args, **kwargs):
         super(InfoMessageBox, self).__init__(*args, **kwargs)
         try:
-            with open('config/config.yaml', 'r') as file:
+            with open(os.path.join(basedir,'config/config.yaml'), 'r') as file:
                 self.config_data = yaml.safe_load(file)
             self.OK_button = QPushButton("OK")
             #self.OK_button.setFocusPolicy(Qt.NoFocus)
@@ -70,7 +71,7 @@ class SaveDiscardMessageBox(QMessageBox):
     revert_signal=pyqtSignal()
     def __init__(self, image_path, edited_image, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        with open('config/config.yaml', 'r') as file:
+        with open(os.path.join(basedir,'config/config.yaml'), 'r') as file:
             self.config_data = yaml.safe_load(file)
         self.image_path=image_path
         self.edited_image=edited_image
@@ -130,7 +131,7 @@ class CustomDialog(QDialog):
 
         try:
             # Load colors from config file
-            with open('config/config.yaml', 'r') as file:
+            with open(os.path.join(basedir,'config/config.yaml'), 'r') as file:
                 self.config_data = yaml.safe_load(file)
 
             # Set window title

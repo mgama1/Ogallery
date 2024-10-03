@@ -3,7 +3,7 @@ import numpy as np
 from skimage import transform
 import os
 import pandas as pd
-from core import *
+from core.core import *
 class Model:
     def __init__(self):
         from tensorflow import keras
