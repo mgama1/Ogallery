@@ -1,21 +1,22 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
+#import sys ; sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 block_cipher = None
 
 
 a = Analysis(['ogallery_main.py'],
-             pathex=['/home/mgama1/ogallery_env/lib/python3.10/site-packages'],
+             pathex=['/home/mgama1/ogalleryenv/lib/python3.10/site-packages'],
              binaries=[],
              datas=[('config', 'config'),('core','core'),('custom.py','.'),('gallery','gallery'),('media','media'),('models','models')],
              hiddenimports=['pyzbar','cv2','numpy','pandas','Levenshtein',
                             'PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets',
                             'PyQt5.sip',
-                            'qtpy', 'qtawesome'],
+                            'qtpy', 'qtawesome','tensorflow.keras'],
+                            
              hookspath=[],
              hooksconfig={},
              runtime_hooks=[],
-             excludes=[],
+             excludes=['libprotobuf23'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,

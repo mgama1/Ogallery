@@ -11,14 +11,14 @@ def get_config_path(config_filename):
     if getattr(sys, 'frozen', False):
         # Running in a PyInstaller bundle
         basedir = sys._MEIPASS
-        print(f"basedir:{basedir}")
+        #print(f"basedir:{basedir}")
     else:
         # Running in a normal Python environment
         basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        print(f"basedir:{basedir}")
+        #print(f"basedir:{basedir}")
 
     config_path = os.path.join(basedir, 'config', config_filename)
-    print(f"config_path:{config_path}")    
+    #print(f"config_path:{config_path}")    
     return config_path
     
 
