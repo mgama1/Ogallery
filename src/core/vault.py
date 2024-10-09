@@ -11,27 +11,16 @@ from datetime import datetime
 
 
 
-def get_config_path(config_filename):
-    if getattr(sys, 'frozen', False):
-        # Running in a PyInstaller bundle
-        basedir = sys._MEIPASS
-        #print(f"basedir:{basedir}")
-    else:
-        # Running in a normal Python environment
-        basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        #print(f"basedir:{basedir}")
-
-    config_path = os.path.join(basedir, 'config', config_filename)
-    #print(f"config_path:{config_path}")    
-    return config_path
-    
 
 
 
 class SecureFolder():
     def __init__(self):
         self.username = os.getenv('USER')
-        
+        if not os.path.exists(f"/home/{os.getenv('USER')}/.config/OpenGallery/"):
+            os.makedirs(f"/home/{os.getenv('USER')}/.config/OpenGallery/")
+        self.config_path=f"/home/{self.username}/.config/OpenGallery/"
+
     def logError(self,error_msg):
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(f'/home/{self.username}/.cache/OpenGallery/error.log', 'a') as error_log:
@@ -39,7 +28,7 @@ class SecureFolder():
 
     def hasExistingPassword(self):
         try:
-            with open(get_config_path("encrypted_master_key.key"), "rb") as file:
+            with open(f"{self.config_path}encrypted_master_key.key", "rb") as file:
                 file.read()
                 return True
              
@@ -56,13 +45,13 @@ class SecureFolder():
             
         """
         salt=secrets.token_bytes(size)
-        with open(get_config_path("salt.salt"), "wb") as salt_file:
+        with open(f"{self.config_path}salt.salt", "wb") as salt_file:
                 salt_file.write(salt)
         return salt
     
     def load_salt(self):
         try:
-            with open(get_config_path("salt.salt"), "rb") as file:
+            with open(f"{self.config_path}salt.salt", "rb") as file:
                 return file.read()
         except:
             return None
@@ -77,7 +66,7 @@ class SecureFolder():
         master_key = secrets.token_bytes(32)  # 256-bit key
         master_key_encoded= base64.urlsafe_b64encode(master_key)
         encrypted_master_key = Fernet(self.get_key()).encrypt(master_key_encoded)
-        with open(get_config_path("encrypted_master_key.key"), "wb") as file:
+        with open(f"{self.config_path}encrypted_master_key.key", "wb") as file:
             file.write(encrypted_master_key)
 
 
@@ -88,7 +77,7 @@ class SecureFolder():
         
         self.password=password
         try:
-            with open(get_config_path("encrypted_master_key.key"), "rb") as file:
+            with open(f"{self.config_path}encrypted_master_key.key", "rb") as file:
                 encrypted_master_key = file.read()
             master_key=Fernet(self.get_key()).decrypt(encrypted_master_key)
             if master_key:
@@ -107,7 +96,7 @@ class SecureFolder():
             The decrypted master key
         """
         try:
-            with open(get_config_path("encrypted_master_key.key"), "rb") as file:
+            with open(f"{self.config_path}encrypted_master_key.key", "rb") as file:
                 encrypted_master_key = file.read()
             return Fernet(self.get_key()).decrypt(encrypted_master_key)
         except FileNotFoundError:

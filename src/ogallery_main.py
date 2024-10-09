@@ -111,12 +111,22 @@ class MainWidget(QWidget):
         
 
         self.setWindowIcon(QIcon(get_media_path('iconc.ico')))
-        
+
+        if not os.path.exists(f"/home/{os.getenv('USER')}/.config/OpenGallery/"):
+            os.makedirs(f"/home/{os.getenv('USER')}/.config/OpenGallery/")
+
         config_file_path = get_config_path('config.yaml')
-        if not os.path.exists(config_file_path):
-            with open(config_file_path, 'w') as file:
-                initial_data = {'style_color': '#8c40d4'}
-                yaml.dump(initial_data, file)
+        dynamic_config_path=f"/home/{os.getenv('USER')}/.config/OpenGallery/config.yaml"
+        
+        
+        if not os.path.exists(dynamic_config_path):
+            with open(dynamic_config_path, 'w') as file:
+                style_color = {'style_color': '#8c40d4'}
+                yaml.dump(style_color, file)
+        
+        with open(dynamic_config_path, 'r') as file:
+            self.dynamic_config_data = yaml.safe_load(file)
+
         with open(config_file_path, 'r') as file:
             self.config_data = yaml.safe_load(file)
         
@@ -215,17 +225,17 @@ class MainWidget(QWidget):
         #icons
         
         self.search_button.setIconNormal(qta.icon('fa.search',color='#212121',scale_factor=1.1))
-        self.search_button.setIconHover(qta.icon('fa.search',color=self.config_data["style_color"],scale_factor=1.1))
+        self.search_button.setIconHover(qta.icon('fa.search',color=self.dynamic_config_data["style_color"],scale_factor=1.1))
         
         self.info_button.setIconNormal(qta.icon('ei.info-circle',color=self.config_data['foreground']))
-        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.config_data["style_color"]))
+        self.info_button.setIconHover(qta.icon('ei.info-circle',color=self.dynamic_config_data["style_color"]))
         
         
         self.settings_button.setIconNormal(qta.icon('fa.cog',color=self.config_data['foreground']))
-        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.config_data["style_color"]))
+        self.settings_button.setIconHover(qta.icon('fa.cogs',color=self.dynamic_config_data["style_color"]))
         
         self.gallery_button.setIconNormal(qta.icon('mdi.folder-image',color=self.config_data['foreground']))
-        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.config_data["style_color"]))
+        self.gallery_button.setIconHover(qta.icon('mdi.folder-image',color=self.dynamic_config_data["style_color"]))
      
         self.show()
 
@@ -233,7 +243,7 @@ class MainWidget(QWidget):
     def loadBackground(self):
         
         
-        color=self.config_data["style_color"]
+        color=self.dynamic_config_data["style_color"]
         pixmap = QPixmap(get_media_path(f'{color}.png'))
         
             
@@ -1782,23 +1792,24 @@ class SettingsWidget(QWidget):
         self.setLayout(layout)
 
     def setStyleColor(self,color):
-        config_file_path = get_config_path('config.yaml')
-        with open(config_file_path, 'r') as file:
-            self.config_data = yaml.safe_load(file)
-            
-        self.config_data['style_color'] = color
+        dynamic_config_path=f"/home/{os.getenv('USER')}/.config/OpenGallery/config.yaml"
         
-        with open(config_file_path, 'w') as file:
-            yaml.dump(self.config_data, file)
+        with open(dynamic_config_path, 'r') as file:
+            self.dynamic_config_data = yaml.safe_load(file)      
+            
+        self.dynamic_config_data['style_color'] = color
+        
+        with open(dynamic_config_path, 'w') as file:
+            yaml.dump(self.dynamic_config_data, file)
         self.colorChanged.emit(color)
+    
     def clearBorders(self):
         for button in self.colors_buttons:
             button.setStyleSheet(button.styleSheet().replace("border: 2px solid white;", ""))
     
     def getImagesPaths(self):
         username = os.getenv('USER')
-        #if not os.path.exists(f'/home/{username}/.cache/OpenGallery'):
-            #os.makedirs(f'/home/{username}/.cache/OpenGallery/')
+        images_directories = []  # Initialize with an empty list
 
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'r') as config_file:
@@ -1807,7 +1818,6 @@ class SettingsWidget(QWidget):
             os.makedirs(f'/home/{username}/.cache/OpenGallery/')
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
                 config_file.write('\n')
-        
         else:
             with open(f'/home/{username}/.cache/OpenGallery/config.log', 'w') as config_file:
                 config_file.write('\n')
