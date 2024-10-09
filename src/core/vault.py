@@ -7,6 +7,10 @@ import base64
 import getpass
 from pathlib import Path
 import sys
+from datetime import datetime
+
+
+
 def get_config_path(config_filename):
     if getattr(sys, 'frozen', False):
         # Running in a PyInstaller bundle
@@ -26,8 +30,13 @@ def get_config_path(config_filename):
 
 class SecureFolder():
     def __init__(self):
-        pass
+        self.username = os.getenv('USER')
         
+    def logError(self,error_msg):
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(f'/home/{self.username}/.cache/OpenGallery/error.log', 'a') as error_log:
+            error_log.write(f"{current_time}: {error_msg}\n")    
+
     def hasExistingPassword(self):
         try:
             with open(get_config_path("encrypted_master_key.key"), "rb") as file:
@@ -87,10 +96,8 @@ class SecureFolder():
              
         except FileNotFoundError:
             #there is no existing master key so this is the first use
-            #print("password has been set!")
             return False
         except cryptography.fernet.InvalidToken:
-            #print("password is incorrect")
             return False
         
     def get_master_key(self):
@@ -171,7 +178,7 @@ class SecureFolder():
             try:
                 decrypted_data = f.decrypt(encrypted_data)
             except cryptography.fernet.InvalidToken:
-                print("Invalid token, most likely the password is incorrect")
+                self.logError("Invalid token, most likely the password is incorrect")
                 return
             
             decrypted_filename = Path(filename)
@@ -184,7 +191,7 @@ class SecureFolder():
             try:
                 os.remove(filename)
             except:
-                print("couldn't delete encrypted file")
+                self.logError("couldn't delete encrypted file")
             
             return orig_name
         return 0
@@ -193,8 +200,6 @@ class SecureFolder():
 
 
     def closeLockedFolder(self,decrypted_images,password):
-        print(decrypted_images)
         for decrypted_file in decrypted_images:
             self.encrypt(decrypted_file,password)
         decrypted_images.clear()
-        print("all encrypted again")

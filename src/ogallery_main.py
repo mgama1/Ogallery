@@ -994,8 +994,14 @@ class ImageViewer(QWidget):
             if self.secure_folder.validate_password(self.password):
                 for decrypted_file in secure_files:
                     decrypted_file_path=self.secure_folder.decrypt(decrypted_file,self.password)
-                    self.decrypted_files.append(str(decrypted_file_path))
-                
+                    if decrypted_file_path is not None:
+                        self.decrypted_files.append(str(decrypted_file_path))
+                if len(self.decrypted_files)<1:
+                    #this is the rare case that the password is correct but decryption still failed
+                    #this happens when there are decrypted files by another password or salt
+                    self.showErrorMessage("Locked folder is empty!")
+                    return 0
+
                 self.close()
                 self.main_widget.openLockedFolderGallery(self.decrypted_files,self.password)
             
