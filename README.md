@@ -5,7 +5,7 @@ Ogallery is an open-source image gallery application designed to revolutionize t
 ![image](https://github.com/user-attachments/assets/50b261f9-c025-4c53-80aa-e6197499c0ef)
 
 ## Website
-Visit the website from ![here](https://ogalleryapp.github.io/)
+Visit the website from [here](https://ogalleryapp.github.io/)
 
 ## List of all the features
 
