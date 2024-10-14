@@ -41,11 +41,15 @@ class Model:
 
 
     def predict_batch(self,files_list):
-        if not os.path.exists("./db.csv"):
+        if not os.path.exists(f"/home/{os.getenv('USER')}/.config/OpenGallery/"):
+            os.makedirs(f"/home/{os.getenv('USER')}/.config/OpenGallery/")
+        
+        config_path=f"/home/{os.getenv('USER')}/.config/OpenGallery/"
+        if not os.path.exists(f"{config_path}db.csv"):
             self.db = pd.DataFrame(columns=['directory', 'class',"synonyms"])
-            self.db.to_csv('db.csv', index=False)
+            self.db.to_csv(f'{config_path}db.csv', index=False)
 
-        self.db=pd.read_csv("db.csv")
+        self.db=pd.read_csv(f"{config_path}db.csv")
         
         images_list = []
         pred_files_list=[]
@@ -88,6 +92,6 @@ class Model:
             else:
                 new_row = {"directory":filename,"class":"q_"+prediction.lower(),"synonyms":self.classes_synonyms[prediction]}
                 self.db=pd.concat([self.db, pd.DataFrame([new_row])], ignore_index=True)
-
-        self.db.to_csv("db.csv",index=False)
+        config_path=f"/home/{os.getenv('USER')}/.config/OpenGallery/"
+        self.db.to_csv(f"{config_path}db.csv",index=False)
 

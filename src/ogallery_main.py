@@ -332,8 +332,10 @@ class MainWidget(QWidget):
         self.queryText=self.suggestClasses(self.queryText)
         self.result=[]
         
-        try:   
-            db=pd.read_csv("db.csv")
+        try:
+            config_path=f"/home/{os.getenv('USER')}/.config/OpenGallery/"
+   
+            db=pd.read_csv(f"{config_path}db.csv")
             self.filtered_classes=db[db["class"].str.contains("q_"+self.queryText) | db["synonyms"].str.contains("q_"+self.queryText) ]["directory"].to_list()
             #Not every file in the csv still exists. some are deleted; whether from ogallery or externally
             #instead of continously checking and updating. we only check and update upon search

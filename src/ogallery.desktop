@@ -1,0 +1,20 @@
+[Desktop Entry]
+
+# The type of the thing this desktop file refers to (e.g. can be Link)
+Type=Application
+
+# The application name.
+Name=ogallery
+
+# Tooltip comment to show in menus.
+Comment=open source gallery app
+
+# The path (folder) in which the executable is run
+Path=/opt/ogallery
+
+# The executable (can include arguments)
+Exec=/opt/ogallery/ogallery
+
+# The icon for the entry, using the name from `hicolor/scalable` without the extension.
+# You can also use a full path to a file in /opt.
+Icon=ogallery_icon256

@@ -59,7 +59,30 @@ class ImageGalleryApp(QMainWindow):
         scroll_area.setWidgetResizable(True)
         scroll_content = QWidget()
         scroll_area.setWidget(scroll_content)
+        scroll_area.setStyleSheet("""
+            QScrollBar:vertical {
+                background-color: #212121; /* Background of the scrollbar */
+                width: 16px; /* Width of the scrollbar */
+                margin: 16px 0 16px 0; /* Top, right, bottom, left margins */
+                border-radius: 5px; /* Rounded corners */
+            }
 
+            QScrollBar::handle:vertical {
+                background-color: #888888; /* Scrollbar handle color */
+                min-height: 20px; /* Minimum height of the handle */
+                border-radius: 5px;
+            }
+
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                background-color: #1a1a1a; /* Color of the buttons at the ends */
+                height: 16px;
+                border-radius: 5px;
+            }
+
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none; /* Area above/below the handle */
+            }
+        """)
         # Create the grid layout and add it to the scroll content
         self.grid_layout = QGridLayout()
         scroll_content.setLayout(self.grid_layout)
@@ -110,7 +133,7 @@ class ImageGalleryApp(QMainWindow):
         self.scroll.valueChanged.connect(self.loadNextBatch)
         #go back to Top
         self.backToTopButton.clicked.connect(lambda:self.scroll.setValue(0))
-
+        
         self.setGeometry(300, 100, 800, 650)
         self.setWindowTitle('OGallery')
         self.show()
