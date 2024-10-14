@@ -17,6 +17,7 @@ Visit the website from [here](https://ogalleryapp.github.io/)
  - Move to trash
  - QR-Code scan
  - Image properties
+ - Zooming & Panning
    
 ### Editing features:
  - Adjust (Contrast, Brightness, Saturation, Hue)
