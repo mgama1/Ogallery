@@ -477,6 +477,7 @@ class ImageViewer(QWidget):
         
         self.edit_history=CircularBuffer(10)
         self.fullscreen = False
+        self.slideshow=False
         self.edited_image=None
         self.init_ui()
         
@@ -723,7 +724,22 @@ class ImageViewer(QWidget):
         except:
             self.show_image()
 
-        
+    def startSlideShow(self):
+        if not self.slideshow:
+            self.slideshow=True
+            if not self.fullscreen:
+                self.toggleFullScreen()
+            self.ss_timer = QTimer(self)
+            self.ss_timer.timeout.connect(self.next_image)
+            self.ss_timer.start(3000)
+
+    def stopSlideShow(self):
+        if self.slideshow:
+            self.ss_timer.stop()
+            self.slideshow=False
+            if self.fullscreen:
+                self.toggleFullScreen()
+
     def handle_timeout(self):
         if self.image_files:
             image_path = self.image_files[self.current_index]
@@ -775,6 +791,7 @@ class ImageViewer(QWidget):
         if (event.key() == Qt.Key_Backspace) or (event.key() == Qt.Key_Escape):
             if self.fullscreen:
                 self.toggleFullScreen()
+                self.stopSlideShow()
             else:
                 self.close()
         
@@ -786,7 +803,7 @@ class ImageViewer(QWidget):
             
         if (event.key()==Qt.Key_F) or (event.key()==Qt.Key_F11):
             self.toggleFullScreen()
-        
+            self.stopSlideShow()
         if event.key()==Qt.Key_C:
             self.copyToClipboard()
 
@@ -801,7 +818,10 @@ class ImageViewer(QWidget):
             QDesktopServices.openUrl(QUrl(help_page))
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.applyCrop()
-        
+        if event.key()==Qt.Key_D:
+            self.startSlideShow()
+        if event.key()!=Qt.Key_D:
+            self.stopSlideShow()
         
         super().keyPressEvent(event)
     
@@ -810,6 +830,7 @@ class ImageViewer(QWidget):
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.toggleFullScreen()
+            self.stopSlideShow()
             
     def toggleFullScreen(self):
         self.toggleButtonsVisibility(self.editing_buttons)

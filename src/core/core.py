@@ -4,7 +4,7 @@ import fnmatch
 
 class ImagesModel():
     def __init__(self):
-        self.file_types=['jpg','jpeg','png','gif']
+        self.file_types=['jpg','jpeg','png','gif','webp']
         username = os.getenv('USER')
         if os.path.exists(f'/home/{username}/.cache/OpenGallery/config.log'):
             config_file_path = f'/home/{username}/.cache/OpenGallery/config.log'

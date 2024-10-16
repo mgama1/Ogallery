@@ -62,7 +62,7 @@ class ImageGalleryApp(QMainWindow):
         scroll_area.setStyleSheet("""
             QScrollBar:vertical {
                 background-color: #212121; /* Background of the scrollbar */
-                width: 16px; /* Width of the scrollbar */
+                width: 12px; /* Width of the scrollbar */
                 margin: 16px 0 16px 0; /* Top, right, bottom, left margins */
                 border-radius: 5px; /* Rounded corners */
             }
